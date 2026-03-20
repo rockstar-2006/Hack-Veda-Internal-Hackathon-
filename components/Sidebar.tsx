@@ -141,21 +141,7 @@ export const Sidebar = ({ onClose, announcementCount = 1 }: { onClose?: () => vo
                 </>
            )}
 
-           <div className="pt-16 border-t border-gray-50 mt-16">
-               <div className="flex items-center justify-between px-6 mb-10 italic">
-                   <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.4em]">Administrative</p>
-               </div>
-               <Link 
-                    href={isAdmin ? "/dashboard" : "/admin/login"}
-                    onClick={onClose}
-                    className={`group flex items-center gap-5 px-6 py-5 rounded-[2rem] transition-all duration-500 ${isAdmin ? 'text-indigo-600 bg-indigo-50 border-2 border-indigo-100' : 'text-gray-400 border-2 border-transparent hover:border-indigo-100 hover:bg-indigo-50 hover:text-indigo-600'}`}
-                >
-                    <div className={`w-8 h-8 flex items-center justify-center rounded-xl transition-all duration-500 ${isAdmin ? 'bg-indigo-600 text-white' : 'bg-gray-100 group-hover:bg-indigo-600 group-hover:text-white'}`}>
-                        <ShieldCheck className="w-5 h-5" />
-                    </div>
-                    <span className="font-black tracking-widest text-[10px] uppercase italic">{isAdmin ? "Secure Terminal" : "Admin Portal"}</span>
-                </Link>
-           </div>
+           {/* The Administrative section was removed from here. */}
       </div>
 
       {/* User Footer */}

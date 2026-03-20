@@ -67,46 +67,46 @@ export default function PrizesPage() {
              </p>
         </section>
 
-        <div className="grid lg:grid-cols-3 gap-12 mb-32 group/list">
+        <div className="grid lg:grid-cols-3 gap-6 lg:gap-8 mb-16 lg:mb-24 group/list">
             {prizes.map((prize, idx) => (
                 <motion.div 
                     key={idx}
-                    initial={{ opacity: 0, y: 50 }}
+                    initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ delay: idx * 0.2, duration: 0.8 }}
-                    className={`p-14 rounded-[5rem] ${prize.color} border-4 flex flex-col group hover:-translate-y-8 transition-all duration-700 hover:shadow-3xl relative overflow-hidden h-[700px] shadow-2xl`}
+                    transition={{ delay: idx * 0.2, duration: 0.6 }}
+                    className={`p-8 rounded-3xl ${prize.color} border-2 flex flex-col group hover:-translate-y-4 transition-all duration-500 relative overflow-hidden h-auto shadow-lg hover:shadow-xl`}
                 >
-                    <div className="absolute top-0 right-0 p-12 opacity-5 scale-150 rotate-12 transition-transform duration-[2000ms] group-hover:rotate-45">
-                        <Zap className="w-48 h-48" />
+                    <div className="absolute top-0 right-0 p-6 opacity-5 scale-150 rotate-12 transition-transform duration-[2000ms] group-hover:rotate-45 pointer-events-none">
+                        <Zap className="w-24 h-24" />
                     </div>
 
-                    <div className="mb-14 flex justify-center group-hover:scale-125 group-hover:rotate-12 transition-all duration-700 relative z-10 shrink-0">
+                    <div className="mb-8 flex justify-center group-hover:scale-110 transition-all duration-500 relative z-10 shrink-0">
                         {prize.icon}
                     </div>
                     
-                    <div className="text-center mb-14 relative z-10">
-                        <h2 className="text-sm font-black uppercase tracking-[0.4em] mb-4 opacity-50 italic">{prize.label}</h2>
-                        <h3 className="text-2xl font-black text-gray-900 mb-2 uppercase italic tracking-tighter">{prize.title}</h3>
-                        <p className="text-5xl md:text-6xl font-black tracking-tighter italic leading-none">{prize.amount}</p>
+                    <div className="text-center mb-6 relative z-10">
+                        <h2 className="text-[10px] font-bold uppercase tracking-widest mb-2 opacity-60 italic">{prize.label}</h2>
+                        <h3 className="text-xl font-black text-gray-900 mb-1 uppercase tracking-tight">{prize.title}</h3>
+                        <p className="text-3xl md:text-4xl font-black tracking-tighter italic leading-none">{prize.amount}</p>
                     </div>
 
-                    <p className="text-base font-bold text-center mb-14 opacity-60 leading-relaxed italic border-t-2 border-black/5 pt-14 flex-1 relative z-10 px-4">
+                    <p className="text-sm font-medium text-center mb-8 opacity-70 leading-relaxed italic border-t border-black/5 pt-6 flex-1 relative z-10">
                         "{prize.description}"
                     </p>
 
-                    <div className="space-y-6 mt-auto relative z-10">
-                        <p className="text-[10px] font-black uppercase tracking-[0.5em] opacity-30 mb-8 italic">Prize Benefits</p>
+                    <div className="space-y-4 mt-auto relative z-10">
+                        <p className="text-[10px] font-bold uppercase tracking-widest opacity-40 mb-4 italic">Prize Benefits</p>
                         {prize.perks.map((perk, i) => (
-                            <div key={i} className="flex gap-6 text-base font-black items-center group/item hover:translate-x-3 transition-transform italic text-gray-900/80">
-                                <div className="w-3 h-3 rounded-full bg-indigo-600 shadow-[0_0_8px_rgba(79,70,229,0.5)]" />
-                                <p className="pt-0.5">{perk}</p>
+                            <div key={i} className="flex gap-3 text-sm font-bold items-center group/item transition-transform italic text-gray-800">
+                                <div className="w-2 h-2 rounded-full bg-indigo-600 shadow-[0_0_8px_rgba(79,70,229,0.3)] shrink-0" />
+                                <span>{perk}</span>
                             </div>
                         ))}
                     </div>
                     
                     {/* Dynamic Glow */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
                 </motion.div>
             ))}
         </div>
@@ -115,33 +115,33 @@ export default function PrizesPage() {
         <motion.div 
            initial={{ opacity: 0, scale: 0.95 }}
            whileInView={{ opacity: 1, scale: 1 }}
-           className="p-16 md:p-24 rounded-[5.5rem] bg-gray-950 text-white relative overflow-hidden shadow-3xl border-4 border-gray-900 group"
+           className="p-8 md:p-12 rounded-3xl bg-gray-950 text-white relative overflow-hidden shadow-xl border border-gray-900 group"
         >
-             <div className="relative z-20 flex flex-col lg:flex-row items-center justify-between gap-20">
-                 <div className="max-w-2xl text-center lg:text-left">
-                     <div className="inline-flex items-center gap-3 bg-white/10 text-indigo-300 px-6 py-2.5 rounded-[1.5rem] text-[11px] font-black uppercase tracking-[0.3em] mb-10 border-2 border-white/5 italic">
-                        <Gift className="w-5 h-5 animate-bounce-subtle" />
+             <div className="relative z-20 flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-16">
+                 <div className="max-w-xl text-center lg:text-left">
+                     <div className="inline-flex items-center gap-2 bg-white/10 text-indigo-300 px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest mb-6 border border-white/5 italic">
+                        <Gift className="w-4 h-4 animate-bounce-subtle" />
                         All Participants
                      </div>
-                     <h2 className="text-3xl md:text-5xl font-black mb-6 tracking-tighter italic uppercase leading-none">Participation <br /> Reward Kit.</h2>
-                     <p className="text-gray-400 text-xl font-bold leading-relaxed italic pr-10">
+                     <h2 className="text-2xl md:text-4xl font-black mb-4 tracking-tight italic uppercase leading-none">Participation <br /> Reward Kit.</h2>
+                     <p className="text-gray-400 text-sm md:text-base font-medium leading-relaxed italic">
                         Every innovator that reaches the final evaluation cycle will receive official validation, branded assets, and full coverage of innovation logistics.
                      </p>
                  </div>
                  
-                 <div className="flex -space-x-12 shrink-0">
+                 <div className="flex -space-x-6 sm:-space-x-8 shrink-0 justify-center">
                      {[1,2,3,4].map(i => (
-                         <div key={i} className="w-32 h-32 rounded-[2.5rem] bg-indigo-600/10 backdrop-blur-3xl border-2 border-white/10 flex items-center justify-center -rotate-12 hover:rotate-6 hover:translate-y-6 hover:bg-indigo-600 transition-all duration-700 cursor-pointer shadow-black shadow-2xl overflow-hidden relative group/icon group-hover:rotate-0">
+                         <div key={i} className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-indigo-600/10 backdrop-blur-xl border border-white/10 flex items-center justify-center -rotate-12 hover:rotate-6 hover:-translate-y-2 hover:bg-indigo-600 transition-all duration-500 cursor-pointer shadow-black shadow-lg overflow-hidden relative group/icon group-hover:rotate-0">
                              <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover/icon:opacity-100 transition-opacity" />
-                             <Medal className="w-12 h-12 text-white group-hover/icon:scale-125 transition-transform duration-500" />
+                             <Medal className="w-6 h-6 sm:w-8 sm:h-8 text-white group-hover/icon:scale-110 transition-transform duration-300" />
                          </div>
                      ))}
                  </div>
              </div>
              
              {/* Background Art */}
-             <div className="absolute top-0 left-0 w-full h-full opacity-[0.05] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '60px 60px' }} />
-             <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-indigo-600/20 rounded-full blur-[150px] -z-10 translate-x-1/3 translate-y-1/3" />
+             <div className="absolute top-0 left-0 w-full h-full opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '40px 40px' }} />
+             <div className="absolute bottom-0 right-0 w-64 h-64 bg-indigo-600/10 rounded-full blur-[80px] -z-10 translate-x-1/4 translate-y-1/4" />
         </motion.div>
 
       </div>

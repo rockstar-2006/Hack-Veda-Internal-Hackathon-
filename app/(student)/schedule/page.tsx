@@ -173,37 +173,37 @@ export default function SchedulePage() {
 
   return (
     <ProtectedRoute>
-      <div className="max-w-7xl mx-auto px-6 py-24 min-h-screen pb-60 relative overflow-hidden">
+      <div className="max-w-7xl mx-auto px-6 py-12 md:py-24 min-h-screen pb-32 md:pb-40 relative overflow-hidden">
         
         {/* Animated Background Elements */}
         <div className="fixed inset-0 -z-10 bg-white">
             <motion.div 
-               animate={{ x: [0, 50, 0], y: [0, 30, 0] }}
+               animate={{ x: [0, 30, 0], y: [0, 20, 0] }}
                transition={{ duration: 15, repeat: Infinity }}
-               className="absolute -top-20 -right-20 w-[600px] h-[600px] bg-indigo-50 rounded-full blur-[120px] opacity-60"
+               className="absolute -top-10 -right-10 w-64 h-64 md:w-96 md:h-96 bg-indigo-50 rounded-full blur-[80px] opacity-60"
             />
             <motion.div 
-               animate={{ x: [0, -40, 0], y: [0, 60, 0] }}
+               animate={{ x: [0, -20, 0], y: [0, 30, 0] }}
                transition={{ duration: 18, repeat: Infinity }}
-               className="absolute bottom-40 -left-20 w-[500px] h-[500px] bg-sky-50 rounded-full blur-[100px] opacity-50"
+               className="absolute bottom-20 -left-10 w-48 h-48 md:w-80 md:h-80 bg-sky-50 rounded-full blur-[60px] opacity-50"
             />
         </div>
 
         {/* Header Section */}
-        <div className="text-center mb-40">
+        <div className="text-center mb-20 md:mb-32">
              <motion.div 
                initial={{ y: -20, opacity: 0 }}
                animate={{ y: 0, opacity: 1 }}
-               className="inline-flex items-center gap-3 bg-indigo-50 text-indigo-700 px-6 py-2.5 rounded-full text-[11px] font-black uppercase tracking-[0.3em] mb-12 italic border border-indigo-100 shadow-sm"
+               className="inline-flex items-center gap-2 bg-indigo-50 text-indigo-700 px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest mb-6 border border-indigo-100 shadow-sm"
              >
-                  <Calendar className="w-4 h-4 fill-indigo-600" />
+                  <Calendar className="w-3.5 h-3.5 fill-indigo-600" />
                   Hackveda Timeline 2026
              </motion.div>
-             <h1 className="text-4xl md:text-7xl font-black text-gray-900 leading-tight tracking-tighter mb-10 italic uppercase">
+             <h1 className="text-3xl md:text-5xl font-black text-gray-900 leading-tight tracking-tight mb-4 uppercase">
                 Plan Your <br />
-                <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-indigo-950 font-black">Success.</span>
+                <span className="text-indigo-600">Success.</span>
              </h1>
-             <p className="text-base md:text-lg text-gray-400 font-bold max-w-2xl mx-auto italic leading-relaxed">
+             <p className="text-sm md:text-base text-gray-500 font-medium max-w-lg mx-auto">
                 Stay updated with the official Hackveda event schedule. Every second counts.
              </p>
         </div>
@@ -212,14 +212,14 @@ export default function SchedulePage() {
         <div ref={containerRef} className="relative">
              
              {/* Dynamic Center Line */}
-             <div className="absolute left-8 md:left-1/2 top-0 bottom-0 w-3 bg-slate-100 md:-translate-x-1/2 rounded-full overflow-hidden">
+             <div className="absolute left-6 md:left-1/2 top-0 bottom-0 w-1.5 md:w-2 bg-gray-100 md:-translate-x-1/2 rounded-full overflow-hidden">
                 <motion.div 
                    style={{ scaleY: scrollYProgress }}
-                   className="absolute top-0 left-0 right-0 bg-indigo-600 origin-top shadow-[0_0_20px_rgba(79,70,229,0.5)]"
+                   className="absolute top-0 left-0 right-0 bg-indigo-600 origin-top shadow-sm"
                 />
              </div>
 
-             <div className="space-y-32">
+             <div className="space-y-16 md:space-y-24">
                   {timelineEvents.map((event, index) => {
                       const isEven = index % 2 === 0;
                       const eventDate = parseISO(event.date);
@@ -228,48 +228,48 @@ export default function SchedulePage() {
                       return (
                           <motion.div 
                              key={event.id}
-                             initial={{ opacity: 0, x: isEven ? 50 : -50 }}
+                             initial={{ opacity: 0, x: isEven ? 20 : -20 }}
                              whileInView={{ opacity: 1, x: 0 }}
-                             viewport={{ once: true, margin: "-100px" }}
-                             transition={{ duration: 0.8 }}
-                             className={`relative flex flex-col md:flex-row items-start md:items-center justify-between gap-12 ${isEven ? 'md:flex-row-reverse' : ''}`}
+                             viewport={{ once: true, margin: "-50px" }}
+                             transition={{ duration: 0.6 }}
+                             className={`relative flex flex-col md:flex-row items-start md:items-center justify-between gap-6 md:gap-12 ${isEven ? 'md:flex-row-reverse' : ''}`}
                           >
                                {/* 3D Pop Icon */}
-                               <div className="absolute left-6 md:left-1/2 top-4 md:top-auto z-40 md:-translate-x-1/2">
-                                   <div className={`w-14 h-14 md:w-20 md:h-20 rounded-[2rem] bg-indigo-600 border-4 border-white shadow-2xl flex items-center justify-center transition-transform hover:rotate-12 hover:scale-110`}>
-                                       <event.icon className="w-6 h-6 md:w-10 md:h-10 text-white" />
+                               <div className="absolute left-4 md:left-1/2 top-4 md:top-auto z-40 md:-translate-x-1/2">
+                                   <div className={`w-10 h-10 md:w-14 md:h-14 rounded-xl bg-indigo-600 border-2 border-white shadow-md flex items-center justify-center transition-transform hover:rotate-6 hover:scale-105`}>
+                                       <event.icon className="w-4 h-4 md:w-6 md:h-6 text-white" />
                                    </div>
                                </div>
 
                                {/* Content Area */}
-                               <div className="w-full md:w-[45%] pl-24 md:pl-0">
+                               <div className="w-full md:w-[45%] pl-16 md:pl-0">
                                     <TiltCard isEven={isEven} isToday={isToday}>
-                                        <div className={`flex flex-wrap items-center gap-4 mb-8 ${isEven ? 'md:justify-end' : ''}`}>
-                                            <div className="flex items-center gap-2 bg-slate-900 text-white px-5 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest italic shadow-xl">
-                                                <Clock className="w-3.5 h-3.5" />
+                                        <div className={`flex flex-wrap items-center gap-3 mb-4 md:mb-6 ${isEven ? 'md:justify-end' : ''}`}>
+                                            <div className="flex items-center gap-1.5 bg-gray-900 text-white px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-widest shadow-sm">
+                                                <Clock className="w-3 h-3" />
                                                 {event.time}
                                             </div>
-                                            <div className="flex items-center gap-2 bg-indigo-50 text-indigo-700 px-5 py-2.5 rounded-2xl border border-indigo-100 text-[10px] font-black uppercase tracking-widest italic">
-                                                <Calendar className="w-3.5 h-3.5" />
+                                            <div className="flex items-center gap-1.5 bg-indigo-50 text-indigo-700 px-3 py-1.5 rounded-lg border border-indigo-100 text-[10px] font-bold uppercase tracking-widest">
+                                                <Calendar className="w-3 h-3" />
                                                 {format(eventDate, "MMM dd")}
                                             </div>
                                         </div>
 
                                         <div className={`${isEven ? 'md:text-right' : 'md:text-left'}`}>
-                                            <h3 className="text-2xl md:text-4xl font-black text-gray-900 mb-4 tracking-tighter italic uppercase leading-none">
+                                            <h3 className="text-xl md:text-2xl font-black text-gray-900 mb-2 tracking-tight uppercase leading-none">
                                                 {event.title}
                                             </h3>
-                                            <p className="text-base font-bold text-gray-400 leading-relaxed italic pr-4 opacity-70 group-hover:opacity-100 transition-opacity">
+                                            <p className="text-sm font-medium text-gray-500 leading-relaxed pr-2 md:pr-4">
                                                 {event.description}
                                             </p>
                                         </div>
                                         
                                         {/* Progressive Visual */}
-                                        <div className={`mt-10 h-1.5 w-24 bg-indigo-50 rounded-full overflow-hidden ${isEven ? 'ml-auto' : ''}`}>
+                                        <div className={`mt-6 h-1 w-16 md:w-20 bg-gray-100 rounded-full overflow-hidden ${isEven ? 'ml-auto' : ''}`}>
                                             <motion.div 
-                                                                                               initial={{ width: 0 }}
+                                               initial={{ width: 0 }}
                                                whileInView={{ width: '100%' }}
-                                               transition={{ duration: 1, delay: 0.5 }}
+                                               transition={{ duration: 0.8, delay: 0.3 }}
                                                className={`h-full bg-gradient-to-r ${event.color}`}
                                             />
                                         </div>
@@ -281,9 +281,9 @@ export default function SchedulePage() {
                                     <motion.div 
                                         animate={{ rotate: 360 }}
                                         transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                                        className="relative w-48 h-48 border-4 border-dashed border-indigo-50 rounded-full opacity-30 flex items-center justify-center p-8"
+                                        className="relative w-24 h-24 border-2 border-dashed border-indigo-100 rounded-full opacity-50 flex items-center justify-center"
                                     >
-                                        <CircleDot className="w-12 h-12 text-indigo-100" />
+                                        <CircleDot className="w-6 h-6 text-indigo-200" />
                                     </motion.div>
                                </div>
                           </motion.div>
@@ -293,11 +293,11 @@ export default function SchedulePage() {
         </div>
 
         {/* Footer Action */}
-        <div className="mt-56 text-center">
-             <Link href="/profile" className="inline-flex h-24 items-center justify-center gap-8 bg-gray-950 text-white px-20 rounded-[3rem] shadow-3xl hover:bg-black transition-all hover:scale-105 active:scale-95 group relative overflow-hidden">
+        <div className="mt-24 md:mt-32 text-center">
+             <Link href="/profile" className="inline-flex h-12 md:h-14 items-center justify-center gap-3 bg-gray-900 text-white px-8 md:px-10 rounded-xl shadow-md hover:bg-black transition-all hover:scale-105 active:scale-95 group relative overflow-hidden">
                  <div className="absolute inset-0 bg-gradient-to-r from-indigo-600/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                 <ArrowLeft className="w-6 h-6 group-hover:-translate-x-3 transition-transform" />
-                 <span className="text-xl font-black tracking-tight uppercase italic relative z-10">Back to Dashboard</span>
+                 <ArrowLeft className="w-4 h-4 md:w-5 md:h-5 group-hover:-translate-x-1.5 transition-transform" />
+                 <span className="text-xs md:text-sm font-bold tracking-widest uppercase relative z-10">Back to Dashboard</span>
              </Link>
         </div>
 

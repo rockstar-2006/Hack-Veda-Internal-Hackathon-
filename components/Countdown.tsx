@@ -62,25 +62,25 @@ export const Countdown = ({ targetDate, label }: CountdownProps) => {
 };
 
 const Separator = () => (
-    <div className="text-2xl md:text-3xl font-black text-gray-200 mt-[-1rem]">:</div>
+    <div className="text-xl md:text-3xl font-black text-gray-300 xl:mt-[-0.5rem] mt-[-0.25rem]">:</div>
 );
 
 const TimeUnit = ({ value, label }: { value: number; label: string }) => (
-  <div className="flex flex-col items-start gap-1">
-    <div className="relative h-16 md:h-20 flex items-center">
+  <div className="flex flex-col items-center md:items-start gap-1">
+    <div className="relative h-12 md:h-20 flex items-center justify-center min-w-[3rem] md:min-w-[4.5rem]">
       <AnimatePresence mode="popLayout">
         <motion.span
           key={value}
-          initial={{ y: 20, opacity: 0 }}
+          initial={{ y: 10, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          exit={{ y: -20, opacity: 0 }}
+          exit={{ y: -10, opacity: 0 }}
           transition={{ type: "spring", stiffness: 300, damping: 30 }}
-          className="text-4xl md:text-7xl font-black text-gray-950 tracking-tighter italic"
+          className="text-3xl sm:text-4xl md:text-6xl font-black text-gray-950 tracking-tighter italic absolute"
         >
           {value.toString().padStart(2, '0')}
         </motion.span>
       </AnimatePresence>
     </div>
-    <p className="text-[9px] font-black text-indigo-500 uppercase tracking-widest italic opacity-80">{label}</p>
+    <p className="text-[9px] font-bold text-indigo-500 uppercase tracking-widest italic opacity-80">{label}</p>
   </div>
 );
