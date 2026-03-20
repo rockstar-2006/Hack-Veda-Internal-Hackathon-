@@ -8,6 +8,10 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['var(--font-space)', 'sans-serif'],
+        comic: ['var(--font-bangers)', 'cursive'],
+      },
       colors: {
         primary: {
           50: '#eef2ff',

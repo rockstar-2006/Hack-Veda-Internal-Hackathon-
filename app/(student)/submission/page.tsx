@@ -155,7 +155,7 @@ export default function SubmissionPage() {
 
   return (
     <ProtectedRoute>
-      <div className="max-w-4xl mx-auto px-6 py-12 md:py-20 min-h-screen pb-32">
+      <div className="max-w-4xl mx-auto px-6 py-12 md:py-20 min-h-screen pb-32 font-sans relative">
         
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16 text-center md:text-left">
@@ -163,25 +163,28 @@ export default function SubmissionPage() {
                  <motion.div 
                    initial={{ x: -20, opacity: 0 }}
                    animate={{ x: 0, opacity: 1 }}
-                   className="inline-flex items-center gap-2 bg-indigo-50 text-indigo-700 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-widest mb-4 border border-indigo-100"
+                   className="inline-flex items-center gap-2 bg-yellow-400 text-black px-4 py-2 rounded-xl text-sm font-bold uppercase tracking-widest mb-4 border-4 border-black shadow-[4px_4px_0_#000]"
                  >
-                      <Zap className="w-3.5 h-3.5 fill-indigo-600" />
-                      Hackveda Submission
+                      <Zap className="w-5 h-5 fill-black" />
+                      HACKVEDA SUBMISSION
                  </motion.div>
-                 <h1 className="text-3xl lg:text-5xl font-black text-gray-900 leading-tight tracking-tight uppercase">
-                    Submit Your <br/><span className="text-indigo-600">Project Idea.</span>
+                 <h1 className="text-4xl lg:text-6xl font-comic text-black leading-none tracking-widest uppercase mb-2 drop-shadow-[4px_4px_0_#00f0ff]">
+                    UPLOAD OUR <br/><span className="text-white drop-shadow-[4px_4px_0_#000]">PROJECT!</span>
                  </h1>
+                 <p className="bg-white p-3 inline-block border-4 border-black rounded-xl text-sm font-bold text-gray-800 shadow-[4px_4px_0_#ff007f] transform -rotate-1 mt-4">
+                     Upload your documentation. Only the best survive.
+                 </p>
             </div>
             {team && (
-                <div className="bg-white border border-indigo-50 p-6 rounded-2xl text-right shadow-sm relative overflow-hidden group w-full md:w-auto mt-6 md:mt-0">
-                    <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:scale-110 transition-transform pointer-events-none">
-                        <Users className="w-12 h-12" />
+                <div className="bg-cyan-400 border-4 border-black p-6 rounded-2xl text-right shadow-[8px_8px_0_#000] relative overflow-hidden group w-full md:w-auto mt-6 md:mt-0 transform rotate-1 hover:rotate-0 transition-transform">
+                    <div className="absolute top-0 right-0 p-4 opacity-20 group-hover:scale-110 transition-transform pointer-events-none">
+                        <Users className="w-16 h-16 text-black" />
                     </div>
-                    <p className="text-xs font-bold text-indigo-400 uppercase tracking-widest mb-1">Your Team</p>
-                    <p className="text-xl font-black text-gray-900 leading-none uppercase tracking-tight">{team.teamName}</p>
-                    <div className="flex items-center justify-end gap-2 mt-3">
-                         <div className={`w-1.5 h-1.5 rounded-full ${isTeamSizeInvalid ? 'bg-red-500' : 'bg-green-500'} shadow-[0_0_8px_current]`} />
-                         <span className={`text-[10px] font-bold uppercase tracking-widest ${isTeamSizeInvalid ? 'text-red-500' : 'text-indigo-600'}`}>{team.memberIds.length} Members Active</span>
+                    <p className="text-xs font-bold text-black bg-white inline-block px-2 py-1 border-2 border-black rounded-lg uppercase tracking-widest mb-1 relative z-10">Your Squad</p>
+                    <p className="text-3xl font-comic text-white drop-shadow-[2px_2px_0_#000] leading-none uppercase tracking-widest mt-2 relative z-10">{team.teamName}</p>
+                    <div className="flex items-center justify-end gap-2 mt-4 relative z-10">
+                         <div className={`w-3 h-3 rounded-full border-2 border-black ${isTeamSizeInvalid ? 'bg-red-500 animate-pulse' : 'bg-green-500'} shadow-[2px_2px_0_#000]`} />
+                         <span className={`text-xs font-bold uppercase tracking-widest ${isTeamSizeInvalid ? 'text-red-900 bg-red-200 px-2 rounded border-2 border-black' : 'text-black'}`}>{team.memberIds.length} Members Active</span>
                     </div>
                 </div>
             )}
@@ -193,17 +196,17 @@ export default function SubmissionPage() {
                  <motion.div 
                    initial={{ y: 10, opacity: 0 }}
                    animate={{ y: 0, opacity: 1 }}
-                   className="bg-orange-50 border border-orange-100 p-6 rounded-2xl flex flex-col md:flex-row items-center gap-4 md:gap-6 text-orange-700 shadow-sm"
+                   className="bg-red-400 border-4 border-black p-6 rounded-2xl flex flex-col md:flex-row items-center gap-6 text-black shadow-[8px_8px_0_#000]"
                  >
-                    <div className="bg-white p-3 rounded-xl shadow-sm shrink-0">
-                        <AlertCircle className="w-6 h-6 text-orange-500" />
+                    <div className="bg-white p-4 rounded-xl border-4 border-black shadow-[4px_4px_0_#000] shrink-0 animate-bounce">
+                        <AlertCircle className="w-8 h-8 text-black stroke-[3]" />
                     </div>
-                    <div className="text-center md:text-left">
-                        <h4 className="font-black text-lg mb-1 tracking-tight uppercase">Team Size Not Allowed</h4>
-                        <p className="font-medium text-sm">Hackveda requires teams to have 2 to 4 members. You currently have {team?.memberIds.length}.</p>
+                    <div className="text-center md:text-left bg-white p-4 border-4 border-black rounded-xl w-full">
+                        <h4 className="font-comic text-2xl mb-1 tracking-widest uppercase">TEAM SIZE NOT ALLOWED!</h4>
+                        <p className="font-bold text-sm text-gray-800">HackVeda requires teams to have 2 to 4 members. You currently have {team?.memberIds.length}.</p>
                     </div>
-                    <Link href="/team" className="h-10 px-6 bg-orange-600 text-white rounded-lg flex items-center justify-center font-bold uppercase text-xs tracking-widest hover:bg-orange-700 transition-all md:ml-auto shrink-0 w-full md:w-auto mt-2 md:mt-0">
-                        Update Team
+                    <Link href="/team" className="h-14 px-8 bg-yellow-400 text-black border-4 border-black rounded-xl flex items-center justify-center font-comic text-lg uppercase tracking-widest shadow-[4px_4px_0_#000] hover:-translate-y-1 hover:shadow-[6px_6px_0_#000] active:translate-y-1 active:shadow-none transition-all md:ml-auto shrink-0 w-full md:w-auto mt-2 md:mt-0">
+                        UPDATE TEAM
                     </Link>
                  </motion.div>
              )}
@@ -212,16 +215,16 @@ export default function SubmissionPage() {
                 <motion.div 
                    initial={{ opacity: 0, scale: 0.95 }}
                    animate={{ opacity: 1, scale: 1 }}
-                   className="bg-red-50 border border-red-100 p-4 sm:p-6 rounded-xl flex items-start gap-4 text-red-700 shadow-sm"
+                   className="bg-red-400 border-4 border-black p-6 rounded-2xl flex items-start gap-4 text-black shadow-[6px_6px_0_#000] transform -rotate-[0.5deg]"
                 >
-                    <div className="bg-white p-2 rounded-lg shrink-0 shadow-sm">
-                        <AlertCircle className="w-5 h-5 text-red-500" />
+                    <div className="bg-white p-3 rounded-xl border-4 border-black shadow-[4px_4px_0_#000] shrink-0">
+                        <AlertCircle className="w-6 h-6 text-black stroke-[3]" />
                     </div>
-                    <p className="font-bold text-sm leading-relaxed pt-0.5">{error}</p>
+                    <p className="font-comic text-xl tracking-wider leading-none bg-white p-3 border-4 border-black rounded-xl">{error}</p>
                 </motion.div>
             )}
 
-            <div className={`p-8 md:p-16 rounded-3xl bg-white transition-all duration-500 border-2 shadow-sm ${file ? 'border-indigo-600 bg-indigo-50/50' : 'border-dashed border-gray-200'} ${isTeamSizeInvalid ? 'opacity-50 cursor-not-allowed' : ''} relative group overflow-hidden`}>
+            <div className={`p-8 md:p-16 rounded-3xl bg-white transition-all duration-300 border-4 shadow-[12px_12px_0_#000] ${file ? 'border-black bg-yellow-100' : 'border-dashed border-black'} ${isTeamSizeInvalid ? 'opacity-50 cursor-not-allowed' : 'hover:-translate-y-1 hover:shadow-[16px_16px_0_#000]'} relative group overflow-hidden`}>
                 <input 
                     type="file" 
                     id="pdf-upload" 
@@ -231,78 +234,87 @@ export default function SubmissionPage() {
                     disabled={isTeamSizeInvalid}
                 />
                 
+                {/* Halftone Pattern */}
+                <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, black 1px, transparent 0)', backgroundSize: '16px 16px' }} />
+
                 {!file ? (
-                    <label htmlFor="pdf-upload" className={`cursor-pointer group/label block text-center ${isTeamSizeInvalid ? 'pointer-events-none' : ''}`}>
-                        <div className="w-20 h-20 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-indigo-50 shadow-sm group-hover/label:bg-indigo-600 transition-all duration-300 group-hover/label:scale-105 relative">
-                            <Cloud className="w-8 h-8 text-gray-300 group-hover/label:text-white transition-colors" />
-                            <div className="absolute inset-0 border-2 border-indigo-600 opacity-0 rounded-2xl rotate-6 group-hover/label:opacity-100 transition-opacity" />
+                    <label htmlFor="pdf-upload" className={`cursor-pointer group/label block text-center relative z-10 ${isTeamSizeInvalid ? 'pointer-events-none' : ''}`}>
+                        <div className="w-24 h-24 bg-pink-400 border-4 border-black rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-[8px_8px_0_#000] group-hover/label:-translate-y-2 group-hover/label:shadow-[12px_12px_0_#000] transition-all duration-300 relative transform rotate-2 group-hover/label:rotate-0">
+                            <Cloud className="w-12 h-12 text-black stroke-[3]" />
                         </div>
-                        <h3 className="text-xl md:text-2xl font-black text-gray-900 mb-2 tracking-tight uppercase">Choose Your PDF.</h3>
-                        <p className="text-gray-500 font-medium mb-8 text-sm leading-relaxed">Select your project proposal for evaluation. <br/><span className="text-[10px] uppercase tracking-widest text-indigo-500 font-bold">Supported: PDF Only (Max 10MB)</span></p>
+                        <h3 className="text-3xl md:text-5xl font-comic text-black mb-4 tracking-widest uppercase drop-shadow-[2px_2px_0_#00f0ff] bg-white inline-block px-4 py-2 border-4 border-black rounded-xl">CHOOSE YOUR PDF!</h3>
+                        <p className="text-gray-900 font-bold mb-8 text-sm leading-relaxed bg-yellow-300 inline-block px-4 py-2 border-2 border-black rounded-lg transform -rotate-1">Select your project proposal for evaluation. <br/><span className="text-xs uppercase tracking-widest text-black font-black mt-1 block px-2 py-1 bg-white border-2 border-black rounded">SUPPORTED: PDF ONLY (MAX 10MB)</span></p>
                         
-                        <div className="inline-flex h-12 items-center justify-center gap-3 px-8 rounded-xl bg-gray-900 text-white font-bold uppercase text-xs tracking-widest hover:bg-black transition-all active:scale-[0.98] shadow-md">
-                             Browse File System <ArrowRight className="w-4 h-4" />
+                        <div className="flex h-16 items-center justify-center gap-3 px-8 rounded-2xl bg-cyan-400 text-black border-4 border-black font-comic text-xl uppercase tracking-widest shadow-[8px_8px_0_#000] hover:bg-cyan-300 active:-translate-y-0 active:shadow-none transition-all w-full max-w-sm mx-auto">
+                             BROWSE FILE SYSTEM <ArrowRight className="w-6 h-6 stroke-[3]" />
                         </div>
                     </label>
                 ) : (
-                    <div className="animate-fade-in text-center relative z-10 w-full overflow-hidden">
-                        <div className="w-20 h-20 bg-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-md shadow-indigo-600/30">
-                            <FileText className="w-8 h-8 text-white" />
+                    <div className="animate-fade-in text-center relative z-10 w-full overflow-hidden bg-white p-8 border-4 border-black rounded-3xl shadow-[8px_8px_0_#000]">
+                        <div className="w-24 h-24 bg-pink-400 border-4 border-black rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-[6px_6px_0_#00f0ff] transform -rotate-3">
+                            <FileText className="w-10 h-10 text-black stroke-[3]" />
                         </div>
-                        <h3 className="text-xl md:text-2xl font-black text-gray-900 mb-2 truncate px-4 tracking-tight uppercase max-w-full">{file.name}</h3>
-                        <p className="text-xs font-bold text-indigo-500 uppercase tracking-widest mb-10">Ready to Submit ({(file.size / (1024 * 1024)).toFixed(2)} MB)</p>
+                        <h3 className="text-2xl md:text-3xl font-comic text-black mb-2 truncate px-4 tracking-widest uppercase max-w-full drop-shadow-[2px_2px_0_#ff007f]">{file.name}</h3>
+                        <p className="text-sm font-bold text-black uppercase tracking-widest mb-8 bg-yellow-300 inline-block px-3 py-1 border-2 border-black rounded-lg">READY TO SUBMIT ({(file.size / (1024 * 1024)).toFixed(2)} MB)</p>
                         
-                        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                        <div className="flex flex-col sm:flex-row gap-6 justify-center">
                             <button 
                                 onClick={handleSubmit}
                                 disabled={uploading || isTeamSizeInvalid}
-                                className="h-14 px-8 bg-indigo-600 text-white rounded-xl flex items-center justify-center gap-3 active:scale-[0.98] disabled:opacity-50 font-bold uppercase text-sm tracking-widest shadow-md hover:bg-indigo-700 transition-all w-full sm:w-auto"
+                                className="h-16 px-10 bg-cyan-400 text-black border-4 border-black rounded-2xl flex items-center justify-center gap-3 active:translate-y-2 active:shadow-none disabled:opacity-50 font-comic text-xl uppercase tracking-widest shadow-[8px_8px_0_#000] hover:-translate-y-1 hover:shadow-[12px_12px_0_#000] transition-all w-full sm:w-auto"
                             >
                                 {uploading ? (
                                     <>
-                                        <Loader2 className="w-5 h-5 animate-spin" />
+                                        <Loader2 className="w-6 h-6 animate-spin stroke-[3]" />
                                         UPLOADING {progress}% 
                                     </>
                                 ) : (
                                     <>
-                                        Submit Proposal <ArrowRight className="w-4 h-4" />
+                                        SUBMIT PROPOSAL <ArrowRight className="w-6 h-6 stroke-[3]" />
                                     </>
                                 )}
                             </button>
                             <button 
                                onClick={() => setFile(null)}
                                disabled={uploading}
-                               className="h-14 w-full sm:w-14 bg-red-50 text-red-500 rounded-xl flex items-center justify-center hover:bg-red-600 hover:text-white transition-colors disabled:opacity-50 shadow-sm shrink-0"
+                               className="h-16 w-full sm:w-16 bg-red-400 text-black border-4 border-black rounded-2xl flex items-center justify-center hover:bg-red-500 hover:-translate-y-1 transition-all disabled:opacity-50 shadow-[8px_8px_0_#000] hover:shadow-[12px_12px_0_#000] active:translate-y-2 active:shadow-none shrink-0"
                             >
-                                <Trash2 className="w-5 h-5" />
+                                <Trash2 className="w-6 h-6 stroke-[3]" />
                             </button>
                         </div>
                     </div>
                 )}
 
                 {/* Background Decoration */}
-                <div className="absolute bottom-0 right-0 p-8 opacity-5 -z-10 group-hover:scale-110 transition-transform duration-700 pointer-events-none">
-                    <Zap className="w-64 h-64 fill-indigo-600" />
+                <div className="absolute bottom-0 right-0 p-8 opacity-10 -z-10 group-hover:scale-110 group-hover:rotate-12 transition-all duration-700 pointer-events-none">
+                    <Zap className="w-80 h-80 fill-black stroke-black stroke-[2]" />
                 </div>
             </div>
             
-            <div className="p-8 md:p-10 rounded-3xl bg-gray-50 border border-gray-200 relative overflow-hidden group">
-                <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:rotate-6 transition-transform pointer-events-none">
-                    <Info className="w-32 h-32" />
+            <div className="p-8 md:p-12 rounded-3xl bg-pink-400 border-4 border-black shadow-[12px_12px_0_#000] relative overflow-hidden group transform rotate-1 hover:rotate-0 transition-transform">
+                {/* Halftone Pattern */}
+                <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, black 1px, transparent 0)', backgroundSize: '16px 16px' }} />
+
+                <div className="absolute top-0 right-0 p-6 opacity-20 group-hover:rotate-12 transition-transform pointer-events-none">
+                    <Info className="w-40 h-40 text-black stroke-[2]" />
                 </div>
-                <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-6">Evaluation Rules</h4>
+                <h4 className="text-sm font-bold text-black uppercase tracking-widest mb-8 bg-white inline-block px-4 py-2 border-4 border-black rounded-xl shadow-[4px_4px_0_#000] -rotate-2 relative z-10">SUBMISSION RULES</h4>
+                
                 <div className="grid md:grid-cols-3 gap-8 text-center md:text-left relative z-10">
-                    <div className="space-y-2">
-                        <div className="text-indigo-600 font-black text-2xl tracking-tight">01.</div>
-                        <p className="text-[10px] font-bold text-gray-900 uppercase tracking-widest leading-relaxed">PDF DOCUMENTATION <br/><span className="text-gray-500 font-medium">Technical reports must be formatted for judge review.</span></p>
+                    <div className="bg-white p-6 border-4 border-black rounded-2xl shadow-[6px_6px_0_#000] transform hover:-translate-y-2 transition-transform">
+                        <div className="text-pink-500 font-comic text-5xl tracking-widest drop-shadow-[2px_2px_0_#000]">01.</div>
+                        <p className="text-[10px] font-bold text-black uppercase tracking-widest leading-relaxed mt-2 bg-yellow-300 p-2 border-2 border-black rounded">PDF DOCUMENTATION</p>
+                        <p className="text-gray-800 font-medium text-xs mt-3">Technical reports must be formatted exactly for judge review.</p>
                     </div>
-                    <div className="space-y-2">
-                        <div className="text-indigo-600 font-black text-2xl tracking-tight">02.</div>
-                        <p className="text-[10px] font-bold text-gray-900 uppercase tracking-widest leading-relaxed">DEADLINE COMPLIANCE <br/><span className="text-gray-500 font-medium">Submissions close exactly at 12:00 PM on April 11.</span></p>
+                    <div className="bg-white p-6 border-4 border-black rounded-2xl shadow-[6px_6px_0_#000] transform hover:-translate-y-2 transition-transform mt-4 md:mt-0">
+                        <div className="text-yellow-400 font-comic text-5xl tracking-widest drop-shadow-[2px_2px_0_#000]">02.</div>
+                        <p className="text-[10px] font-bold text-black uppercase tracking-widest leading-relaxed mt-2 bg-cyan-300 p-2 border-2 border-black rounded">DEADLINE COMPLIANCE</p>
+                        <p className="text-gray-800 font-medium text-xs mt-3">Submissions close securely at 12:00 PM on April 11.</p>
                     </div>
-                    <div className="space-y-2">
-                        <div className="text-indigo-600 font-black text-2xl tracking-tight">03.</div>
-                        <p className="text-[10px] font-bold text-gray-900 uppercase tracking-widest leading-relaxed">VERSION CONTROL <br/><span className="text-gray-500 font-medium">The most recently uploaded PDF will be evaluated.</span></p>
+                    <div className="bg-white p-6 border-4 border-black rounded-2xl shadow-[6px_6px_0_#000] transform hover:-translate-y-2 transition-transform mt-8 md:mt-0">
+                        <div className="text-cyan-400 font-comic text-5xl tracking-widest drop-shadow-[2px_2px_0_#000]">03.</div>
+                        <p className="text-[10px] font-bold text-black uppercase tracking-widest leading-relaxed mt-2 bg-pink-300 p-2 border-2 border-black rounded">VERSION CONTROL</p>
+                        <p className="text-gray-800 font-medium text-xs mt-3">Only the final uploaded PDF protocol will be evaluated.</p>
                     </div>
                 </div>
             </div>

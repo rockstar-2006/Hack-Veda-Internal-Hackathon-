@@ -42,45 +42,46 @@ export const Countdown = ({ targetDate, label }: CountdownProps) => {
   if (!timeLeft) return null;
 
   return (
-    <div className="flex flex-col items-center md:items-start">
-      <div className="flex items-center gap-4 mb-4">
-         <div className="h-0.5 w-6 bg-indigo-600 rounded-full" />
-         <p className="text-[10px] font-black text-gray-900 uppercase tracking-[0.4em] italic leading-none">{label}</p>
+    <div className="flex flex-col items-center">
+      <div className="flex items-center justify-center gap-4 mb-6">
+         <div className="bg-pink-400 p-1.5 px-4 rounded-full border-2 border-black shadow-[2px_2px_0_#000]">
+            <p className="text-xs font-bold text-black uppercase tracking-widest">{label}</p>
+         </div>
       </div>
       
-      <div className="flex items-center gap-6 md:gap-10">
-        <TimeUnit value={timeLeft.days} label="Days" />
+      <div className="flex items-center gap-3 sm:gap-4 lg:gap-6">
+        <TimeUnit value={timeLeft.days} label="DAYS" color="bg-yellow-400" />
         <Separator />
-        <TimeUnit value={timeLeft.hours} label="Hours" />
+        <TimeUnit value={timeLeft.hours} label="HRS" color="bg-cyan-400" />
         <Separator />
-        <TimeUnit value={timeLeft.minutes} label="Mins" />
+        <TimeUnit value={timeLeft.minutes} label="MINS" color="bg-purple-400" />
         <Separator />
-        <TimeUnit value={timeLeft.seconds} label="Secs" />
+        <TimeUnit value={timeLeft.seconds} label="SECS" color="bg-pink-400" />
       </div>
     </div>
   );
 };
 
 const Separator = () => (
-    <div className="text-xl md:text-3xl font-black text-gray-300 xl:mt-[-0.5rem] mt-[-0.25rem]">:</div>
+    <div className="hidden sm:block text-2xl md:text-4xl font-comic text-black mt-[-1rem] drop-shadow-[2px_2px_0_#000]">:</div>
 );
 
-const TimeUnit = ({ value, label }: { value: number; label: string }) => (
-  <div className="flex flex-col items-center md:items-start gap-1">
-    <div className="relative h-12 md:h-20 flex items-center justify-center min-w-[3rem] md:min-w-[4.5rem]">
+const TimeUnit = ({ value, label, color }: { value: number; label: string; color: string }) => (
+  <div className="flex flex-col items-center gap-2">
+    <div className={`relative h-16 w-16 sm:h-20 sm:w-20 md:h-24 md:w-24 ${color} border-4 border-black rounded-2xl flex items-center justify-center shadow-[4px_4px_0_#000]`}>
       <AnimatePresence mode="popLayout">
         <motion.span
           key={value}
-          initial={{ y: 10, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: -10, opacity: 0 }}
-          transition={{ type: "spring", stiffness: 300, damping: 30 }}
-          className="text-3xl sm:text-4xl md:text-6xl font-black text-gray-950 tracking-tighter italic absolute"
+          initial={{ scale: 0.5, y: -20, opacity: 0 }}
+          animate={{ scale: 1, y: 0, opacity: 1 }}
+          exit={{ scale: 1.5, y: 20, opacity: 0 }}
+          transition={{ type: "spring", stiffness: 300, damping: 20 }}
+          className="text-4xl sm:text-5xl md:text-6xl font-comic text-black drop-shadow-[2px_2px_0_#fff] absolute"
         >
           {value.toString().padStart(2, '0')}
         </motion.span>
       </AnimatePresence>
     </div>
-    <p className="text-[9px] font-bold text-indigo-500 uppercase tracking-widest italic opacity-80">{label}</p>
+    <p className="text-[10px] sm:text-xs font-bold text-black bg-white px-3 py-1 border-2 border-black rounded-full shadow-[2px_2px_0_#000] uppercase tracking-widest">{label}</p>
   </div>
 );

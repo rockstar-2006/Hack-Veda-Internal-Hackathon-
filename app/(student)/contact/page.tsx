@@ -1,7 +1,7 @@
 "use client";
 
 import { ProtectedRoute } from "@/components/ProtectedRoute";
-import { Mail, MessageSquare, MapPin, ExternalLink, ArrowLeft, Phone, UserRound } from "lucide-react";
+import { Mail, MessageSquare, MapPin, ExternalLink, ArrowLeft, Phone, UserRound, Zap } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 
@@ -20,96 +20,123 @@ const faqs = [
 export default function ContactPage() {
   return (
     <ProtectedRoute>
-      <div className="max-w-5xl mx-auto px-4 py-12 md:py-20 animate-fade-in pb-40">
-        <Link href="/profile" className="inline-flex items-center gap-2 text-primary-600 font-bold mb-8 hover:opacity-70 transition-all">
-            <ArrowLeft className="w-4 h-4" /> Back to Dashboard
+      <div className="max-w-5xl mx-auto px-4 py-12 md:py-24 relative min-h-screen pb-40 font-sans">
+        <Link href="/profile" className="inline-flex items-center gap-2 bg-white text-black px-4 py-2 border-4 border-black rounded-xl font-comic text-lg uppercase tracking-widest shadow-[4px_4px_0_#000] hover:-translate-y-1 transition-all mb-12">
+            <ArrowLeft className="w-5 h-5 stroke-[3]" /> BACK TO TERMINAL
         </Link>
         
-        <div className="mb-16">
-            <h1 className="text-4xl lg:text-5xl font-extrabold text-gray-900 leading-tight mb-4 tracking-tight">
-                Get <span className="text-primary-600 font-black">Help.</span>
+        <div className="mb-20 text-center md:text-left relative">
+            <motion.div 
+               initial={{ x: -20, opacity: 0 }}
+               animate={{ x: 0, opacity: 1 }}
+               className="inline-flex items-center gap-2 bg-yellow-400 text-black px-4 py-2 rounded-xl border-4 border-black shadow-[4px_4px_0_#000] mb-6 transform rotate-2 font-comic text-xl uppercase tracking-widest"
+            >
+                <Zap className="w-6 h-6 fill-black" /> MISSION SUPPORT
+            </motion.div>
+            <h1 className="text-6xl md:text-8xl font-comic text-black leading-none uppercase mb-6 drop-shadow-[4px_4px_0_#ff007f]">
+                NEED <br />
+                <span className="text-white drop-shadow-[4px_4px_0_#000]">ASSISTANCE?</span>
             </h1>
-            <p className="text-lg text-gray-500 font-medium max-w-2xl">
-                Need clarification or technical assistance? Our team is here to support you 24/7 during the event.
+            <p className="text-xl text-black font-bold max-w-2xl bg-white p-4 border-4 border-black shadow-[6px_6px_0_#00f0ff] rounded-xl transform -rotate-1">
+                Synchronize with the HackVeda High Command. Our units are standing by to ensure your mission's success!
             </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-12">
-            <div className="space-y-12">
+        <div className="grid md:grid-cols-2 gap-12 lg:gap-20">
+            <div className="space-y-16">
                  <div>
-                     <h2 className="text-2xl font-black text-gray-900 mb-8 border-l-4 border-primary-600 pl-4 uppercase tracking-[0.2em] text-xs">Organizing Committee</h2>
-                     <div className="space-y-4">
+                     <h2 className="text-3xl font-comic text-black mb-10 uppercase tracking-widest bg-cyan-400 inline-block px-4 py-2 border-4 border-black shadow-[6px_6px_0_#000] transform -rotate-2">
+                        THE COMMANDERS
+                     </h2>
+                     <div className="space-y-8">
                         {organizers.map((org, i) => (
-                             <div key={i} className="card p-6 border-gray-100 hover:border-primary-100 transition-all shadow-xl shadow-gray-500/5 group">
-                                 <div className="flex items-center gap-4 mb-4">
-                                     <div className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center group-hover:bg-primary-600 transition-colors">
-                                         <UserRound className="w-5 h-5 text-primary-600 group-hover:text-white" />
+                             <motion.div 
+                                key={i} 
+                                whileHover={{ scale: 1.02, rotate: i % 2 === 0 ? 1 : -1 }}
+                                className="bg-white p-6 border-4 border-black shadow-[8px_8px_0_#000] relative overflow-hidden group rounded-3xl"
+                             >
+                                 <div className="absolute inset-0 opacity-10 group-hover:opacity-20 transition-opacity pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, black 1px, transparent 0)', backgroundSize: '16px 16px' }} />
+                                 <div className="flex items-center gap-6 mb-6 relative z-10">
+                                     <div className="w-16 h-16 bg-pink-400 border-4 border-black rounded-2xl flex items-center justify-center shadow-[4px_4px_0_#000] transform -rotate-6 group-hover:rotate-0 transition-transform">
+                                         <UserRound className="w-8 h-8 text-black stroke-[3]" />
                                      </div>
                                      <div>
-                                         <h3 className="font-bold text-gray-900 leading-none mb-1">{org.name}</h3>
-                                         <p className="text-xs font-bold text-gray-400 uppercase tracking-widest italic">{org.role}</p>
+                                         <h3 className="font-comic text-2xl text-black uppercase tracking-widest leading-none mb-1">{org.name}</h3>
+                                         <p className="text-xs font-bold text-gray-500 uppercase tracking-widest bg-gray-100 inline-block px-2 py-0.5 rounded border border-black">{org.role}</p>
                                      </div>
                                  </div>
-                                 <div className="grid grid-cols-2 gap-3 mt-4">
-                                     <a href={`mailto:${org.email}`} className="flex items-center gap-2 bg-gray-50 text-gray-700 px-4 py-2.5 rounded-xl hover:bg-primary-50 hover:text-primary-600 transition-all text-xs font-bold border border-gray-100">
-                                         <Mail className="w-3.5 h-3.5" />
-                                         Email
+                                 <div className="grid grid-cols-2 gap-4 relative z-10">
+                                     <a href={`mailto:${org.email}`} className="flex items-center justify-center gap-2 bg-cyan-400 text-black px-4 py-3 border-2 border-black rounded-xl font-bold uppercase text-[10px] tracking-widest shadow-[3px_3px_0_#000] hover:translate-y-0.5 hover:shadow-none transition-all">
+                                         <Mail className="w-4 h-4" /> EMAIL
                                      </a>
-                                     <a href={`tel:${org.phone}`} className="flex items-center gap-2 bg-white text-gray-700 px-4 py-2.5 rounded-xl hover:bg-gray-100 transition-all text-xs font-bold border border-gray-200">
-                                         <Phone className="w-3.5 h-3.5 opacity-40" />
-                                         Call
+                                     <a href={`tel:${org.phone}`} className="flex items-center justify-center gap-2 bg-yellow-400 text-black px-4 py-3 border-2 border-black rounded-xl font-bold uppercase text-[10px] tracking-widest shadow-[3px_3px_0_#000] hover:translate-y-0.5 hover:shadow-none transition-all">
+                                         <Phone className="w-4 h-4" /> CALL
                                      </a>
                                  </div>
-                             </div>
+                             </motion.div>
                         ))}
                      </div>
                  </div>
 
-                 <div className="card bg-gray-900 text-white border-0 shadow-2xl p-8 overflow-hidden relative group">
-                     <h3 className="text-xl font-bold mb-4 flex items-center gap-3">
-                         <MapPin className="w-5 h-5 text-primary-400" />
-                         Event Venue
+                 <div className="bg-black text-white border-4 border-black p-8 rounded-[2.5rem] shadow-[12px_12px_0_#00f0ff] relative overflow-hidden group">
+                     <div className="absolute top-0 right-0 p-8 opacity-20 transform translate-x-4 -translate-y-4">
+                        <MapPin className="w-32 h-32 text-white stroke-[2]" />
+                     </div>
+                     <h3 className="text-3xl font-comic mb-4 flex items-center gap-4 uppercase tracking-widest relative z-10">
+                         <MapPin className="w-8 h-8 text-pink-500 stroke-[3]" />
+                         MISSION HQ
                      </h3>
-                     <p className="text-gray-400 font-medium mb-8">
+                     <p className="text-gray-300 font-bold mb-8 relative z-10 uppercase tracking-widest text-sm">
                          SODE Main Campus auditorium & Labs. <br />
                          Reporting starts at 9:00 AM on April 10.
                      </p>
                      
-                     <div className="h-40 bg-white/5 rounded-2xl border border-white/10 flex items-center justify-center group-hover:bg-white/10 transition-colors cursor-pointer relative overflow-hidden">
-                         <MapPin className="w-12 h-12 text-white/10 group-hover:scale-150 transition-transform duration-700" />
-                         <span className="absolute inset-0 flex items-center justify-center font-black text-xs uppercase tracking-widest opacity-40">View Google Map</span>
+                     <div className="h-48 bg-white/10 rounded-3xl border-4 border-white/20 flex flex-col items-center justify-center group-hover:bg-white/20 transition-all cursor-pointer relative overflow-hidden">
+                         <div className="text-6xl font-comic text-white opacity-20 group-hover:scale-125 transition-transform duration-700">MAP</div>
+                         <span className="absolute bottom-4 font-bold text-[10px] uppercase tracking-[0.3em] text-white">INTERACT TO REVEAL</span>
                      </div>
                  </div>
             </div>
 
-            <div className="space-y-12">
-                <h2 className="text-2xl font-black text-gray-900 mb-8 border-l-4 border-amber-500 pl-4 uppercase tracking-[0.2em] text-xs">Common Questions</h2>
-                <div className="space-y-6">
-                    {faqs.map((faq, i) => (
-                        <div key={i} className="card p-8 border-gray-100 bg-gray-50/30 hover:bg-white transition-all shadow-xl shadow-gray-500/5 group">
-                             <div className="flex items-start gap-4 mb-4">
-                                 <div className="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center shrink-0">
-                                     <MessageSquare className="w-4 h-4 text-amber-600" />
+            <div className="space-y-16">
+                <div>
+                    <h2 className="text-3xl font-comic text-black mb-10 uppercase tracking-widest bg-yellow-400 inline-block px-4 py-2 border-4 border-black shadow-[6px_6px_0_#000] transform rotate-1">
+                        INTEL BRIEFING
+                    </h2>
+                    <div className="space-y-8">
+                        {faqs.map((faq, i) => (
+                            <motion.div 
+                                key={i} 
+                                whileHover={{ x: 10 }}
+                                className="bg-white p-8 border-4 border-black shadow-[8px_8px_0_#00f0ff] rounded-3xl group transform"
+                            >
+                                 <div className="flex items-start gap-4 mb-4">
+                                     <div className="w-10 h-10 bg-black text-yellow-400 rounded-full flex items-center justify-center shrink-0 border-2 border-black shadow-[2px_2px_0_#000]">
+                                         <MessageSquare className="w-5 h-5 fill-yellow-400" />
+                                     </div>
+                                     <h3 className="font-comic text-2xl text-black uppercase tracking-widest leading-tight">{faq.q}</h3>
                                  </div>
-                                 <h3 className="font-bold text-gray-900 leading-snug">{faq.q}</h3>
-                             </div>
-                             <p className="text-sm font-medium text-gray-500 leading-relaxed pl-12">
-                                 {faq.a}
-                             </p>
-                        </div>
-                    ))}
+                                 <p className="text-base font-bold text-gray-700 leading-relaxed pl-14">
+                                     {faq.a}
+                                 </p>
+                            </motion.div>
+                        ))}
+                    </div>
                 </div>
                 
-                <div className="card bg-blue-50 border-blue-100 p-8">
-                     <div className="flex items-center gap-4 mb-4">
-                         <div className="bg-blue-100 p-3 rounded-2xl">
-                             <ExternalLink className="w-5 h-5 text-blue-600" />
+                <div className="bg-indigo-400 border-4 border-black p-10 rounded-[2.5rem] shadow-[12px_12px_0_#000] relative overflow-hidden">
+                     {/* Halftone BG */}
+                     <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, black 1px, transparent 0)', backgroundSize: '16px 16px' }} />
+                     
+                     <div className="flex items-center gap-6 mb-8 relative z-10">
+                         <div className="bg-white p-4 border-4 border-black rounded-2xl shadow-[4px_4px_0_#000] transform -rotate-12">
+                             <ExternalLink className="w-8 h-8 text-black stroke-[3]" />
                          </div>
-                         <h3 className="text-xl font-bold text-blue-900">Resource Hub</h3>
+                         <h3 className="text-4xl font-comic text-white drop-shadow-[2px_2px_0_#000] uppercase tracking-widest">KIT ROOM</h3>
                      </div>
-                     <p className="text-blue-800 text-sm font-medium mb-6">Access official hackathon kits, design assets, and previous years' winning projects.</p>
-                     <button className="w-full btn-primary bg-blue-600 text-white border-0 h-14 rounded-2xl shadow-xl shadow-blue-500/20 active:scale-[0.98]">
-                         Open Resource Drive
+                     <p className="text-white font-bold text-base mb-8 relative z-10 uppercase tracking-widest drop-shadow-[1px_1px_0_#000]">Access official hackathon kits, design assets, and previous years' winning projects.</p>
+                     <button className="w-full bg-yellow-400 text-black border-4 border-black h-16 rounded-2xl shadow-[6px_6px_0_#000] font-comic text-2xl uppercase tracking-widest hover:translate-y-1 hover:shadow-none transition-all relative z-10">
+                         OPEN RESOURCE DRIVE!
                      </button>
                 </div>
             </div>

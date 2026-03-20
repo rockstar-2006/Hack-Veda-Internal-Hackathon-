@@ -5,7 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { getAllTeamsForAdmin } from "@/lib/db";
 import { Team } from "@/types";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
-import { Trophy, ShieldCheck, Mail, ArrowRight, Table, Search, RefreshCcw, MoreHorizontal, FileCheck, Circle, Clock, CheckCircle2, LayoutGrid, Users } from "lucide-react";
+import { Trophy, ShieldCheck, Mail, ArrowRight, Table, Search, RefreshCcw, MoreHorizontal, FileCheck, Circle, Clock, CheckCircle2, Users, Zap } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -40,7 +40,7 @@ export default function LeaderboardPage() {
 
   return (
     <ProtectedRoute>
-      <div className="max-w-7xl mx-auto px-4 py-20 relative min-h-screen pb-40">
+      <div className="max-w-7xl mx-auto px-4 py-12 md:py-20 relative min-h-screen pb-40 font-sans">
         
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-12 mb-24 relative">
@@ -48,138 +48,148 @@ export default function LeaderboardPage() {
                   <motion.div 
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="inline-flex items-center gap-2 bg-indigo-50 text-indigo-700 px-5 py-2 rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] border border-indigo-100 mb-8 italic"
+                    className="inline-flex items-center gap-2 bg-yellow-400 text-black px-5 py-2 rounded-2xl text-lg font-bold uppercase tracking-widest border-4 border-black shadow-[4px_4px_0_#000] transform rotate-2 mb-8"
                   >
-                      <Trophy className="w-4 h-4" />
-                      Live Standings
+                      <Trophy className="w-6 h-6 fill-yellow-200" />
+                      LIVE STANDINGS!
                   </motion.div>
-                  <h1 className="text-6xl lg:text-8xl font-black text-gray-900 leading-[0.9] tracking-tighter mb-8 italic">
-                     Team <br />
-                     <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-indigo-950">Leaderboard.</span>
-                  </h1>
-                  <p className="text-xl text-gray-400 font-bold italic leading-relaxed">
-                     Track the progress, status, and shortlisting results of all participating teams in real-time.
+                   <h1 className="text-6xl lg:text-9xl font-comic text-black leading-none uppercase mb-8 drop-shadow-[4px_4px_0_#ff007f] transform -rotate-1">
+                      EVENT <br />
+                      <span className="text-white drop-shadow-[4px_4px_0_#000]">SCOREBOARD!</span>
+                   </h1>
+                  <p className="text-xl text-black bg-white p-4 border-4 border-black shadow-[6px_6px_0_#00f0ff] rounded-xl transform rotate-1 font-bold">
+                     Track the progress, status, and shortlisting results of all participating teams in real-time. THE RACE IS ON!
                   </p>
              </div>
              
-             {/* Search/Filter Bar */}
-             <div className="w-full md:w-96 relative z-10">
-                  <div className="flex items-center gap-4 bg-white p-3 rounded-[2rem] border border-gray-100 shadow-2xl shadow-indigo-600/5 focus-within:border-indigo-200 transition-all">
-                      <Search className="w-5 h-5 text-gray-300 ml-4" />
+             {/* Search Bar */}
+             <div className="w-full md:w-96 relative z-10 px-2 sm:px-0">
+                  <div className="flex items-center gap-4 bg-white p-4 rounded-2xl border-4 border-black shadow-[8px_8px_0_#000] focus-within:-translate-y-1 transition-all">
+                      <Search className="w-6 h-6 text-black stroke-[3]" />
                       <input 
                          type="text" 
-                         placeholder="Search teams..." 
+                         placeholder="FIND SQUAD..." 
                          value={searchTerm}
                          onChange={(e) => setSearchTerm(e.target.value)}
-                         className="flex-1 bg-transparent border-0 focus:outline-none focus:ring-0 text-sm font-black tracking-tight uppercase"
+                         className="flex-1 bg-transparent border-0 focus:outline-none focus:ring-0 text-lg font-comic tracking-widest uppercase placeholder:text-gray-400"
                       />
                       <button 
                         onClick={fetchTeams}
-                        className={`p-3 rounded-2xl bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white transition-all ${refreshing ? 'animate-spin' : ''}`}
+                        className={`p-3 rounded-xl bg-pink-400 text-black border-2 border-black hover:bg-black hover:text-white transition-all shadow-[2px_2px_0_#000] active:translate-y-1 active:shadow-none ${refreshing ? 'animate-spin' : ''}`}
                       >
-                          <RefreshCcw className="w-4 h-4" />
+                          <RefreshCcw className="w-5 h-5 stroke-[3]" />
                       </button>
                   </div>
              </div>
         </div>
 
         {/* Status Indicators Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12 mb-20 relative z-10">
              <motion.div 
-                whileHover={{ y: -10 }}
-                className="p-10 rounded-[3rem] bg-white border border-gray-50 flex items-center justify-between shadow-sm"
+                whileHover={{ y: -10, rotate: -2 }}
+                className="p-10 rounded-[2.5rem] bg-yellow-400 border-4 border-black flex items-center justify-between shadow-[10px_10px_0_#000] relative overflow-hidden"
              >
-                 <div>
-                     <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 italic">Total Teams</p>
-                     <p className="text-5xl font-black text-gray-900 leading-none">{teams.length}</p>
+                 <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, black 1px, transparent 0)', backgroundSize: '16px 16px' }} />
+                 <div className="relative z-10">
+                     <p className="text-sm font-comic text-black uppercase tracking-widest mb-3 bg-white inline-block px-2 border-2 border-black rounded">TOTAL TEAMS</p>
+                     <p className="text-7xl font-comic text-black leading-none drop-shadow-[2px_2px_0_#fff]">{teams.length}</p>
                  </div>
-                 <div className="w-16 h-16 rounded-[2rem] bg-indigo-50 flex items-center justify-center">
-                     <Users className="w-8 h-8 text-indigo-600" />
+                 <div className="w-20 h-20 rounded-2xl bg-white border-4 border-black flex items-center justify-center shadow-[4px_4px_0_#000] relative z-10">
+                     <Users className="w-10 h-10 text-black stroke-[3]" />
                  </div>
              </motion.div>
+
              <motion.div 
-                whileHover={{ y: -10 }}
-                className="p-10 rounded-[3rem] bg-white border border-gray-50 flex items-center justify-between shadow-sm"
+                whileHover={{ y: -10, rotate: 2 }}
+                className="p-10 rounded-[2.5rem] bg-cyan-400 border-4 border-black flex items-center justify-between shadow-[10px_10px_0_#000] relative overflow-hidden"
              >
-                 <div>
-                     <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-3 italic">Shortlisted</p>
-                     <p className="text-5xl font-black text-indigo-600 leading-none">{teams.filter(t => t.shortlisted).length}</p>
+                 <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, black 1px, transparent 0)', backgroundSize: '16px 16px' }} />
+                 <div className="relative z-10">
+                     <p className="text-sm font-comic text-black uppercase tracking-widest mb-3 bg-white inline-block px-2 border-2 border-black rounded">SHORTLISTED</p>
+                     <p className="text-7xl font-comic text-black leading-none drop-shadow-[2px_2px_0_#fff]">{teams.filter(t => t.shortlisted).length}</p>
                  </div>
-                 <div className="w-16 h-16 rounded-[2rem] bg-indigo-50 flex items-center justify-center">
-                     <CheckCircle2 className="w-8 h-8 text-indigo-600" />
+                 <div className="w-20 h-20 rounded-2xl bg-white border-4 border-black flex items-center justify-center shadow-[4px_4px_0_#000] relative z-10">
+                     <CheckCircle2 className="w-10 h-10 text-black stroke-[3]" />
                  </div>
              </motion.div>
+
              <motion.div 
-                whileHover={{ y: -10 }}
-                className="p-10 rounded-[3rem] bg-indigo-900 flex items-center justify-between shadow-2xl"
+                whileHover={{ y: -10, rotate: -1 }}
+                className="p-10 rounded-[2.5rem] bg-pink-400 border-4 border-black flex items-center justify-between shadow-[10px_10px_0_#000] relative overflow-hidden"
              >
-                 <div>
-                     <p className="text-[10px] font-black text-indigo-300 uppercase tracking-widest mb-3 italic">Submission Rate</p>
-                     <p className="text-5xl font-black text-white leading-none">
+                 <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, black 1px, transparent 0)', backgroundSize: '16px 16px' }} />
+                 <div className="relative z-10">
+                     <p className="text-sm font-comic text-black uppercase tracking-widest mb-3 bg-white inline-block px-2 border-2 border-black rounded">SUCCESS RATE</p>
+                     <p className="text-7xl font-comic text-black leading-none drop-shadow-[2px_2px_0_#fff]">
                         {teams.length ? Math.floor((teams.filter(t => t.shortlisted).length / teams.length) * 100) : 0}%
                      </p>
                  </div>
-                 <div className="w-16 h-16 rounded-[2rem] bg-white/10 flex items-center justify-center">
-                     <LayoutGrid className="w-8 h-8 text-white" />
+                 <div className="w-20 h-20 rounded-2xl bg-white border-4 border-black flex items-center justify-center shadow-[4px_4px_0_#000] relative z-10">
+                     <Zap className="w-10 h-10 text-black fill-yellow-400 stroke-[3]" />
                  </div>
              </motion.div>
         </div>
 
         {/* Data List */}
-        <div className="space-y-6">
+        <div className="space-y-8 relative z-10">
              <AnimatePresence mode="popLayout">
                  {loading ? (
                       [...Array(4)].map((_, i) => (
-                        <div key={i} className="h-24 rounded-[2.5rem] bg-gray-50 animate-pulse border border-gray-100" />
+                        <div key={i} className="h-32 rounded-3xl bg-gray-200 animate-pulse border-4 border-black shadow-[8px_8px_0_#000]" />
                       ))
                  ) : filteredTeams.length > 0 ? (
                     filteredTeams.map((t, idx) => (
                         <motion.div 
                             key={t.id}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
+                            initial={{ opacity: 0, x: -50 }}
+                            animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, scale: 0.95 }}
                             transition={{ delay: idx * 0.05 }}
-                            className={`p-8 md:p-10 rounded-[3rem] bg-white border flex flex-col md:flex-row items-center justify-between group transition-all duration-700 hover:shadow-2xl hover:shadow-indigo-600/5 hover:border-indigo-100 ${t.shortlisted ? 'border-primary-100 bg-indigo-50/10' : 'border-gray-50'}`}
+                            whileHover={{ scale: 1.02, x: 10 }}
+                            className={`p-6 md:p-8 rounded-[3rem] bg-white border-4 border-black flex flex-col md:flex-row items-center justify-between group transition-all shadow-[12px_12px_0_#000] hover:shadow-[16px_16px_0_#ff007f] relative overflow-hidden`}
                         >
-                            <div className="flex items-center gap-10 w-full md:w-auto">
-                                <span className="text-3xl font-black text-gray-200 group-hover:text-indigo-600 transition-colors w-12 italic">
+                            {/* Halftone BG on hover */}
+                            <div className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, black 1px, transparent 0)', backgroundSize: '16px 16px' }} />
+
+                            <div className="flex items-center gap-6 md:gap-10 w-full md:w-auto relative z-10">
+                                <span className="text-4xl md:text-5xl font-comic text-gray-200 group-hover:text-black transition-colors w-16 text-center transform -rotate-12">
                                     {(idx + 1).toString().padStart(2, '0')}
                                 </span>
                                 <div className="flex-1">
-                                    <h3 className="text-2xl font-black text-gray-900 mb-1 tracking-tighter italic uppercase">{t.teamName}</h3>
-                                    <div className="flex items-center gap-3">
-                                        <div className="flex -space-x-2">
-                                            {t.memberIds.map(id => (
-                                                <div key={id} className="w-5 h-5 rounded-full bg-indigo-100 border border-white" />
-                                            ))}
+                                    <h3 className="text-3xl md:text-4xl font-comic text-black mb-2 tracking-widest uppercase drop-shadow-[2px_2px_0_#00f0ff]">{t.teamName}</h3>
+                                    <div className="flex items-center gap-4">
+                                        <div className="flex items-center gap-2 bg-gray-100 border-2 border-black px-3 py-1 rounded-xl">
+                                            <Users className="w-4 h-4 text-black" />
+                                            <span className="text-xs font-bold text-black uppercase tracking-widest">{t.memberIds.length} SQUAD MEMBERS</span>
                                         </div>
-                                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{t.memberIds.length} Members</span>
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-12 mt-8 md:mt-0 w-full md:w-auto justify-between border-t border-gray-50 md:border-0 pt-8 md:pt-0">
+                            <div className="flex items-center gap-12 mt-8 md:mt-0 w-full md:w-auto justify-end relative z-10">
                                 <div className="text-right">
-                                     <div className={`px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center gap-3 border transition-all ${t.shortlisted ? 'bg-indigo-600 text-white border-indigo-600 shadow-xl shadow-indigo-600/20' : 'bg-gray-50 text-gray-400 border-gray-100'}`}>
-                                         {t.shortlisted ? <CheckCircle2 className="w-4 h-4" /> : <Clock className="w-4 h-4" />}
-                                         {t.shortlisted ? 'Shortlisted' : 'Registered'}
+                                     <div className={`px-8 py-4 rounded-2xl text-lg font-comic uppercase tracking-widest flex items-center gap-4 border-4 border-black shadow-[6px_6px_0_#000] group-hover:shadow-[8px_8px_0_#000] rotate-1 group-hover:rotate-0 transition-all ${t.shortlisted ? 'bg-indigo-400 text-white' : 'bg-gray-100 text-black'}`}>
+                                         {t.shortlisted ? <CheckCircle2 className="w-6 h-6 stroke-[3]" /> : <Clock className="w-6 h-6 stroke-[3]" />}
+                                         {t.shortlisted ? 'SHORTLISTED!' : 'REGISTERED'}
                                      </div>
                                 </div>
                             </div>
                         </motion.div>
                     ))
                  ) : (
-                     <div className="text-center py-40">
-                         <Search className="w-16 h-16 text-gray-100 mx-auto mb-6" />
-                         <p className="text-xl text-gray-400 font-bold italic uppercase tracking-widest">No matching teams found</p>
-                     </div>
+                    <motion.div 
+                        initial={{ scale: 0.8, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        className="text-center py-40 bg-white border-4 border-black rounded-3xl shadow-[12px_12px_0_#000]"
+                    >
+                         <Search className="w-32 h-32 text-gray-200 mx-auto mb-8 animate-bounce" />
+                         <p className="text-4xl font-comic text-black uppercase tracking-widest drop-shadow-[2px_2px_0_#fff]">NO MATCHING SQUADS FOUND!</p>
+                         <button onClick={() => setSearchTerm("")} className="mt-8 bg-yellow-400 text-black border-4 border-black px-8 py-3 rounded-xl font-comic text-xl uppercase tracking-widest shadow-[6px_6px_0_#000] hover:translate-y-1 hover:shadow-none transition-all">CLEAR SCAN</button>
+                    </motion.div>
                  )}
              </AnimatePresence>
         </div>
 
-        {/* Decorative Background Art */}
-        <div className="fixed bottom-0 left-0 w-96 h-96 bg-indigo-50/20 rounded-full blur-[100px] -z-10 translate-x-1/2 -translate-y-1/2" />
       </div>
     </ProtectedRoute>
   );

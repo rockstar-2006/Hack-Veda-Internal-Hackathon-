@@ -38,110 +38,114 @@ const prizes = [
 export default function PrizesPage() {
   return (
     <ProtectedRoute>
-      <div className="max-w-7xl mx-auto px-6 py-20 min-h-screen pb-40 relative">
+      <div className="max-w-7xl mx-auto px-6 py-20 min-h-screen pb-40 relative font-sans">
         
         {/* Header Section */}
-        <section className="mb-32 text-center">
-             <Link href="/profile" className="inline-flex items-center gap-3 bg-indigo-50 text-indigo-700 px-5 py-2 rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] mb-12 italic border border-indigo-100 hover:bg-indigo-600 hover:text-white transition-all group active:scale-95">
-                  <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-                  Back to Dashboard
+        <section className="mb-24 text-center relative z-10">
+             <Link href="/profile" className="inline-flex items-center gap-3 bg-pink-400 text-black px-6 py-3 rounded-xl font-comic text-xl uppercase tracking-widest border-4 border-black hover:-translate-y-1 hover:shadow-[6px_6px_0_#000] shadow-[4px_4px_0_#000] transition-all active:translate-y-1 active:shadow-none mb-12">
+                  <ArrowLeft className="w-5 h-5 stroke-[3]" />
+                  BACK TO DASHBOARD
              </Link>
              
              <motion.div 
-               animate={{ scale: [1, 1.05, 1] }}
-               transition={{ duration: 4, repeat: Infinity }}
-               className="inline-flex items-center gap-3 bg-yellow-400 text-yellow-950 px-8 py-3 rounded-2xl text-[11px] font-black uppercase tracking-[0.4em] mb-10 italic shadow-2xl shadow-yellow-500/20"
+               animate={{ y: [0, -10, 0] }}
+               transition={{ duration: 2, repeat: Infinity }}
+               className="inline-flex items-center gap-3 bg-cyan-400 text-black px-6 py-2 rounded-xl text-lg font-bold uppercase tracking-widest mb-10 border-4 border-black shadow-[4px_4px_0_#000] rotate-2"
              >
-                 <Crown className="w-4 h-4 fill-yellow-950" />
-                 Victory Prizes
+                 <Crown className="w-6 h-6 fill-yellow-400 stroke-black stroke-[2]" />
+                 VICTORY PRIZES!
              </motion.div>
              
-             <h1 className="text-4xl md:text-7xl font-black text-gray-900 leading-tight tracking-tighter mb-10 italic">
-                Win Big for <br />
-                <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-indigo-900 to-indigo-950 font-black italic">
-                    Great Ideas.
-                </span>
+             <h1 className="text-5xl md:text-7xl lg:text-8xl font-comic text-black leading-none tracking-widest uppercase mb-10 drop-shadow-[4px_4px_0_#ff007f] transform -rotate-1">
+                PRIZES & <br />
+                <span className="text-white drop-shadow-[4px_4px_0_#000]">REWARDS!</span>
              </h1>
-             <p className="text-xl text-gray-400 font-bold max-w-2xl mx-auto italic leading-relaxed">
-                 Rewarding excellence in software development. Every participant receives recognition.
+             <p className="text-lg md:text-xl text-black bg-yellow-300 font-bold max-w-2xl mx-auto p-4 border-4 border-black rounded-xl shadow-[6px_6px_0_#000] rotate-1">
+                 Rewarding excellence in software development. EVERY PARTICIPANT RECEIVES RECOGNITION!
              </p>
         </section>
 
-        <div className="grid lg:grid-cols-3 gap-6 lg:gap-8 mb-16 lg:mb-24 group/list">
-            {prizes.map((prize, idx) => (
+        <div className="grid lg:grid-cols-3 gap-8 lg:gap-12 mb-24 relative z-10">
+            {prizes.map((prize, idx) => {
+                const colors = ['bg-yellow-400', 'bg-cyan-400', 'bg-pink-400'];
+                const cardColor = colors[idx % colors.length];
+
+                return (
                 <motion.div 
                     key={idx}
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ delay: idx * 0.2, duration: 0.6 }}
-                    className={`p-8 rounded-3xl ${prize.color} border-2 flex flex-col group hover:-translate-y-4 transition-all duration-500 relative overflow-hidden h-auto shadow-lg hover:shadow-xl`}
+                    transition={{ delay: idx * 0.2, duration: 0.4 }}
+                    whileHover={{ y: -8, x: -4 }}
+                    className={`p-8 rounded-3xl ${cardColor} border-4 border-black flex flex-col group transition-all relative overflow-hidden h-auto shadow-[12px_12px_0_#000] hover:shadow-[16px_16px_0_#000]`}
                 >
-                    <div className="absolute top-0 right-0 p-6 opacity-5 scale-150 rotate-12 transition-transform duration-[2000ms] group-hover:rotate-45 pointer-events-none">
-                        <Zap className="w-24 h-24" />
+                    {/* Halftone BG */}
+                    <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, black 1px, transparent 0)', backgroundSize: '16px 16px' }} />
+
+                    <div className="absolute top-0 right-0 p-6 opacity-20 scale-150 rotate-12 transition-transform duration-500 group-hover:rotate-45 pointer-events-none">
+                        <Zap className="w-32 h-32 fill-black stroke-black stroke-[2]" />
                     </div>
 
-                    <div className="mb-8 flex justify-center group-hover:scale-110 transition-all duration-500 relative z-10 shrink-0">
-                        {prize.icon}
+                    <div className="mb-8 flex justify-center group-hover:scale-110 transition-transform relative z-10 shrink-0">
+                        <div className="bg-white p-4 rounded-2xl border-4 border-black shadow-[6px_6px_0_#000] transform rotate-3 group-hover:-rotate-3 transition-transform">
+                             <div className="[&>svg]:w-16 [&>svg]:h-16 [&>svg]:text-black [&>svg]:stroke-[2]">{prize.icon}</div>
+                        </div>
                     </div>
                     
-                    <div className="text-center mb-6 relative z-10">
-                        <h2 className="text-[10px] font-bold uppercase tracking-widest mb-2 opacity-60 italic">{prize.label}</h2>
-                        <h3 className="text-xl font-black text-gray-900 mb-1 uppercase tracking-tight">{prize.title}</h3>
-                        <p className="text-3xl md:text-4xl font-black tracking-tighter italic leading-none">{prize.amount}</p>
+                    <div className="text-center mb-6 relative z-10 bg-white p-4 border-4 border-black rounded-xl shadow-[4px_4px_0_#000] transform -rotate-1">
+                        <h2 className="text-sm font-bold uppercase tracking-widest mb-1 text-gray-800 bg-gray-200 inline-block px-2 rounded">{prize.label}</h2>
+                        <h3 className="text-3xl font-comic text-black mb-1 uppercase tracking-widest">{prize.title}</h3>
+                        <p className="text-4xl md:text-5xl font-comic tracking-widest text-black drop-shadow-[2px_2px_0_#fff]">{prize.amount}</p>
                     </div>
 
-                    <p className="text-sm font-medium text-center mb-8 opacity-70 leading-relaxed italic border-t border-black/5 pt-6 flex-1 relative z-10">
+                    <p className="text-base font-bold text-center mb-8 text-black bg-white/60 p-4 border-2 border-black rounded-lg flex-1 relative z-10">
                         "{prize.description}"
                     </p>
 
-                    <div className="space-y-4 mt-auto relative z-10">
-                        <p className="text-[10px] font-bold uppercase tracking-widest opacity-40 mb-4 italic">Prize Benefits</p>
+                    <div className="space-y-4 mt-auto relative z-10 bg-white p-6 border-4 border-black rounded-2xl shadow-[4px_4px_0_#000] transform rotate-1">
+                        <p className="text-sm font-comic uppercase tracking-widest text-black mb-4 mx-auto w-fit bg-yellow-300 px-2 rounded border-2 border-black">PRIZE BENEFITS</p>
                         {prize.perks.map((perk, i) => (
-                            <div key={i} className="flex gap-3 text-sm font-bold items-center group/item transition-transform italic text-gray-800">
-                                <div className="w-2 h-2 rounded-full bg-indigo-600 shadow-[0_0_8px_rgba(79,70,229,0.3)] shrink-0" />
+                            <div key={i} className="flex gap-3 text-sm font-bold items-center group/item text-black">
+                                <div className="w-3 h-3 rounded-full bg-black border-2 border-white shadow-[2px_2px_0_#00f0ff] shrink-0" />
                                 <span>{perk}</span>
                             </div>
                         ))}
                     </div>
-                    
-                    {/* Dynamic Glow */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
                 </motion.div>
-            ))}
+                );
+            })}
         </div>
 
         {/* Participation Rewards Section */}
         <motion.div 
            initial={{ opacity: 0, scale: 0.95 }}
            whileInView={{ opacity: 1, scale: 1 }}
-           className="p-8 md:p-12 rounded-3xl bg-gray-950 text-white relative overflow-hidden shadow-xl border border-gray-900 group"
+           className="p-8 md:p-16 rounded-3xl bg-black text-white relative overflow-hidden border-4 border-black shadow-[16px_16px_0_#00f0ff] group z-10 transform -rotate-1 hover:rotate-0 transition-transform"
         >
+             {/* Halftone Pattern Light */}
+             <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '16px 16px' }} />
+             
              <div className="relative z-20 flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-16">
                  <div className="max-w-xl text-center lg:text-left">
-                     <div className="inline-flex items-center gap-2 bg-white/10 text-indigo-300 px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest mb-6 border border-white/5 italic">
-                        <Gift className="w-4 h-4 animate-bounce-subtle" />
-                        All Participants
+                     <div className="inline-flex items-center gap-3 bg-pink-500 text-black px-4 py-2 rounded-xl text-sm font-bold uppercase tracking-widest mb-6 border-4 border-black shadow-[4px_4px_0_#fff] transform rotate-2">
+                        <Gift className="w-5 h-5 stroke-[3]" />
+                        ALL PARTICIPANTS!
                      </div>
-                     <h2 className="text-2xl md:text-4xl font-black mb-4 tracking-tight italic uppercase leading-none">Participation <br /> Reward Kit.</h2>
-                     <p className="text-gray-400 text-sm md:text-base font-medium leading-relaxed italic">
+                     <h2 className="text-4xl md:text-6xl font-comic mb-4 tracking-widest uppercase leading-none drop-shadow-[2px_2px_0_#ff007f]">PARTICIPATION <br /> REWARD KIT!</h2>
+                     <p className="bg-white text-black text-base md:text-lg font-bold p-4 border-4 border-black rounded-xl shadow-[4px_4px_0_#00f0ff] transform -rotate-1">
                         Every innovator that reaches the final evaluation cycle will receive official validation, branded assets, and full coverage of innovation logistics.
                      </p>
                  </div>
                  
-                 <div className="flex -space-x-6 sm:-space-x-8 shrink-0 justify-center">
+                 <div className="flex flex-wrap sm:flex-nowrap gap-4 sm:-space-x-8 shrink-0 justify-center mt-8 lg:mt-0">
                      {[1,2,3,4].map(i => (
-                         <div key={i} className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-indigo-600/10 backdrop-blur-xl border border-white/10 flex items-center justify-center -rotate-12 hover:rotate-6 hover:-translate-y-2 hover:bg-indigo-600 transition-all duration-500 cursor-pointer shadow-black shadow-lg overflow-hidden relative group/icon group-hover:rotate-0">
-                             <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover/icon:opacity-100 transition-opacity" />
-                             <Medal className="w-6 h-6 sm:w-8 sm:h-8 text-white group-hover/icon:scale-110 transition-transform duration-300" />
+                         <div key={i} className={`w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-yellow-400 border-4 border-black flex items-center justify-center transform hover:-translate-y-4 hover:scale-110 transition-all cursor-pointer shadow-[6px_6px_0_#fff] relative group/icon ${i % 2 === 0 ? 'rotate-6' : '-rotate-6 hover:rotate-0'}`}>
+                             <Medal className="w-10 h-10 sm:w-12 sm:h-12 text-black stroke-[2] group-hover/icon:animate-bounce" />
                          </div>
                      ))}
                  </div>
              </div>
-             
-             {/* Background Art */}
-             <div className="absolute top-0 left-0 w-full h-full opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '40px 40px' }} />
-             <div className="absolute bottom-0 right-0 w-64 h-64 bg-indigo-600/10 rounded-full blur-[80px] -z-10 translate-x-1/4 translate-y-1/4" />
         </motion.div>
 
       </div>

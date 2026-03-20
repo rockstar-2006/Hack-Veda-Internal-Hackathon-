@@ -70,6 +70,23 @@ body {
   100% { transform: translateY(0px) rotate(0deg); }
 }
 
+button, 
+a {
+  touch-action: manipulation;
+}
+
+.font-comic {
+  font-family: var(--font-bangers), cursive;
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.animate-spin-slow {
+  animation: spin-slow 8s linear infinite;
+}
+
 .custom-scrollbar::-webkit-scrollbar {
   width: 5px;
 }
@@ -77,9 +94,9 @@ body {
   background: transparent;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #f1f5f9;
+  background: #000000;
   border-radius: 20px;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #e2e8f0;
+  background: #333;
 }
