@@ -161,71 +161,71 @@ export default function ProfilePage() {
   if (showSetup) {
       return (
           <ProtectedRoute>
-              <div className="max-w-2xl mx-auto px-6 py-20 lg:py-40 min-h-screen">
+              <div className="max-w-2xl mx-auto px-6 py-10 lg:py-20 min-h-screen">
                   <motion.div 
-                    initial={{ opacity: 0, y: 30 }}
+                    initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="p-10 md:p-14 rounded-[4rem] bg-white border-4 border-indigo-50 shadow-2xl relative overflow-hidden"
+                    className="p-6 md:p-10 rounded-[2rem] bg-white border border-indigo-50 shadow-sm relative overflow-hidden"
                   >
-                        <div className="absolute top-0 right-0 w-48 h-48 bg-indigo-600/5 rounded-full blur-[80px] -mr-24 -mt-24" />
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-600/5 rounded-full blur-[50px] -mr-16 -mt-16" />
                         
-                        <div className="flex items-center gap-4 mb-12 relative z-10">
-                             <div className="bg-indigo-600 p-4 rounded-3xl shadow-xl shadow-indigo-600/30">
-                                 <Settings className="w-8 h-8 text-white animate-spin-slow" />
+                        <div className="flex items-center gap-4 mb-8 relative z-10">
+                             <div className="bg-indigo-600 p-3 rounded-xl shadow-md shadow-indigo-600/20">
+                                 <Settings className="w-6 h-6 text-white animate-spin-slow" />
                              </div>
-                             <h2 className="text-4xl font-black text-gray-900 italic tracking-tighter uppercase leading-none">Settings & <br /> Profile.</h2>
+                             <h2 className="text-2xl font-black text-gray-900 tracking-tight leading-none">Settings & Profile</h2>
                         </div>
 
                         {error && (
-                            <div className="mb-8 p-4 bg-red-50 text-red-600 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-red-100 italic">
+                            <div className="mb-6 p-4 bg-red-50 text-red-600 rounded-xl text-xs font-bold border border-red-100">
                                 {error}
                             </div>
                         )}
                         
-                        <form onSubmit={handleProfileUpdate} className="space-y-8">
+                        <form onSubmit={handleProfileUpdate} className="space-y-6">
                              {team && team.leaderId === user?.uid && (
-                                <div className="space-y-2 p-6 bg-indigo-50/50 rounded-3xl border-2 border-dashed border-indigo-100">
-                                    <label className="text-[10px] font-black text-indigo-400 uppercase tracking-widest pl-4">Team Designation (Leader Only)</label>
+                                <div className="space-y-2 p-4 bg-indigo-50/50 rounded-2xl border border-dashed border-indigo-100">
+                                    <label className="text-xs font-bold text-indigo-400 uppercase tracking-widest pl-2 block">Team Designation</label>
                                     <input 
                                         type="text" 
                                         value={currentTeamName}
                                         onChange={(e) => setCurrentTeamName(e.target.value)}
                                         placeholder="Team Name"
-                                        className="w-full h-16 px-8 rounded-3xl bg-white border-4 border-transparent focus:border-indigo-600 outline-none transition-all font-black text-lg italic"
+                                        className="w-full h-12 px-4 rounded-xl bg-white border border-transparent focus:border-indigo-600 outline-none transition-all font-bold text-sm"
                                         required
                                     />
                                 </div>
                              )}
                              <div className="space-y-2">
-                                 <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-4">Full Name</label>
+                                 <label className="text-xs font-bold text-gray-500 uppercase tracking-widest pl-2 block">Full Name</label>
                                  <input 
                                    type="text" 
                                    value={fullName}
                                    onChange={(e) => setFullName(e.target.value)}
                                    placeholder="Your Full Name"
-                                   className="w-full h-16 px-8 rounded-3xl bg-gray-50 border-4 border-transparent focus:border-indigo-600 focus:bg-white outline-none transition-all font-black text-lg"
+                                   className="w-full h-12 px-4 rounded-xl bg-gray-50 border border-gray-200 focus:border-indigo-600 focus:bg-white outline-none transition-all font-bold text-sm"
                                    required
                                  />
                              </div>
                              
-                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-4">USN</label>
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-widest pl-2 block">USN</label>
                                     <input 
                                       type="text" 
                                       value={usn}
                                       onChange={(e) => setUsn(e.target.value)}
                                       placeholder="Ex: 4SO23CS..."
-                                      className="w-full h-16 px-8 rounded-3xl bg-gray-50 border-4 border-transparent focus:border-indigo-600 focus:bg-white outline-none transition-all font-black text-lg"
+                                      className="w-full h-12 px-4 rounded-xl bg-gray-50 border border-gray-200 focus:border-indigo-600 focus:bg-white outline-none transition-all font-bold text-sm"
                                       required
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-4">Branch</label>
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-widest pl-2 block">Branch</label>
                                     <select 
                                       value={branch}
                                       onChange={(e) => setBranch(e.target.value)}
-                                      className="w-full h-16 px-8 rounded-3xl bg-gray-50 border-4 border-transparent focus:border-indigo-600 focus:bg-white outline-none transition-all font-black text-lg appearance-none cursor-pointer"
+                                      className="w-full h-12 px-4 rounded-xl bg-gray-50 border border-gray-200 focus:border-indigo-600 focus:bg-white outline-none transition-all font-bold text-sm appearance-none cursor-pointer"
                                       required
                                     >
                                         <option value="CSE">CSE</option>
@@ -240,11 +240,11 @@ export default function ProfilePage() {
                              </div>
 
                              <div className="space-y-2">
-                                 <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-4">Year of Study</label>
+                                 <label className="text-xs font-bold text-gray-500 uppercase tracking-widest pl-2 block">Year of Study</label>
                                  <select 
                                       value={year}
                                       onChange={(e) => setYear(e.target.value)}
-                                      className="w-full h-16 px-8 rounded-3xl bg-gray-50 border-4 border-transparent focus:border-indigo-600 focus:bg-white outline-none transition-all font-black text-lg appearance-none cursor-pointer"
+                                      className="w-full h-12 px-4 rounded-xl bg-gray-50 border border-gray-200 focus:border-indigo-600 focus:bg-white outline-none transition-all font-bold text-sm appearance-none cursor-pointer"
                                       required
                                     >
                                         <option value="1st Year">1st Year</option>
@@ -257,16 +257,16 @@ export default function ProfilePage() {
                              <button 
                                type="submit" 
                                disabled={profileSaving}
-                               className="w-full h-24 rounded-[3rem] bg-indigo-600 text-white flex items-center justify-center gap-4 text-xl font-black tracking-tight mt-10 shadow-2xl shadow-indigo-600/30 hover:bg-indigo-700 transition-all active:scale-95 disabled:opacity-50"
+                               className="w-full h-12 rounded-xl bg-indigo-600 text-white flex items-center justify-center gap-2 text-sm font-bold mt-6 shadow-md shadow-indigo-600/20 hover:bg-indigo-700 transition-all active:scale-95 disabled:opacity-50"
                              >
-                                 {profileSaving ? <Loader2 className="w-8 h-8 animate-spin" /> : "Save All Changes"}
+                                 {profileSaving ? <Loader2 className="w-5 h-5 animate-spin" /> : "Save Changes"}
                              </button>
                              <button 
                                type="button"
                                onClick={() => setShowSetup(false)}
-                               className="w-full h-16 rounded-[2rem] text-gray-400 font-black uppercase text-[10px] tracking-widest hover:text-gray-900 transition-colors"
+                               className="w-full h-10 rounded-lg text-gray-500 font-bold uppercase text-[10px] tracking-widest hover:text-gray-900 transition-colors"
                              >
-                                 Discard Changes
+                                 Discard
                              </button>
                         </form>
                   </motion.div>
@@ -277,45 +277,45 @@ export default function ProfilePage() {
 
   return (
     <ProtectedRoute>
-      <div className="max-w-7xl mx-auto px-6 py-20 min-h-screen pb-40 relative">
+      <div className="max-w-7xl mx-auto px-6 py-10 min-h-screen">
         
         {/* Profile Settings Toggle */}
-        <div className="absolute top-10 right-10 z-[50]">
+        <div className="absolute top-6 right-6 z-[50]">
              <button 
                onClick={() => setShowSetup(true)}
-               className="p-5 bg-white border-4 border-indigo-50 text-indigo-600 rounded-[2rem] shadow-2xl shadow-indigo-600/5 hover:border-indigo-600 transition-all active:scale-95 group"
+               className="p-3 bg-white border border-gray-200 text-gray-600 rounded-xl shadow-sm hover:border-indigo-600 hover:text-indigo-600 transition-all active:scale-95 group"
                title="Update Profile"
              >
-                 <Settings className="group-hover:rotate-90 transition-transform duration-500" />
+                 <Settings className="w-5 h-5 group-hover:rotate-90 transition-transform duration-500" />
              </button>
         </div>
 
-        {/* Merged Header Section (Compact) */}
-        <section className="mb-20 flex flex-col lg:flex-row items-center lg:items-end justify-between gap-12 lg:gap-24 text-center lg:text-left">
-            <div className="flex-1 space-y-10">
+        {/* Header Section */}
+        <section className="mb-12 flex flex-col lg:flex-row items-center lg:items-end justify-between gap-8 lg:gap-12 text-center lg:text-left">
+            <div className="flex-1 space-y-4">
                  <motion.div 
                    initial={{ x: -20, opacity: 0 }}
                    animate={{ x: 0, opacity: 1 }}
-                   className="inline-flex items-center gap-3 bg-indigo-50 text-indigo-700 px-5 py-2 rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] italic border border-indigo-100"
+                   className="inline-flex items-center gap-2 bg-indigo-50 text-indigo-700 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-widest border border-indigo-100"
                  >
-                      <Zap className="w-4 h-4 fill-indigo-600" />
+                      <Zap className="w-3.5 h-3.5 fill-indigo-600" />
                       Hackveda Dashboard
                  </motion.div>
                  
-                  <h1 className="text-4xl md:text-6xl font-black text-gray-900 leading-tight tracking-tighter italic">
+                  <h1 className="text-3xl md:text-4xl font-black text-gray-900 leading-tight tracking-tight">
                     Welcome, <br />
-                    <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-indigo-950 font-black">
+                    <span className="text-indigo-600">
                         {profile?.full_name?.split(" ")[0] || "Innovator"}.
                     </span>
                   </h1>
                  
-                 <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 uppercase font-black text-[10px] italic tracking-widest">
-                      <div className="p-3 bg-indigo-600 text-white rounded-2xl shadow-xl shadow-indigo-600/30 flex items-center gap-3">
-                           <Users className="w-5 h-5 text-white" />
+                 <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 uppercase font-bold text-[10px] tracking-widest">
+                      <div className="px-4 py-2 bg-indigo-600 text-white rounded-lg shadow-sm flex items-center gap-2">
+                           <Users className="w-4 h-4 text-white" />
                            {team?.teamName || "NO TEAM"}
                       </div>
-                      <div className="bg-gray-50 px-6 py-3 rounded-2xl border-4 border-gray-100 flex items-center gap-3 text-gray-400">
-                           <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_10px_green]" />
+                      <div className="bg-gray-50 px-4 py-2 rounded-lg border border-gray-200 flex items-center gap-2 text-gray-600">
+                           <div className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_green]" />
                            {profile?.usn || "NOT INITIALIZED"}
                       </div>
                  </div>
@@ -323,23 +323,18 @@ export default function ProfilePage() {
 
             {/* Countdown Component on the Right */}
             <motion.div 
-               initial={{ scale: 0.9, opacity: 0 }}
+               initial={{ scale: 0.95, opacity: 0 }}
                animate={{ scale: 1, opacity: 1 }}
-               className="p-8 md:p-14 rounded-[3.5rem] bg-white border-4 border-indigo-50 shadow-2xl relative group hover:border-indigo-600 transition-all duration-700"
+               className="p-6 md:p-8 rounded-2xl bg-white border border-indigo-100 shadow-sm relative group hover:border-indigo-600 transition-all duration-300 w-full lg:w-auto"
             >
                  <Countdown targetDate="2026-04-10T10:00:00" label="Countdown to Hackveda Start" />
-                 
-                 {/* Subtle Watermark Decoration */}
-                 <div className="absolute top-[-20%] right-[-10%] opacity-[0.03] pointer-events-none transition-transform duration-1000 group-hover:scale-110">
-                    <Trophy className="w-64 h-64 text-indigo-900" />
-                 </div>
             </motion.div>
         </section>
 
 
 
         {/* Global Action Grid */}
-        <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-12">
             {[
                 { label: 'TEAM', desc: 'Team Registration', href: '/team', icon: Users },
                 { label: 'SUBMIT', desc: 'Upload Your Proposal', href: '/submission', icon: FileCheck },
@@ -349,88 +344,87 @@ export default function ProfilePage() {
                 <Link 
                     key={i} 
                     href={box.href}
-                    className="p-12 rounded-[4rem] bg-white border-4 border-indigo-50 hover:border-indigo-600 hover:shadow-2xl hover:shadow-indigo-600/10 transition-all duration-500 group relative overflow-hidden h-[340px] flex flex-col justify-between"
+                    className="p-6 rounded-2xl bg-white border border-gray-200 hover:border-indigo-600 hover:shadow-lg hover:shadow-indigo-600/5 transition-all duration-300 group relative overflow-hidden flex flex-col justify-between min-h-[160px]"
                 >
-                    <div className="w-20 h-20 rounded-[2.5rem] bg-indigo-50 border-2 border-indigo-100 flex items-center justify-center group-hover:scale-110 group-hover:bg-indigo-600 transition-all duration-700">
-                        <box.icon className="w-10 h-10 text-indigo-600 group-hover:text-white transition-colors" />
+                    <div className="w-12 h-12 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center group-hover:scale-105 group-hover:bg-indigo-600 transition-all duration-500 mb-4">
+                        <box.icon className="w-6 h-6 text-indigo-600 group-hover:text-white transition-colors" />
                     </div>
                     <div>
-                        <h4 className="text-xl md:text-2xl font-black italic tracking-tighter uppercase leading-none mb-2 group-hover:text-indigo-600 transition-colors">{box.label}</h4>
-                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] italic">{box.desc}</p>
+                        <h4 className="text-lg font-black tracking-tight uppercase leading-none mb-1 group-hover:text-indigo-600 transition-colors">{box.label}</h4>
+                        <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">{box.desc}</p>
                     </div>
-                    <div className="absolute bottom-10 right-10 opacity-0 group-hover:opacity-100 group-hover:translate-x-3 transition-all duration-500">
-                         <ArrowRight className="w-10 h-10 text-indigo-600" />
+                    <div className="absolute right-6 bottom-6 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300">
+                         <ArrowRight className="w-5 h-5 text-indigo-600" />
                     </div>
                 </Link>
             ))}
         </section>
 
         {/* Notifications Bar */}
-        <section className="mt-20 p-12 md:p-16 rounded-[4.5rem] bg-gray-950 text-white relative overflow-hidden shadow-2xl border-4 border-gray-900">
-             <div className="flex flex-col md:flex-row items-center gap-14 relative z-10">
-                 <div className="bg-indigo-600 p-8 rounded-[3rem] shadow-2xl shadow-indigo-600/40 shrink-0 relative">
-                     <Bell className="w-12 h-12 text-white animate-bounce-subtle" />
-                     {announcements.length > 0 && <span className="absolute top-0 right-0 w-6 h-6 bg-red-500 rounded-full border-4 border-gray-950 animate-ping" />}
+        <section className="p-6 md:p-8 rounded-2xl bg-gray-900 text-white relative overflow-hidden shadow-lg border border-gray-800">
+             <div className="flex flex-col md:flex-row items-start md:items-center gap-6 relative z-10 w-full">
+                 <div className="bg-indigo-600 p-4 rounded-xl shadow-lg shadow-indigo-600/30 shrink-0 relative">
+                     <Bell className="w-6 h-6 text-white" />
+                     {announcements.length > 0 && <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-gray-900 animate-pulse" />}
                  </div>
-                 <div className="flex-1 text-center md:text-left">
-                     <div className="inline-flex items-center gap-3 text-indigo-400 font-black text-[10px] uppercase tracking-[0.4em] mb-6 italic">
-                          <span className="w-2.5 h-2.5 rounded-full bg-red-500 shadow-[0_0_15px_red] animate-pulse" />
+                 <div className="flex-1">
+                     <div className="inline-flex items-center gap-2 text-indigo-400 font-bold text-[10px] uppercase tracking-widest mb-2">
+                          <span className="w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_8px_red] animate-pulse" />
                           Official Updates
                      </div>
                      {announcements.length > 0 ? (
                          <>
-                             <h3 className="text-2xl md:text-3xl font-black italic tracking-tighter mb-3 uppercase">{announcements[0].title}</h3>
-                             <p className="text-gray-400 font-bold italic text-base line-clamp-2 max-w-4xl">{announcements[0].message}</p>
+                             <h3 className="text-lg md:text-xl font-black tracking-tight mb-1">{announcements[0].title}</h3>
+                             <p className="text-gray-300 font-medium text-sm line-clamp-2 md:max-w-xl">{announcements[0].message}</p>
                          </>
                      ) : (
                          <>
-                             <h3 className="text-2xl md:text-3xl font-black italic tracking-tighter mb-3 uppercase">System Synchronized.</h3>
-                             <p className="text-gray-400 font-bold italic text-base">Awaiting official directives from the Hackveda central hub.</p>
+                             <h3 className="text-lg md:text-xl font-black tracking-tight mb-1">System Synchronized.</h3>
+                             <p className="text-gray-400 font-medium text-sm">Awaiting official directives from the Hackveda central hub.</p>
                          </>
                      )}
                  </div>
-                 <Link href="/schedule" className="h-20 px-12 rounded-3xl bg-white text-gray-950 flex items-center justify-center font-black uppercase text-sm tracking-[0.2em] italic hover:bg-gray-200 transition-all shrink-0 active:scale-95 group">
-                    View Schedule <ChevronRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
+                 <Link href="/schedule" className="h-10 px-6 rounded-lg bg-white text-gray-900 flex items-center justify-center font-bold uppercase text-xs tracking-widest hover:bg-gray-100 transition-all shrink-0 active:scale-95 group w-full md:w-auto mt-4 md:mt-0">
+                    Schedule <ChevronRight className="w-4 h-4 inline group-hover:translate-x-1 transition-transform ml-1" />
                  </Link>
              </div>
              
              {/* Dynamic Background Pattern */}
-             <div className="absolute inset-0 bg-gradient-to-r from-indigo-900/40 via-transparent to-transparent opacity-50" />
-             <div className="absolute top-0 left-0 w-full h-full opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '40px 40px' }} />
+             <div className="absolute inset-0 bg-gradient-to-r from-indigo-900/40 via-transparent to-transparent opacity-50 pointer-events-none" />
         </section>
 
         {/* Team Modals */}
         <AnimatePresence>
             {(isCreating || isJoining) && (
-                <div className="fixed inset-0 z-[1000] flex items-center justify-center p-6 bg-black/90 backdrop-blur-xl">
+                <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
                     <motion.div 
-                        initial={{ scale: 0.9, opacity: 0, y: 50 }}
+                        initial={{ scale: 0.95, opacity: 0, y: 20 }}
                         animate={{ scale: 1, opacity: 1, y: 0 }}
-                        exit={{ scale: 0.9, opacity: 0, y: 50 }}
-                        className="relative bg-white p-14 md:p-20 rounded-[4.5rem] w-full max-w-2xl shadow-2xl border-4 border-indigo-50"
+                        exit={{ scale: 0.95, opacity: 0, y: 20 }}
+                        className="relative bg-white p-6 md:p-10 rounded-3xl w-full max-w-lg shadow-2xl border border-gray-100"
                     >
-                         <button onClick={() => { setIsCreating(false); setIsJoining(false); }} className="absolute top-10 right-10 p-4 rounded-2xl bg-gray-50 text-gray-400 hover:text-indigo-600 transition-all">
-                             <X className="w-6 h-6" />
+                         <button onClick={() => { setIsCreating(false); setIsJoining(false); }} className="absolute top-6 right-6 p-2 rounded-xl bg-gray-50 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all">
+                             <X className="w-5 h-5" />
                          </button>
-                          <h3 className="text-3xl md:text-4xl font-black text-gray-900 mb-4 italic tracking-tighter uppercase leading-none">
+                          <h3 className="text-2xl font-black text-gray-900 mb-2 tracking-tight">
                             {isCreating ? "Create Team." : "Join Team."}
                          </h3>
-                         <p className="text-lg font-bold text-gray-400 mb-14 uppercase tracking-widest italic">{isCreating ? "Choose your team name" : "Enter the team code"}</p>
+                         <p className="text-sm font-bold text-gray-500 mb-8">{isCreating ? "Choose your team name" : "Enter the team code"}</p>
                          
-                         <form onSubmit={isCreating ? handleCreateTeam : handleJoinTeam} className="space-y-12">
+                         <form onSubmit={isCreating ? handleCreateTeam : handleJoinTeam} className="space-y-6">
                               <div className="space-y-2">
-                                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-8">{isCreating ? "Team Name" : "Team Code"}</label>
+                                  <label className="text-xs font-bold text-gray-600 uppercase tracking-widest block">{isCreating ? "Team Name" : "Team Code"}</label>
                                   <input 
                                     type="text" 
                                     value={isCreating ? teamName : teamCode}
                                     onChange={(e) => isCreating ? setTeamName(e.target.value) : setTeamCode(e.target.value.toUpperCase())}
-                                    placeholder={isCreating ? "SQUAD_ALPHA_26" : "000000"}
-                                    className="w-full h-24 px-12 rounded-[3rem] bg-gray-50 border-4 border-transparent focus:border-indigo-600 focus:bg-white outline-none font-black text-3xl tracking-tighter uppercase transition-all"
+                                    placeholder={isCreating ? "e.g. SQUAD_ALPHA" : "e.g. 000000"}
+                                    className="w-full h-14 px-4 rounded-xl bg-gray-50 border border-gray-200 focus:border-indigo-600 focus:bg-white outline-none font-bold text-lg uppercase transition-all focus:ring-4 focus:ring-indigo-600/10"
                                     required
                                   />
                               </div>
-                              <button type="submit" className="w-full h-24 rounded-[3.5rem] bg-indigo-600 text-white font-black text-2xl tracking-tight shadow-3xl shadow-indigo-600/40 hover:bg-indigo-700 transition-all active:scale-95 flex items-center justify-center gap-6">
-                                   {isCreating ? "Create Team" : "Join Team"} <Zap className="w-6 h-6 fill-white" />
+                              <button type="submit" className="w-full h-14 rounded-xl bg-indigo-600 text-white font-bold tracking-tight shadow-md hover:bg-indigo-700 transition-all active:scale-[0.98] flex items-center justify-center gap-2">
+                                   {isCreating ? "Create Team" : "Join Team"} <Zap className="w-4 h-4 fill-white" />
                               </button>
                          </form>
                     </motion.div>

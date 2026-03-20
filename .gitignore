@@ -33,4 +33,4 @@ yarn-error.log*
 next-env.d.ts
 
 # credentials
-/Credential_ServiceAccount/
+app/Credential_ServiceAccount/

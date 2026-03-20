@@ -157,8 +157,10 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
 
       <main className={`min-h-screen w-full relative ${showSidebar ? (pathname !== "/login" ? 'pt-20 lg:pt-0' : '') : ''}`}>
            {/* Global Background Glow */}
-           <div className="fixed top-0 right-0 w-[800px] h-[800px] bg-indigo-50/50 rounded-full blur-[160px] -z-[1] translate-x-1/2 -translate-y-1/2 pointer-events-none opacity-40 select-none" />
-           <div className="fixed bottom-0 left-0 w-[600px] h-[600px] bg-blue-50/30 rounded-full blur-[140px] -z-[1] -translate-x-1/2 translate-y-1/2 pointer-events-none opacity-40 select-none" />
+           <div className="fixed inset-0 overflow-hidden pointer-events-none -z-[1]">
+               <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-indigo-50/50 rounded-full blur-[160px] translate-x-1/2 -translate-y-1/2 opacity-40 select-none" />
+               <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-blue-50/30 rounded-full blur-[140px] -translate-x-1/2 translate-y-1/2 opacity-40 select-none" />
+           </div>
            
            <div className="w-full relative px-6 sm:px-10 lg:px-16 py-12 max-w-[90rem] mx-auto min-h-screen">
                 {children}
