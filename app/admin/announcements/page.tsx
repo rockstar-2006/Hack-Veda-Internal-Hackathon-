@@ -51,64 +51,61 @@ export default function AdminAnnouncements() {
 
   return (
     <ProtectedRoute requireAdmin={true}>
-      <div className="max-w-6xl mx-auto px-6 py-20 min-h-screen pb-40">
+      <div className="max-w-5xl mx-auto px-6 py-10 min-h-screen">
         
         {/* Header */}
-        <section className="mb-24 flex flex-col md:flex-row md:items-end justify-between gap-12 text-center md:text-left">
-            <div className="flex-1 space-y-10">
+        <section className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6 text-center md:text-left">
+            <div className="flex-1 space-y-4">
                  <motion.div 
                    initial={{ x: -20, opacity: 0 }}
                    animate={{ x: 0, opacity: 1 }}
-                   className="inline-flex items-center gap-3 bg-red-50 text-red-700 px-5 py-2 rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] italic border border-red-100"
+                   className="inline-flex items-center gap-2 bg-red-50 text-red-700 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-widest border border-red-100"
                  >
-                      <Bell className="w-4 h-4 fill-red-600" />
-                      Announcement Center
+                      <Bell className="w-3.5 h-3.5 fill-red-600" />
+                      Global Announcements
                  </motion.div>
-                 <h1 className="text-4xl md:text-6xl font-black text-gray-900 leading-tight tracking-tighter italic">
-                    Send <br />
-                    <span className="bg-clip-text text-transparent bg-gradient-to-r from-red-600 to-red-950 font-black">
-                        Updates.
-                    </span>
+                 <h1 className="text-3xl md:text-4xl font-black text-gray-900 leading-tight tracking-tight italic">
+                    Send Updates.
                  </h1>
-                 <p className="text-lg text-gray-400 font-bold max-w-2xl italic leading-relaxed">
+                 <p className="text-sm text-gray-500 font-medium max-w-2xl leading-relaxed">
                     Post new announcements and send important notifications to all participating teams.
                  </p>
             </div>
             
-            <div className="bg-red-950 p-10 rounded-[3rem] text-white shadow-2xl relative overflow-hidden group shrink-0">
-                 <p className="text-[10px] font-black text-red-400 uppercase tracking-widest mb-2 italic">Broadcast Power</p>
-                 <p className="text-3xl font-black italic tracking-tighter">Level 4 Clearance</p>
-                 <div className="flex items-center gap-2 mt-4 text-red-500">
-                     <div className="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping shadow-[0_0_12px_red]" />
-                     <span className="text-[10px] font-black uppercase tracking-[0.2em]">Transmission Ready</span>
+            <div className="bg-red-950 p-6 rounded-2xl text-white shadow-lg relative overflow-hidden group shrink-0 min-w-[200px]">
+                 <p className="text-[10px] font-bold text-red-400 uppercase tracking-widest mb-1">Status</p>
+                 <p className="text-xl font-black tracking-tight">System Ready</p>
+                 <div className="flex items-center gap-2 mt-2 text-red-400">
+                     <div className="w-2 h-2 rounded-full bg-red-500 animate-ping shadow-[0_0_8px_red]" />
+                     <span className="text-[10px] font-bold uppercase tracking-widest">Live</span>
                  </div>
                  {/* Decor */}
-                 <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform duration-1000">
+                 <div className="absolute -top-4 -right-4 p-4 opacity-10 group-hover:scale-110 transition-transform duration-1000">
                      <Bell className="w-24 h-24" />
                  </div>
             </div>
         </section>
 
-        <div className="grid lg:grid-cols-2 gap-12">
+        <div className="grid lg:grid-cols-2 gap-8">
             <div>
-                 <form onSubmit={handleSubmit} className="p-12 md:p-16 rounded-[4.5rem] bg-white border-4 border-indigo-50 shadow-2xl shadow-indigo-600/5 space-y-12 relative overflow-hidden group">
-                    <div className="space-y-4">
-                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.4em] mb-4 block italic">Archive Headline</label>
+                 <form onSubmit={handleSubmit} className="p-6 md:p-8 rounded-2xl bg-white border border-gray-200 shadow-sm space-y-6 relative overflow-hidden group">
+                    <div className="space-y-2">
+                        <label className="text-xs font-bold text-gray-500 uppercase tracking-widest block">Announcement Title</label>
                         <input 
                             type="text" 
-                            placeholder="Ex: FINAL SUBMISSION DEADLINE EXTENDED" 
-                            className="w-full h-20 px-10 rounded-3xl bg-gray-50 border-4 border-transparent focus:border-red-600 focus:bg-white outline-none font-black text-xl italic tracking-tighter uppercase transition-all"
+                            placeholder="e.g. Final Submission Deadline" 
+                            className="w-full h-12 px-4 rounded-xl bg-gray-50 border border-gray-200 focus:border-red-600 focus:bg-white outline-none font-medium text-sm transition-all focus:ring-4 focus:ring-red-600/10"
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
                             required
                         />
                     </div>
                     
-                    <div className="space-y-4">
-                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.4em] mb-4 block italic">Transmission Intel</label>
+                    <div className="space-y-2">
+                        <label className="text-xs font-bold text-gray-500 uppercase tracking-widest block">Message Details</label>
                         <textarea 
-                            placeholder="Input detailed directive here..." 
-                            className="w-full min-h-[240px] px-10 py-8 rounded-[3rem] bg-gray-50 border-4 border-transparent focus:border-red-600 focus:bg-white outline-none font-bold text-lg italic transition-all resize-none"
+                            placeholder="Enter the details of your announcement..." 
+                            className="w-full min-h-[160px] px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:border-red-600 focus:bg-white outline-none font-medium text-sm transition-all resize-none focus:ring-4 focus:ring-red-600/10"
                             value={message}
                             onChange={(e) => setMessage(e.target.value)}
                             required
@@ -118,82 +115,72 @@ export default function AdminAnnouncements() {
                     <button 
                         type="submit" 
                         disabled={loading || !title || !message}
-                        className="w-full h-24 rounded-[3rem] bg-indigo-600 text-white font-black text-2xl tracking-tight shadow-3xl shadow-indigo-600/40 hover:bg-indigo-700 transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-6 group"
+                        className="w-full h-12 rounded-xl bg-red-600 text-white font-bold text-sm tracking-tight shadow-lg shadow-red-600/20 hover:bg-red-700 transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2 group"
                     >
-                        {loading ? <RefreshCcw className="w-8 h-8 animate-spin" /> : <>Initiate Broadcast <Send className="w-6 h-6 group-hover:translate-x-2 group-hover:-translate-y-2 transition-transform" /></>}
+                        {loading ? <RefreshCcw className="w-5 h-5 animate-spin" /> : <span>Broadcast <Send className="w-4 h-4 inline ml-1 group-hover:translate-x-1 transition-transform" /></span>}
                     </button>
 
                     <AnimatePresence>
                         {success && (
                             <motion.div 
-                                initial={{ opacity: 0, y: 10 }}
+                                initial={{ opacity: 0, y: 5 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0 }}
-                                className="p-8 bg-green-50 text-green-700 rounded-[2.5rem] border-4 border-green-100 font-black text-sm uppercase italic tracking-widest text-center flex items-center justify-center gap-4"
+                                className="p-4 bg-green-50 text-green-700 rounded-xl border border-green-100 font-bold text-xs flex items-center gap-3"
                             >
-                                <ShieldCheck className="w-6 h-6" /> Transmission Successful.
+                                <ShieldCheck className="w-4 h-4" /> Announcement Sent Successfully.
                             </motion.div>
                         )}
                         {error && (
                             <motion.div 
-                                initial={{ opacity: 0, y: 10 }}
+                                initial={{ opacity: 0, y: 5 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0 }}
-                                className="p-8 bg-red-50 text-red-700 rounded-[2.5rem] border-4 border-red-100 font-black text-sm uppercase italic tracking-widest text-center flex items-center justify-center gap-4"
+                                className="p-4 bg-red-50 text-red-700 rounded-xl border border-red-100 font-bold text-xs flex items-center gap-3"
                             >
-                                <ShieldAlert className="w-6 h-6" /> {error}
+                                <ShieldAlert className="w-4 h-4" /> {error}
                             </motion.div>
                         )}
                     </AnimatePresence>
-                    
-                    {/* Background Icon Watermark */}
-                    <div className="absolute bottom-0 right-0 p-10 opacity-0 group-hover:opacity-[0.03] transition-opacity duration-1000 -z-0 bg-red-600 rounded-full scale-150 blur-3xl" />
                  </form>
             </div>
 
-            <div className="space-y-12">
-                 <div className="p-12 rounded-[4rem] bg-indigo-50 border-4 border-indigo-100 shadow-2xl shadow-indigo-600/5 relative overflow-hidden group">
-                     <h3 className="text-2xl font-black text-indigo-950 mb-10 flex items-center gap-4 uppercase italic tracking-tighter">
-                         <Info className="w-6 h-6 text-indigo-600" />
-                         Transmission Standards
+            <div className="space-y-6">
+                 <div className="p-8 rounded-2xl bg-gray-50 border border-gray-200 shadow-sm relative overflow-hidden group">
+                     <h3 className="text-lg font-black text-gray-900 mb-6 flex items-center gap-2 tracking-tight">
+                         <Info className="w-5 h-5 text-indigo-600" />
+                         Guidelines
                      </h3>
-                     <ul className="space-y-8">
+                     <ul className="space-y-4">
                          {[
-                             "Headers must be concise (Max 50 characters).",
-                             "Directives should be actionable and time-sensitive.",
-                             "Avoid ambiguity in technical instructions.",
-                             "All transmissions are logged for audit purposes."
+                             "Titles must be concise and descriptive.",
+                             "Keep the message actionable and polite.",
+                             "Check spelling to maintain professionalism.",
+                             "Sent announcements cannot be immediately deleted."
                          ].map((text, i) => (
-                             <li key={i} className="flex gap-6 text-indigo-900 text-base font-bold items-start group/li italic">
-                                 <div className="bg-indigo-600 w-8 h-8 rounded-2xl flex items-center justify-center shrink-0 text-white font-black text-[10px] shadow-lg shadow-indigo-600/20 group-hover/li:rotate-12 transition-transform">{i+1}</div>
-                                 <p className="pt-1">{text}</p>
+                             <li key={i} className="flex gap-3 text-gray-600 text-sm font-medium items-start">
+                                 <div className="bg-white border border-gray-200 w-6 h-6 rounded-lg flex items-center justify-center shrink-0 text-gray-500 font-bold text-[10px]">{i+1}</div>
+                                 <p className="pt-0.5">{text}</p>
                              </li>
                          ))}
                      </ul>
-                     <div className="absolute top-0 right-0 p-10 opacity-5 group-hover:rotate-12 transition-transform duration-1000">
-                         <Zap className="w-48 h-48" />
-                     </div>
                  </div>
 
-                 <div className="p-12 rounded-[4rem] bg-gray-950 text-white border-4 border-gray-900 shadow-3xl relative overflow-hidden group">
+                 <div className="p-8 rounded-2xl bg-indigo-950 text-white shadow-xl relative overflow-hidden group">
                      <div className="relative z-10">
-                        <div className="flex items-center gap-6 mb-10">
-                             <div className="bg-red-600 p-5 rounded-3xl shadow-2xl shadow-red-600/30 group-hover:rotate-45 transition-transform duration-700">
-                                 <Bell className="w-8 h-8" />
+                        <div className="flex items-center gap-4 mb-6">
+                             <div className="bg-indigo-600/30 p-3 rounded-xl border border-indigo-500/30">
+                                 <Bell className="w-5 h-5 text-indigo-200" />
                              </div>
                              <div>
-                                 <h3 className="text-2xl font-black uppercase tracking-tighter italic">Fleet Tracker</h3>
-                                 <p className="text-[10px] font-black text-red-500 tracking-[0.4em] uppercase italic animate-pulse">Connection Secured</p>
+                                 <h3 className="text-lg font-black tracking-tight">Notification System</h3>
+                                 <p className="text-[10px] font-bold text-indigo-400 tracking-widest uppercase mt-1">Real-time Enabled</p>
                              </div>
                         </div>
-                        <p className="text-base font-bold text-gray-400 italic mb-10 border-l-4 border-red-600 pl-8 leading-relaxed">
-                            Authorized broadcasts are pushed to all active terminals via edge-cached optimization. 
+                        <p className="text-sm font-medium text-indigo-200/80 mb-6 leading-relaxed">
+                            Announcements will instantly appear as popup notifications to all students currently browsing the portal.
                         </p>
-                        <button className="flex items-center gap-4 text-white font-black text-xs uppercase tracking-[0.3em] hover:text-red-500 transition-all group/btn italic">
-                            Archive History <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-3 transition-transform" />
-                        </button>
                      </div>
-                     <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-red-600/10 rounded-full blur-[120px] pointer-events-none group-hover:scale-150 transition-transform duration-[2000ms]" />
                  </div>
             </div>
         </div>
