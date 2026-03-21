@@ -15,13 +15,15 @@ if (!admin.apps.length) {
       // Handle both literal \n and actual newlines, and strip any accidental quotes
       privateKey: privateKey.replace(/\\n/g, '\n').replace(/"/g, ''),
     });
-  } else {
-    // Local development fallback
+  } else if (process.env.NODE_ENV === "development") {
+    // Local development fallback (only attempted locally)
     try {
-      const serviceAccount = require("../app/Credential_ServiceAccount/internal-hacka-firebase-adminsdk-fbsvc-0707ffb503.json");
+      // Use dynamic require to prevent Vercel build-time resolution errors
+      const path = "../app/Credential_ServiceAccount/internal-hacka-firebase-adminsdk-fbsvc-0707ffb503.json";
+      const serviceAccount = require(`${path}`);
       credential = admin.credential.cert(serviceAccount);
     } catch (error) {
-      console.warn("Firebase Admin environment variables missing and local service account JSON not found. Admin APIs will fail.");
+       console.warn("Local service account JSON not found. Admin APIs will fail unless env variables are set.");
     }
   }
 
