@@ -219,9 +219,9 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
                <motion.button 
                  whileTap={{ scale: 0.9, y: 2, boxShadow: "0 0 0 #000" }}
                  onClick={() => setIsSidebarOpen(prev => !prev)}
-                 className={`p-3 border-2 border-black shadow-[2px_2px_0_#000] rounded-xl transition-all ${isSidebarOpen ? 'bg-white text-black' : 'bg-pink-400 text-black'} pointer-events-auto`}
+                 className={`p-3 border-2 border-black shadow-[2px_2px_0_#000] rounded-xl transition-all bg-pink-400 text-black pointer-events-auto ${isSidebarOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
                >
-                    {isSidebarOpen ? <X className="w-6 h-6 stroke-[3]" /> : <Menu className="w-6 h-6 stroke-[3]" />}
+                    <Menu className="w-6 h-6 stroke-[3]" />
                </motion.button>
           </header>
       )}
@@ -249,7 +249,7 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
                  animate={{ x: 0 }}
                  exit={{ x: "-100%" }}
                  transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                 className="fixed top-0 left-0 bottom-0 w-[300px] bg-white border-r-4 border-black z-[20005] shadow-[20px_0px_0_rgba(0,0,0,0.5)] flex flex-col lg:hidden pointer-events-auto"
+                 className="fixed top-0 left-0 bottom-0 w-[300px] bg-white border-r-4 border-black z-[20005] shadow-[20px_0px_0_#000] flex flex-col lg:hidden pointer-events-auto"
               >
                  <Sidebar onClose={() => setIsSidebarOpen(false)} />
               </motion.aside>
