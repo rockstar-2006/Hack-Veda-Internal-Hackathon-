@@ -48,9 +48,21 @@ export default function TeamPage() {
     if (team) {
       setLoading(true);
       try {
-        const profilePromises = team.memberIds.map(id => getUserProfile(id));
+        const profilePromises = team.memberIds.map(async id => {
+            const profile = await getUserProfile(id);
+            if (profile) return profile;
+            
+            // Fallback for pending profiles
+            return {
+                userId: id,
+                full_name: "STUDENT JOINED",
+                role: "student",
+                usn: "PENDING PROFILE",
+                branch: "..."
+            } as UserProfile;
+        });
         const profiles = await Promise.all(profilePromises);
-        setMembers(profiles.filter(p => p !== null) as UserProfile[]);
+        setMembers(profiles);
       } catch (err) {
         console.error("Error fetching members:", err);
       } finally {
