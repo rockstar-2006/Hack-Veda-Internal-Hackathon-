@@ -153,6 +153,31 @@ export default function SubmissionPage() {
       );
   }
 
+  const isLeader = !!(team && team.leaderId === user?.uid);
+
+  if (!isLeader) {
+      return (
+          <ProtectedRoute>
+              <div className="max-w-3xl mx-auto px-6 py-20 md:py-32 text-center min-h-screen">
+                   <motion.div 
+                      initial={{ scale: 0.95, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      className="p-8 md:p-12 rounded-3xl bg-white border-4 border-black shadow-[8px_8px_0_#000] relative overflow-hidden"
+                   >
+                        <div className="w-20 h-20 bg-yellow-400 rounded-2xl border-4 border-black flex items-center justify-center mx-auto mb-8 shadow-[4px_4px_0_#000]">
+                            <ShieldCheck className="w-10 h-10 text-black stroke-[3]" />
+                        </div>
+                        <h2 className="text-3xl md:text-3xl font-comic text-black mb-4 tracking-tight uppercase">Leader Only Submission.</h2>
+                        <p className="text-gray-700 text-xs md:text-sm font-bold mb-10 uppercase tracking-widest leading-loose bg-yellow-50 p-6 border-4 border-black rounded-2xl">Only the Team Leader has access to this terminal for documentation upload. Please coordinate with your leader.</p>
+                        <Link href="/profile" className="inline-flex items-center justify-center gap-3 bg-pink-400 text-black border-4 border-black px-8 h-14 rounded-2xl font-comic uppercase text-lg tracking-widest hover:bg-yellow-400 transition-all active:scale-95 shadow-[4px_4px_0_#000]">
+                            <ArrowLeft className="w-6 h-6 stroke-[3]" /> Back to Dashboard
+                        </Link>
+                   </motion.div>
+              </div>
+          </ProtectedRoute>
+      );
+  }
+
   return (
     <ProtectedRoute>
       <div className="max-w-4xl mx-auto px-6 py-12 md:py-20 min-h-screen pb-32 font-sans relative">

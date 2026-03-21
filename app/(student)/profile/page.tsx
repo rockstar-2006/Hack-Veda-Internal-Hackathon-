@@ -330,8 +330,8 @@ export default function ProfilePage() {
         </div>
 
         {/* Header Section */}
-        <section className="mb-12 md:mb-16 flex flex-col lg:flex-row items-center lg:items-end justify-between gap-8 lg:gap-12 text-center lg:text-left">
-            <div className="flex-1 space-y-4 md:space-y-6">
+        <section className="mb-12 md:mb-16 flex flex-col items-center justify-center gap-8 lg:gap-12 text-center w-full">
+            <div className="flex-1 space-y-4 md:space-y-6 flex flex-col items-center">
                  <motion.div 
                    initial={{ x: -50, opacity: 0 }}
                    animate={{ x: 0, opacity: 1 }}
@@ -349,7 +349,7 @@ export default function ProfilePage() {
                     </span>
                   </h1>
                  
-                  <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4">
+                  <div className="flex flex-wrap items-center justify-center gap-4">
                        <motion.div whileHover={{ y: -4 }} className="px-5 py-3 bg-purple-400 border-4 border-black text-black font-bold uppercase tracking-wider text-xs md:text-sm rounded-xl shadow-[4px_4px_0_#000] flex items-center gap-2">
                             <Users className="w-5 h-5" />
                             {team?.teamName || "READY TO JOIN?"}
@@ -438,12 +438,11 @@ export default function ProfilePage() {
                  </div>
             </div>
 
-            {/* Countdown Component on the Right */}
+            {/* Countdown Component */}
             <motion.div 
-               initial={{ scale: 0.8, opacity: 0, rotate: 5 }}
-               animate={{ scale: 1, opacity: 1, rotate: 0 }}
-               transition={{ type: "spring", bounce: 0.5, delay: 0.2 }}
-               className="p-1 rounded-3xl bg-black shadow-[8px_8px_0_#ff007f] w-full lg:w-auto transform hover:-rotate-1 transition-transform"
+               initial={{ scale: 0.8, opacity: 0 }}
+               animate={{ scale: 1, opacity: 1 }}
+               className="p-1 rounded-3xl bg-black shadow-[8px_8px_0_#ff007f] w-full lg:w-fit transform hover:-rotate-1 transition-transform"
             >
                 <div className="bg-white p-6 md:p-8 rounded-[22px]">
                    <Countdown targetDate="2026-04-10T10:00:00" label="HACKATHON STARTING IN" />

@@ -122,24 +122,24 @@ export default function TeamPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 lg:py-20 min-h-screen pb-40 relative font-sans">
         
         {/* Header Section */}
-        <section className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6 text-center md:text-left">
-            <div className="flex-1">
+        <section className="mb-12 flex flex-col items-center justify-center gap-6 text-center">
+            <div className="flex-1 flex flex-col items-center">
                  <motion.div 
                    initial={{ x: -20, opacity: 0 }}
                    animate={{ x: 0, opacity: 1 }}
                    className="inline-flex items-center gap-2 bg-yellow-400 text-black px-4 py-2 rounded-xl border-4 border-black shadow-[4px_4px_0_#000] mb-4"
                  >
                       <Zap className="w-5 h-5 fill-black" />
-                      <span className="font-comic text-xl tracking-wider">TEAM INFO</span>
+                      <span className="font-comic text-xl tracking-wider uppercase">Team Stats</span>
                  </motion.div>
-                 <h1 className="text-5xl md:text-7xl lg:text-8xl font-comic text-black leading-none drop-shadow-[4px_4px_0_#ff007f] uppercase mb-4">
-                    MY TEAM <br />
+                 <h1 className="text-6xl md:text-8xl lg:text-9xl font-comic text-black leading-none drop-shadow-[4px_4px_0_#ff007f] uppercase mb-4">
+                    MY <br />
                     <span className="text-white drop-shadow-[4px_4px_0_#000]">
                         TEAM!
                     </span>
                  </h1>
-                 <p className="text-sm md:text-base text-gray-800 font-bold max-w-xl bg-white p-4 border-4 border-black shadow-[4px_4px_0_#00f0ff] rounded-xl transform -rotate-1">
-                    Manage your team. Invite members to join your group.
+                 <p className="text-sm md:text-base text-gray-800 font-bold max-w-xl bg-white p-4 border-4 border-black shadow-[4px_4px_0_#00f0ff] rounded-xl transform -rotate-1 center-text">
+                    Manage your team. Invite members to join your group and innovate correctly!
                  </p>
             </div>
             
@@ -164,7 +164,7 @@ export default function TeamPage() {
                 {/* Team Members List */}
                 <div className="lg:col-span-2 space-y-6">
                     <div className="flex items-center justify-between bg-white p-4 border-4 border-black shadow-[4px_4px_0_#000] rounded-2xl">
-                        <h3 className="text-xl font-comic text-black tracking-widest uppercase">Team Members ({members.length}/4)</h3>
+                        <h3 className="text-xl font-comic text-black tracking-widest uppercase">Team Members ({team.memberIds?.length || 0}/4)</h3>
                         <Users className="w-6 h-6 stroke-[3]" />
                     </div>
 
@@ -250,6 +250,7 @@ export default function TeamPage() {
                 {/* Sidebar: Invite & Status */}
                 <div className="space-y-8">
                     {/* Invite Section */}
+                    {team.leaderId === user?.uid && (
                     <div className="p-6 md:p-8 rounded-3xl bg-pink-400 border-4 border-black shadow-[10px_10px_0_#000] relative overflow-hidden group transform rotate-1">
                         {/* Halftone Pattern */}
                         <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, black 1px, transparent 0)', backgroundSize: '16px 16px' }} />
@@ -337,6 +338,7 @@ export default function TeamPage() {
                             </div>
                         )}
                     </div>
+                    )}
 
                     {/* Team Status Card */}
                     <div className="p-6 md:p-8 rounded-3xl bg-cyan-400 border-4 border-black shadow-[10px_10px_0_#000] transform -rotate-1 relative overflow-hidden">

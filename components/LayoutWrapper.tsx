@@ -226,33 +226,29 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
           </header>
       )}
 
-      {/* Mobile Sidebar Backdrop */}
+      {/* Mobile Sidebar Cleanup */}
       <AnimatePresence>
           {isSidebarOpen && (
-              <motion.div 
-                 key="backdrop"
-                 initial={{ opacity: 0 }}
-                 animate={{ opacity: 1 }}
-                 exit={{ opacity: 0 }}
-                 onClick={() => setIsSidebarOpen(false)}
-                 className="fixed inset-0 z-[20000] lg:hidden bg-black/80 backdrop-blur-md cursor-pointer pointer-events-auto"
-              />
-          )}
-      </AnimatePresence>
-
-      {/* Mobile Sidebar Panel */}
-      <AnimatePresence>
-          {isSidebarOpen && (
-              <motion.aside 
-                 key="sidebar-panel"
-                 initial={{ x: "-100%" }}
-                 animate={{ x: 0 }}
-                 exit={{ x: "-100%" }}
-                 transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                 className="fixed top-0 left-0 bottom-0 w-[300px] bg-white border-r-4 border-black z-[20005] shadow-[20px_0px_0_#000] flex flex-col lg:hidden pointer-events-auto"
-              >
-                 <Sidebar onClose={() => setIsSidebarOpen(false)} />
-              </motion.aside>
+              <>
+                  <motion.div 
+                     key="backdrop"
+                     initial={{ opacity: 0 }}
+                     animate={{ opacity: 1 }}
+                     exit={{ opacity: 0 }}
+                     onClick={() => setIsSidebarOpen(false)}
+                     className="fixed inset-0 z-[20000] lg:hidden bg-black/80 backdrop-blur-md cursor-pointer pointer-events-auto"
+                  />
+                  <motion.aside 
+                     key="sidebar-panel"
+                     initial={{ x: "-100%" }}
+                     animate={{ x: 0 }}
+                     exit={{ x: "-100%" }}
+                     transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                     className="fixed top-0 left-0 bottom-0 w-[300px] bg-white border-r-4 border-black z-[20005] shadow-[20px_0px_0_#000] flex flex-col lg:hidden pointer-events-auto"
+                  >
+                     <Sidebar onClose={() => setIsSidebarOpen(false)} />
+                  </motion.aside>
+              </>
           )}
       </AnimatePresence>
 

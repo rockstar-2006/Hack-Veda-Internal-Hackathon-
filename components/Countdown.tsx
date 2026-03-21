@@ -76,12 +76,12 @@ const TimeUnit = ({ value, label, color }: { value: number; label: string; color
           animate={{ scale: 1, y: 0, opacity: 1 }}
           exit={{ scale: 1.5, y: 20, opacity: 0 }}
           transition={{ type: "spring", stiffness: 300, damping: 20 }}
-          className="text-4xl sm:text-5xl md:text-6xl font-comic text-black drop-shadow-[2px_2px_0_#fff] absolute"
+          className="text-4xl sm:text-5xl md:text-5xl font-comic text-black drop-shadow-[2px_2px_0_#fff] absolute"
         >
           {value.toString().padStart(2, '0')}
         </motion.span>
       </AnimatePresence>
     </div>
-    <p className="text-[10px] sm:text-xs font-bold text-black bg-white px-3 py-1 border-2 border-black rounded-full shadow-[2px_2px_0_#000] uppercase tracking-widest">{label}</p>
+    <p className="w-max text-[10px] sm:text-xs font-bold text-black bg-white px-3 py-1 border-2 border-black rounded-full shadow-[2px_2px_0_#000] uppercase tracking-widest">{label}</p>
   </div>
 );
