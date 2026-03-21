@@ -9,12 +9,11 @@ if (!admin.apps.length) {
 
   if (privateKey && clientEmail && projectId) {
     // Ultimate robust parsing: Strip everything and re-wrap the raw key data
-    const rawKey = privateKey
-      .replace(/\\n/g, '')
-      .replace(/\s/g, '')
-      .replace(/-+BEGIN[^-]*-+/, '')
-      .replace(/-+END[^-]*-+/, '')
-      .replace(/"/g, '');
+    // Extraction Precision: Capture only the base64 content within the BEGIN/END tags
+    const keyMatch = privateKey.match(/-+BEGIN[^-]*-+\s*([\s\S]+?)\s*-+END[^-]*-+/);
+    const rawKey = keyMatch 
+      ? keyMatch[1].replace(/\s+/g, '') // Content between tags, stripped of whitespace
+      : privateKey.replace(/\\n/g, '').replace(/\s+/g, '').replace(/-+BEGIN[^-]*-+/, '').replace(/-+END[^-]*-+/, '').replace(/"/g, ''); // Fallback
 
     // Robust parsing for Vercel / Production deployment
     credential = admin.credential.cert({
