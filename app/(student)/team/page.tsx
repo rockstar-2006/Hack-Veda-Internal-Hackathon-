@@ -30,6 +30,8 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { updateUserProfile, getUserProfile, addTeammateByUSN, leaveTeam } from "@/lib/db";
+import { collection, query, where, onSnapshot } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 import { UserProfile } from "@/types";
 import { Toast, ToastType } from "@/components/Toast";
 
@@ -44,15 +46,32 @@ export default function TeamPage() {
   const [inviting, setInviting] = useState(false);
   const [toast, setToast] = useState<{ message: string, type: ToastType } | null>(null);
 
-  const fetchMembers = async () => {
-    if (team) {
-      setLoading(true);
-      try {
-        const profilePromises = team.memberIds.map(async id => {
-            const profile = await getUserProfile(id);
+  useEffect(() => {
+    if (!team || team.memberIds.length === 0) {
+        setMembers([]);
+        setLoading(false);
+        return;
+    }
+
+    setLoading(true);
+    // Real-time listener for the team members' profiles
+    const q = query(
+        collection(db, "users"), 
+        where("userId", "in", team.memberIds)
+    );
+    
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+        const profileMap = new Map();
+        snapshot.docs.forEach(doc => {
+            const data = doc.data() as UserProfile;
+            if (data.userId) profileMap.set(data.userId, data);
+        });
+        
+        // Match profiles back to IDs to maintain order and detect missing profiles
+        const enrichedMembers = team.memberIds.map(id => {
+            const profile = profileMap.get(id);
             if (profile) return profile;
             
-            // Fallback for pending profiles
             return {
                 userId: id,
                 full_name: "STUDENT JOINED",
@@ -61,19 +80,16 @@ export default function TeamPage() {
                 branch: "..."
             } as UserProfile;
         });
-        const profiles = await Promise.all(profilePromises);
-        setMembers(profiles);
-      } catch (err) {
-        console.error("Error fetching members:", err);
-      } finally {
+        
+        setMembers(enrichedMembers);
         setLoading(false);
-      }
-    }
-  };
+    }, (err) => {
+        console.error("Error listening for members:", err);
+        setLoading(false);
+    });
 
-  useEffect(() => {
-    fetchMembers();
-  }, [team]);
+    return () => unsubscribe();
+  }, [team?.memberIds]);
 
   const handleCopy = () => {
     if (team?.teamCode) {
@@ -102,7 +118,6 @@ export default function TeamPage() {
           setToast({ message: `${inviteUSN} ADDED TO TEAM!`, type: "success" });
           setInviteUSN("");
           refreshTeam?.();
-          fetchMembers();
       } catch (err: any) {
           setToast({ message: err.message || "FAILED TO ADD MEMBER", type: "error" });
       } finally {
