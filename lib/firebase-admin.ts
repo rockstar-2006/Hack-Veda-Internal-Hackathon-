@@ -12,7 +12,7 @@ if (!admin.apps.length) {
     // Extraction Precision: Capture only the base64 content within the BEGIN/END tags
     const keyMatch = privateKey.match(/-+BEGIN[^-]*-+\s*([\s\S]+?)\s*-+END[^-]*-+/);
     const rawKey = keyMatch 
-      ? keyMatch[1].replace(/\s+/g, '') // Content between tags, stripped of whitespace
+      ? keyMatch[1].replace(/\\n/g, '').replace(/\s+/g, '') // Remove both literal \n and actual whitespace
       : privateKey.replace(/\\n/g, '').replace(/\s+/g, '').replace(/-+BEGIN[^-]*-+/, '').replace(/-+END[^-]*-+/, '').replace(/"/g, ''); // Fallback
 
     // Robust parsing for Vercel / Production deployment
