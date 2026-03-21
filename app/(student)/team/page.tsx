@@ -30,7 +30,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { updateUserProfile, getUserProfile, addTeammateByUSN, leaveTeam } from "@/lib/db";
-import { collection, query, where, onSnapshot } from "firebase/firestore";
+import { collection, query, where, onSnapshot, documentId } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { UserProfile } from "@/types";
 import { Toast, ToastType } from "@/components/Toast";
@@ -66,14 +66,14 @@ export default function TeamPage() {
     // Real-time listener for the team members' profiles
     const q = query(
         collection(db, "users"), 
-        where("userId", "in", validMemberIds)
+        where(documentId(), "in", validMemberIds)
     );
     
     const unsubscribe = onSnapshot(q, (snapshot) => {
         const profileMap = new Map();
         snapshot.docs.forEach(doc => {
             const data = doc.data() as UserProfile;
-            if (data.userId) profileMap.set(data.userId, data);
+            profileMap.set(doc.id, data);
         });
         
         // Match profiles back to IDs to maintain order and detect missing profiles
