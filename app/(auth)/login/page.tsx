@@ -68,7 +68,7 @@ export default function LoginPage() {
   );
 
   return (
-    <div className="min-h-screen relative bg-yellow-400 selection:bg-black selection:text-white overflow-hidden flex items-center justify-center p-4 sm:p-6 md:p-8 font-sans">
+    <div className="min-h-screen relative bg-[#fffcf0] selection:bg-black selection:text-white overflow-hidden flex items-center justify-center p-4 sm:p-6 md:p-8 font-sans">
       
       {/* Halftone / Line Pattern Background (Simulated via CSS) */}
       <div 

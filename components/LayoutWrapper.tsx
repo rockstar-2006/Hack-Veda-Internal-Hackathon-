@@ -196,7 +196,7 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
   }
 
   return (
-    <div className={`min-h-screen bg-[#fffcf0] font-sans transition-all duration-700 ${showSidebar ? 'lg:pl-72' : ''}`}>
+    <div className={`min-h-screen bg-[#fffcf0] font-sans ${showSidebar ? 'lg:pl-72' : ''}`}>
       
       {/* Desktop Sidebar */}
       {showSidebar && (
@@ -226,27 +226,33 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
           </header>
       )}
 
-      {/* Mobile Sidebar Overlay */}
+      {/* Mobile Sidebar Backdrop */}
       <AnimatePresence>
           {isSidebarOpen && (
-              <div className="fixed inset-0 z-[20000] lg:hidden pointer-events-auto">
-                  <motion.div 
-                     initial={{ opacity: 0 }}
-                     animate={{ opacity: 1 }}
-                     exit={{ opacity: 0 }}
-                     onClick={() => setIsSidebarOpen(false)}
-                     className="absolute inset-0 bg-black/80 backdrop-blur-md cursor-pointer pointer-events-auto"
-                  />
-                  <motion.aside 
-                     initial={{ x: "-100%" }}
-                     animate={{ x: 0 }}
-                     exit={{ x: "-100%" }}
-                     transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                     className="absolute top-0 left-0 bottom-0 w-[300px] bg-white border-r-4 border-black z-10 shadow-[20px_0px_0_rgba(0,0,0,0.5)] flex flex-col pointer-events-auto"
-                  >
-                     <Sidebar onClose={() => setIsSidebarOpen(false)} />
-                  </motion.aside>
-              </div>
+              <motion.div 
+                 key="backdrop"
+                 initial={{ opacity: 0 }}
+                 animate={{ opacity: 1 }}
+                 exit={{ opacity: 0 }}
+                 onClick={() => setIsSidebarOpen(false)}
+                 className="fixed inset-0 z-[20000] lg:hidden bg-black/80 backdrop-blur-md cursor-pointer pointer-events-auto"
+              />
+          )}
+      </AnimatePresence>
+
+      {/* Mobile Sidebar Panel */}
+      <AnimatePresence>
+          {isSidebarOpen && (
+              <motion.aside 
+                 key="sidebar-panel"
+                 initial={{ x: "-100%" }}
+                 animate={{ x: 0 }}
+                 exit={{ x: "-100%" }}
+                 transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                 className="fixed top-0 left-0 bottom-0 w-[300px] bg-white border-r-4 border-black z-[20005] shadow-[20px_0px_0_rgba(0,0,0,0.5)] flex flex-col lg:hidden pointer-events-auto"
+              >
+                 <Sidebar onClose={() => setIsSidebarOpen(false)} />
+              </motion.aside>
           )}
       </AnimatePresence>
 
