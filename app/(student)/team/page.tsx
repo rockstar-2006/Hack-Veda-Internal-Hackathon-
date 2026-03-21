@@ -53,52 +53,37 @@ export default function TeamPage() {
         return;
     }
 
-    const validMemberIds = team.memberIds.filter(id => !!id);
-    if (validMemberIds.length === 0) {
-        setMembers([]);
-        setLoading(false);
-        return;
-    }
-
-    setLoading(true);
-    console.log("SYNC: Listening for profiles of", validMemberIds);
-    
-    // Real-time listener for the team members' profiles
-    const q = query(
-        collection(db, "users"), 
-        where(documentId(), "in", validMemberIds)
-    );
-    
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-        const profileMap = new Map();
-        snapshot.docs.forEach(doc => {
-            const data = doc.data() as UserProfile;
-            profileMap.set(doc.id, data);
-        });
-        
-        // Match profiles back to IDs to maintain order and detect missing profiles
-        const enrichedMembers = team.memberIds.map(id => {
-            const profile = profileMap.get(id);
-            if (profile) return profile;
+    const fetchOrderlyMembers = async () => {
+        setLoading(true);
+        try {
+            // Fetch each profile individually to bypass possible collection-query restrictions
+            const profilePromises = team.memberIds.map(id => getUserProfile(id));
+            const profiles = await Promise.all(profilePromises);
             
-            return {
-                userId: id,
-                full_name: "STUDENT JOINED",
-                role: "student",
-                usn: "PENDING PROFILE",
-                branch: "..."
-            } as UserProfile;
-        });
-        
-        setMembers(enrichedMembers);
-        setLoading(false);
-    }, (err) => {
-        console.error("Error listening for members:", err);
-        setLoading(false);
-    });
+            // Map them to include fallout data for pending profiles
+            const enriched = team.memberIds.map((id, index) => {
+                const p = profiles[index];
+                if (p) return p;
+                return {
+                    userId: id,
+                    full_name: "STUDENT JOINED",
+                    role: "student" as any,
+                    usn: `ID: ${id.substring(0, 5)}...`,
+                    branch: "...",
+                    year: "..."
+                } as UserProfile;
+            });
+            
+            setMembers(enriched);
+        } catch (err) {
+            console.error("Fetch members error:", err);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-    return () => unsubscribe();
-  }, [team?.memberIds]);
+    fetchOrderlyMembers();
+  }, [team?.memberIds, team?.id]);
 
   const handleCopy = () => {
     if (team?.teamCode) {
