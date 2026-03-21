@@ -59,13 +59,8 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
 
   // Lock body scroll when sidebar is open
   useEffect(() => {
-    if (isSidebarOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
     return () => {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = '';
     };
   }, [isSidebarOpen]);
 
@@ -125,6 +120,9 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
 
   // Close sidebar on navigation (for mobile)
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+        window.scrollTo(0, 0);
+    }
     setIsSidebarOpen(false);
   }, [pathname]);
 
@@ -220,7 +218,7 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
 
       {/* Mobile Top Bar */}
       {showSidebar && (
-          <header className={`lg:hidden fixed top-0 left-0 right-0 h-20 border-b-4 border-black px-6 flex items-center justify-between shadow-[0px_4px_0_#000] transition-all duration-300 ${isSidebarOpen ? 'z-[20005] bg-pink-400' : 'z-[10002] bg-white'} pointer-events-auto`}>
+          <header className={`lg:hidden fixed top-0 left-0 right-0 h-20 border-b-4 border-black px-6 flex items-center justify-between shadow-[0px_4px_0_#000] transition-colors duration-200 ${isSidebarOpen ? 'z-[9999] bg-pink-400 text-white' : 'z-[9999] bg-white text-black'} pointer-events-auto`}>
                <div className="flex items-center gap-4">
                     <div className="bg-yellow-400 p-2.5 rounded-xl border-2 border-black shadow-[2px_2px_0_#000]">
                          <Zap className="w-5 h-5 text-black fill-black" />
@@ -229,13 +227,12 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
                          HACKVEDA
                     </span>
                </div>
-               <motion.button 
-                 whileTap={{ scale: 0.9, y: 2, boxShadow: "0 0 0 #000" }}
-                 onClick={() => setIsSidebarOpen(prev => !prev)}
-                 className={`p-3 border-2 border-black shadow-[2px_2px_0_#000] rounded-xl transition-all bg-pink-400 text-black pointer-events-auto ${isSidebarOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
-               >
-                    <Menu className="w-6 h-6 stroke-[3]" />
-               </motion.button>
+                <button 
+                  onClick={() => setIsSidebarOpen(prev => !prev)}
+                  className={`p-3 border-2 border-black shadow-[2px_2px_0_#000] rounded-xl bg-pink-400 text-black pointer-events-auto ${isSidebarOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'} active:translate-y-0.5 active:shadow-none transition-all`}
+                >
+                     <Menu className="w-6 h-6 stroke-[3]" />
+                </button>
           </header>
       )}
 
@@ -249,7 +246,7 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
                      animate={{ opacity: 1 }}
                      exit={{ opacity: 0 }}
                      onClick={() => setIsSidebarOpen(false)}
-                     className="fixed inset-0 z-[20000] lg:hidden bg-black/80 backdrop-blur-md cursor-pointer pointer-events-auto"
+                     className="fixed inset-0 z-[100] lg:hidden bg-black/60 cursor-pointer pointer-events-auto"
                   />
                   <motion.aside 
                      key="sidebar-panel"
@@ -257,7 +254,7 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
                      animate={{ x: 0 }}
                      exit={{ x: "-100%" }}
                      transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                     className="fixed top-0 left-0 bottom-0 w-[300px] bg-white border-r-4 border-black z-[20005] flex flex-col lg:hidden pointer-events-auto"
+                     className="fixed top-0 left-0 bottom-0 w-[280px] bg-white border-r-4 border-black z-[110] flex flex-col lg:hidden pointer-events-auto shadow-[10px_0_0_rgba(0,0,0,0.1)]"
                   >
                      <Sidebar onClose={() => setIsSidebarOpen(false)} />
                   </motion.aside>
@@ -267,32 +264,11 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
 
       {showNavbar && <Navbar />}
 
-      <main className={`min-h-screen w-full relative overflow-hidden bg-[#fdfdfd] ${showSidebar && pathname !== "/login" ? 'pt-20 lg:pt-0 lg:border-l-8 lg:border-black' : ''}`}>
-           {/* Navigation Transition Effect (ZAP!) */}
-           <motion.div
-              key={pathname + "-transition"}
-              initial={{ opacity: 1, scale: 2 }}
-              animate={{ opacity: 0, scale: 1 }}
-              transition={{ duration: 0.3, ease: "easeOut" }}
-              className="fixed inset-0 z-[150] pointer-events-none flex items-center justify-center"
-           >
-               <div className="absolute inset-0 bg-yellow-400 opacity-20" />
-               {/* Speed lines on transition */}
-               {[...Array(12)].map((_, i) => (
-                    <div 
-                        key={i} 
-                        className="absolute bg-black w-[200%] h-4" 
-                        style={{ 
-                            top: '50%', 
-                            left: '50%', 
-                            transform: `translate(-50%, -50%) rotate(${i * 30}deg)` 
-                        }} 
-                    />
-               ))}
-           </motion.div>
+      <main className={`min-h-screen w-full relative z-10 overflow-x-hidden ${showSidebar && pathname !== "/login" ? 'pt-20 lg:pt-0 lg:border-l-8 lg:border-black' : ''}`}>
+           {/* Page Transition removed for better performance on mobile/PWA */}
 
            {/* Global Animated Live Background Pattern */}
-           <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden bg-white">
+           <div className="fixed inset-0 pointer-events-none z-[-2] overflow-hidden bg-[#fffcf0]">
                {/* Animated moving halftone grid */}
                <motion.div 
                    className="absolute inset-[0%] opacity-20 w-[120%] h-[120%]"
@@ -408,7 +384,7 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
               initial={{ y: 100, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 100, opacity: 0 }}
-              className="fixed bottom-0 left-0 right-0 z-[50000] p-4 pointer-events-auto"
+              className="fixed bottom-0 left-0 right-0 z-[200] p-4 pointer-events-none"
            >
                <div className="max-w-md mx-auto bg-black text-white p-4 rounded-3xl border-4 border-yellow-400 shadow-[0_-8px_20px_rgba(0,0,0,0.5)] flex items-center gap-4 relative isolate overflow-hidden">
                    {/* Background rays */}

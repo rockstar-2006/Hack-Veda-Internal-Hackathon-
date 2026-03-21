@@ -29,7 +29,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${spaceGrotesk.variable} ${bangers.variable} font-sans min-h-screen bg-[#fffcf0] text-black selection:bg-pink-500 selection:text-white overflow-x-hidden relative`}>
         {/* Global Halftone Filter */}
-        <div className="fixed inset-0 pointer-events-none opacity-[0.03] z-[9999]" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, black 1px, transparent 0)', backgroundSize: '12px 12px' }} />
+        <div className="fixed inset-0 pointer-events-none opacity-[0.03] z-[-1]" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, black 1px, transparent 0)', backgroundSize: '12px 12px' }} />
 
         <AuthProvider>
           <LayoutWrapper>

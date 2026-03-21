@@ -168,7 +168,8 @@ export default function SchedulePage() {
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
-    offset: ["start end", "end end"]
+    offset: ["start end", "end end"],
+    layoutEffect: false
   });
 
   return (
