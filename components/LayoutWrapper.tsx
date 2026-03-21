@@ -255,7 +255,7 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
 
       {showNavbar && <Navbar />}
 
-      <main className={`min-h-screen w-full relative overflow-hidden bg-[#fdfdfd] border-black ${showSidebar ? (pathname !== "/login" ? 'pt-20 lg:pt-0 lg:border-l-8' : '') : ''}`}>
+      <main className={`min-h-screen w-full relative overflow-hidden bg-[#fdfdfd] ${showSidebar && pathname !== "/login" ? 'pt-20 lg:pt-0 lg:border-l-8 border-black' : ''}`}>
            {/* Navigation Transition Effect (ZAP!) */}
            <motion.div
               key={pathname + "-transition"}

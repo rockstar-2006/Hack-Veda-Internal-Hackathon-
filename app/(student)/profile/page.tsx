@@ -30,7 +30,9 @@ import {
   Zap,
   Bell,
   Settings,
-  ChevronRight
+  ChevronRight,
+  Phone,
+  ChevronDown
 } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -255,35 +257,41 @@ export default function ProfilePage() {
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-xs font-bold text-black uppercase tracking-widest pl-2 block">Branch</label>
-                                    <select 
-                                      value={branch}
-                                      onChange={(e) => setBranch(e.target.value)}
-                                      className="w-full h-14 px-4 rounded-xl bg-cyan-100 border-4 border-black focus:bg-cyan-200 outline-none transition-all font-bold text-sm appearance-none cursor-pointer shadow-[4px_4px_0_#000] focus:translate-y-1 focus:shadow-[0_0_0_#000]"
-                                      required
-                                    >
-                                        <option value="CSE">CSE</option>
-                                        <option value="ISE">ISE</option>
-                                        <option value="AIML">AIML</option>
-                                        <option value="AI-DS">AI-DS</option>
-                                        <option value="ECE">ECE</option>
-                                        <option value="EEE">EEE</option>
-                                        <option value="ME">ME</option>
-                                        <option value="CV">CV</option>
-                                    </select>
+                                    <div className="relative">
+                                        <select 
+                                          value={branch}
+                                          onChange={(e) => setBranch(e.target.value)}
+                                          className="w-full h-14 pl-4 pr-10 rounded-xl bg-cyan-100 border-4 border-black focus:bg-cyan-200 outline-none transition-all font-bold text-sm appearance-none cursor-pointer shadow-[4px_4px_0_#000] focus:translate-y-1 focus:shadow-[0_0_0_#000]"
+                                          required
+                                        >
+                                            <option value="CSE">CSE</option>
+                                            <option value="ISE">ISE</option>
+                                            <option value="AIML">AIML</option>
+                                            <option value="AI-DS">AI-DS</option>
+                                            <option value="ECE">ECE</option>
+                                            <option value="EEE">EEE</option>
+                                            <option value="ME">ME</option>
+                                            <option value="CV">CV</option>
+                                        </select>
+                                        <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 pointer-events-none" />
+                                    </div>
                                 </div>
                              </div>
 
                              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
                                     <label className="text-xs font-bold text-black uppercase tracking-widest pl-2 block">Phone Number</label>
-                                    <input 
-                                      type="tel" 
-                                      value={phone}
-                                      onChange={(e) => setPhone(e.target.value)}
-                                      placeholder="Ex: 9876543210"
-                                      className="w-full h-14 px-4 rounded-xl bg-gray-50 border-4 border-black focus:bg-white outline-none transition-all font-bold text-sm shadow-[4px_4px_0_#000] focus:translate-y-1 focus:shadow-[0_0_0_#000]"
-                                      required
-                                    />
+                                    <div className="relative">
+                                        <input 
+                                          type="tel" 
+                                          value={phone}
+                                          onChange={(e) => setPhone(e.target.value)}
+                                          placeholder="Ex: 9876543210"
+                                          className="w-full h-14 pl-12 pr-4 rounded-xl bg-gray-50 border-4 border-black focus:bg-white outline-none transition-all font-bold text-sm shadow-[4px_4px_0_#000] focus:translate-y-1 focus:shadow-[0_0_0_#000]"
+                                          required
+                                        />
+                                        <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                    </div>
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-xs font-bold text-black uppercase tracking-widest pl-2 block">Year of Study</label>
