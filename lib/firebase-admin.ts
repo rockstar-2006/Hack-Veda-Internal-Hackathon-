@@ -18,9 +18,9 @@ if (!admin.apps.length) {
   } else if (process.env.NODE_ENV === "development") {
     // Local development fallback (only attempted locally)
     try {
-      // Use dynamic require to prevent Vercel build-time resolution errors
-      const path = "../app/Credential_ServiceAccount/internal-hacka-firebase-adminsdk-fbsvc-0707ffb503.json";
-      const serviceAccount = require(`${path}`);
+      // Using eval("require") to completely hide this from the Next.js / Vercel build-time bundler
+      const saPath = "../app/Credential_ServiceAccount/internal-hacka-firebase-adminsdk-fbsvc-0707ffb503.json";
+      const serviceAccount = eval("require")(saPath);
       credential = admin.credential.cert(serviceAccount);
     } catch (error) {
        console.warn("Local service account JSON not found. Admin APIs will fail unless env variables are set.");
