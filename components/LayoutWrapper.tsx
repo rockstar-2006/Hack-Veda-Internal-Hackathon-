@@ -57,6 +57,18 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
     return () => window.removeEventListener('beforeinstallprompt', handler);
   }, []);
 
+  // Lock body scroll when sidebar is open
+  useEffect(() => {
+    if (isSidebarOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isSidebarOpen]);
+
   const handleInstallClick = async () => {
     if (!deferredPrompt) return;
     deferredPrompt.prompt();
@@ -245,7 +257,7 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
                      animate={{ x: 0 }}
                      exit={{ x: "-100%" }}
                      transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                     className="fixed top-0 left-0 bottom-0 w-[300px] bg-white border-r-4 border-black z-[20005] shadow-[20px_0px_0_#000] flex flex-col lg:hidden pointer-events-auto"
+                     className="fixed top-0 left-0 bottom-0 w-[300px] bg-white border-r-4 border-black z-[20005] flex flex-col lg:hidden pointer-events-auto"
                   >
                      <Sidebar onClose={() => setIsSidebarOpen(false)} />
                   </motion.aside>
@@ -255,7 +267,7 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
 
       {showNavbar && <Navbar />}
 
-      <main className={`min-h-screen w-full relative overflow-hidden bg-[#fdfdfd] ${showSidebar && pathname !== "/login" ? 'pt-20 lg:pt-0 lg:border-l-8 border-black' : ''}`}>
+      <main className={`min-h-screen w-full relative overflow-hidden bg-[#fdfdfd] ${showSidebar && pathname !== "/login" ? 'pt-20 lg:pt-0 lg:border-l-8 lg:border-black' : ''}`}>
            {/* Navigation Transition Effect (ZAP!) */}
            <motion.div
               key={pathname + "-transition"}
