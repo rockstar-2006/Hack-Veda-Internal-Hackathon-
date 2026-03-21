@@ -19,16 +19,27 @@ import { db } from "./firebase";
 import { generateCode } from "@/utils/generateCode";
 import { Team, Submission, Announcement } from "@/types";
 
+// Helper function to add timeout to Firestore operations
+const withTimeout = async <T>(
+  promise: Promise<T>,
+  timeoutMs: number = 8000
+): Promise<T> => {
+  const timeoutPromise = new Promise<T>((_, reject) =>
+    setTimeout(() => reject(new Error('Firestore operation timeout')), timeoutMs)
+  );
+  return Promise.race([promise, timeoutPromise]);
+};
+
 // Team Operations
 export const createTeam = async (userId: string, teamName: string) => {
   // Check if user is already in a team
-  const existingTeam = await getMyTeam(userId);
+  const existingTeam = await withTimeout(getMyTeam(userId), 8000);
   if (existingTeam) {
     throw new Error("You are already part of a team!");
   }
 
   const teamCode = generateCode();
-  const profile = await getUserProfile(userId);
+  const profile = await withTimeout(getUserProfile(userId), 8000);
   const leaderSnippet = {
       userId: userId,
       full_name: profile?.full_name || "LEADER",
@@ -50,13 +61,13 @@ export const createTeam = async (userId: string, teamName: string) => {
     createdAt: serverTimestamp(),
   };
 
-  const docRef = await addDoc(collection(db, "teams"), teamData);
+  const docRef = await withTimeout(addDoc(collection(db, "teams"), teamData), 8000);
   return { id: docRef.id, ...teamData };
 };
 
 export const joinTeam = async (teamCode: string, userId: string) => {
   // Check if user is already in a team
-  const existingTeam = await getMyTeam(userId);
+  const existingTeam = await withTimeout(getMyTeam(userId), 8000);
   if (existingTeam) {
     throw new Error("You are already part of a team!");
   }
@@ -67,7 +78,7 @@ export const joinTeam = async (teamCode: string, userId: string) => {
     where("archived", "==", false)
   );
   
-  const snapshot = await getDocs(q);
+  const snapshot = await withTimeout(getDocs(q), 8000);
 
   if (snapshot.empty) {
     throw new Error("Invalid or inactive team code.");
@@ -75,7 +86,7 @@ export const joinTeam = async (teamCode: string, userId: string) => {
 
   const teamDoc = snapshot.docs[0];
   const data = teamDoc.data() as Team;
-  const profile = await getUserProfile(userId);
+  const profile = await withTimeout(getUserProfile(userId), 8000);
   const snippet = {
       userId: userId,
       full_name: profile?.full_name || "STUDENT",
@@ -100,7 +111,7 @@ export const joinTeam = async (teamCode: string, userId: string) => {
 export const addTeammateByUSN = async (teamId: string, usn: string) => {
   // 1. Find user by USN
   const uq = query(collection(db, "users"), where("usn", "==", usn.toUpperCase()));
-  const usnap = await getDocs(uq);
+  const usnap = await withTimeout(getDocs(uq), 8000);
   
   if (usnap.empty) {
     throw new Error("Student with this USN not found. Ask them to setup their profile first!");
@@ -118,7 +129,7 @@ export const addTeammateByUSN = async (teamId: string, usn: string) => {
 
   // 2. Check current team size
   const teamRef = doc(db, "teams", teamId);
-  const teamSnap = await getDoc(teamRef);
+  const teamSnap = await withTimeout(getDoc(teamRef), 8000);
   if (!teamSnap.exists()) throw new Error("Team not found.");
   
   const teamData = teamSnap.data() as Team;
@@ -128,38 +139,38 @@ export const addTeammateByUSN = async (teamId: string, usn: string) => {
 
   // 3. Check if user already in any team
   const tq = query(collection(db, "teams"), where("memberIds", "array-contains", targetUserId), where("archived", "==", false));
-  const tsnap = await getDocs(tq);
+  const tsnap = await withTimeout(getDocs(tq), 8000);
   if (!tsnap.empty) {
     throw new Error("This student is already in a team!");
   }
 
   // 4. Add to our team
-  await updateDoc(teamRef, {
+  await withTimeout(updateDoc(teamRef, {
     memberIds: arrayUnion(targetUserId),
     memberProfiles: arrayUnion(snippet)
-  });
+  }), 8000);
 
   return userData;
 };
 
 export const leaveTeam = async (teamId: string, userId: string) => {
     const teamRef = doc(db, "teams", teamId);
-    const teamSnap = await getDoc(teamRef);
+    const teamSnap = await withTimeout(getDoc(teamRef), 8000);
     if (!teamSnap.exists()) throw new Error("Team not found.");
     
     const team = teamSnap.data() as Team;
     
     // If the leader leaves, or it's the last member, we dissolve the team softly to bypass strict Firebase delete rules
     if (team.leaderId === userId || team.memberIds.length === 1) {
-        await updateDoc(teamRef, {
+        await withTimeout(updateDoc(teamRef, {
             archived: true,
             memberIds: arrayRemove(userId)
-        });
+        }), 8000);
         return { deleted: true };
     } else {
-        await updateDoc(teamRef, {
+        await withTimeout(updateDoc(teamRef, {
             memberIds: arrayRemove(userId)
-        });
+        }), 8000);
         return { deleted: false };
     }
 };

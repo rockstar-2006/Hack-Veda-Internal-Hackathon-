@@ -36,9 +36,10 @@ export default function AdminLoginPage() {
       const data = await response.json();
 
       if (response.ok && data.success) {
-        // Admin session verified
+        // Admin session verified - expires in 8 hours (28800000 ms)
         localStorage.setItem("adminSession", "active");
         localStorage.setItem("adminEmail", email);
+        localStorage.setItem("adminSessionTime", Date.now().toString());
         router.push("/admin/dashboard");
       } else {
         setError(data.message || "Invalid Admin Protocol. Access Denied.");

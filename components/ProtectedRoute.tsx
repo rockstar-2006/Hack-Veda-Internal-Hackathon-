@@ -23,7 +23,22 @@ export const ProtectedRoute = ({ children, requireAdmin = false }: ProtectedRout
     if (loading) return;
 
     // Hardcoded Admin Session Check (Local Persistence)
-    const isAdminSessionActive = typeof window !== 'undefined' && localStorage.getItem('adminSession') === 'active';
+    // Check if admin session is still valid (8 hour expiry)
+    let isAdminSessionActive = false;
+    if (typeof window !== 'undefined' && localStorage.getItem('adminSession') === 'active') {
+      const sessionTime = localStorage.getItem('adminSessionTime');
+      const sessionAgeMs = Date.now() - (sessionTime ? parseInt(sessionTime) : 0);
+      const ADMIN_SESSION_TIMEOUT = 8 * 60 * 60 * 1000; // 8 hours
+      
+      if (sessionAgeMs > ADMIN_SESSION_TIMEOUT) {
+        // Session expired, clear it
+        localStorage.removeItem('adminSession');
+        localStorage.removeItem('adminEmail');
+        localStorage.removeItem('adminSessionTime');
+      } else {
+        isAdminSessionActive = true;
+      }
+    }
 
     if (requireAdmin && isAdminSessionActive) {
         setAuthorized(true);

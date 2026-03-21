@@ -12,8 +12,20 @@ export const uploadPDF = (
   onProgress?: (progress: number) => void
 ): Promise<string> => {
   return new Promise((resolve, reject) => {
+    // Validate file type
     if (file.type !== "application/pdf") {
       return reject(new Error("Only PDF files are allowed."));
+    }
+    
+    // Validate file size (10MB max)
+    const MAX_FILE_SIZE = 10 * 1024 * 1024;
+    if (file.size > MAX_FILE_SIZE) {
+      return reject(new Error("File size exceeds 10MB limit."));
+    }
+    
+    // Validate file name to prevent injection attacks
+    if (!file.name || file.name.length === 0) {
+      return reject(new Error("Invalid file name."));
     }
     
     console.log("Starting universal file upload (Free Tier active)...");

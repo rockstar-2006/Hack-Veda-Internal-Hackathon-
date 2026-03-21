@@ -27,15 +27,22 @@ export const useTeam = () => {
     );
     
     const unsubscribe = onSnapshot(q, (snapshot) => {
-        if (snapshot.empty) {
-            setTeam(null);
-        } else {
-            setTeam({ id: snapshot.docs[0].id, ...snapshot.docs[0].data() } as Team & { id: string });
+        try {
+            if (snapshot.empty) {
+                setTeam(null);
+            } else {
+                setTeam({ id: snapshot.docs[0].id, ...snapshot.docs[0].data() } as Team & { id: string });
+            }
+            setError("");
+            setLoading(false);
+        } catch (err: any) {
+            console.error("Error processing team snapshot:", err);
+            setError(err.message || "Failed to load team data");
+            setLoading(false);
         }
-        setLoading(false);
     }, (err) => {
-        console.error(err);
-        setError(err.message);
+        console.error("Listener error:", err);
+        setError(err.message || "Failed to listen to team updates");
         setLoading(false);
     });
 

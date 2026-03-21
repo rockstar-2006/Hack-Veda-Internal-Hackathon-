@@ -1,9 +1,10 @@
 
 import { NextResponse } from 'next/server';
-import { adminDb } from '@/lib/firebase-admin';
+import { getAdminDb } from '@/lib/firebase-admin';
 
 export async function GET() {
     try {
+        const adminDb = getAdminDb();
         const [teamsSnap, submissionsSnap] = await Promise.all([
             adminDb.collection("teams").where("archived", "==", false).get(),
             adminDb.collection("submissions").get()

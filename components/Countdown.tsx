@@ -17,13 +17,12 @@ export const Countdown = ({ targetDate, label }: CountdownProps) => {
   } | null>(null);
 
   useEffect(() => {
-    const timer = setInterval(() => {
+    const updateTime = () => {
       const target = new Date(targetDate).getTime();
       const now = new Date().getTime();
       const distance = target - now;
 
       if (distance < 0) {
-        clearInterval(timer);
         setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
         return;
       }
@@ -34,7 +33,12 @@ export const Countdown = ({ targetDate, label }: CountdownProps) => {
         minutes: Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)),
         seconds: Math.floor((distance % (1000 * 60)) / 1000),
       });
-    }, 1000);
+    };
+
+    // Update immediately on mount
+    updateTime();
+
+    const timer = setInterval(updateTime, 1000);
 
     return () => clearInterval(timer);
   }, [targetDate]);

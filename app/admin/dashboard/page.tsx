@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Team } from "@/types";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
@@ -35,14 +35,24 @@ export default function AdminDashboard() {
   const [searchTerm, setSearchTerm] = useState("");
   const [refreshing, setRefreshing] = useState(false);
   const [selectedTeam, setSelectedTeam] = useState<any>(null);
+  const isMountedRef = useRef(true);
 
   const fetchData = async () => {
+    if (!isMountedRef.current) return;
     setRefreshing(true);
+    
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+    
     try {
       const [statsRes, teamsRes] = await Promise.all([
-          fetch('/api/admin/stats'),
-          fetch('/api/admin/teams')
+          fetch('/api/admin/stats', { signal: controller.signal }),
+          fetch('/api/admin/teams?limit=100', { signal: controller.signal })
       ]);
+      
+      clearTimeout(timeout);
+
+      if (!isMountedRef.current) return;
 
       if (!statsRes.ok || !teamsRes.ok) throw new Error("Database link synchronization failed");
       
@@ -51,27 +61,47 @@ export default function AdminDashboard() {
           teamsRes.json()
       ]);
 
-      setStats(statsData);
-      setTeams(teamsData);
-      setError("");
+      if (isMountedRef.current) {
+        setStats(statsData);
+        setTeams(teamsData);
+        setError("");
+      }
     } catch (err: any) {
-      setError(err.message || "Failed to establish secure data link.");
+      if (isMountedRef.current) {
+        if (err.name !== 'AbortError') {
+          setError(err.message || "Failed to establish secure data link.");
+        }
+      }
     } finally {
-      setLoading(false);
-      setRefreshing(false);
+      if (isMountedRef.current) {
+        setLoading(false);
+        setRefreshing(false);
+      }
     }
   };
 
   useEffect(() => {
+    isMountedRef.current = true;
+    setLoading(true);
     fetchData();
+    return () => {
+      isMountedRef.current = false;
+    };
   }, []);
 
   const handleShortlist = async (teamId: string, currentStatus: boolean) => {
     try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 10000);
+        
         const response = await fetch('/api/admin/teams/shortlist', {
             method: 'POST',
-            body: JSON.stringify({ teamId, status: !currentStatus })
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ teamId, status: !currentStatus }),
+            signal: controller.signal
         });
+        
+        clearTimeout(timeout);
         
         if (!response.ok) throw new Error("Action denied");
 
@@ -79,7 +109,9 @@ export default function AdminDashboard() {
         setStats(prev => ({ ...prev, shortlisted: prev.shortlisted + (currentStatus ? -1 : 1) }));
     } catch (err: any) {
         console.error(err);
-        setError("Failed to update team status.");
+        if (err.name !== 'AbortError') {
+          setError("Failed to update team status.");
+        }
     }
   };
 
@@ -88,7 +120,17 @@ export default function AdminDashboard() {
     t.teamCode?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  if (loading) return null;
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6">
+          <div className="relative">
+              <div className="w-24 h-24 border-8 border-black border-t-yellow-400 rounded-full animate-spin shadow-[8px_8px_0_#000]" />
+              <Database className="absolute inset-0 m-auto w-10 h-10 text-black fill-cyan-400 animate-pulse" />
+          </div>
+          <p className="font-comic text-2xl tracking-[0.2em] text-black uppercase animate-bounce">Syncing Database Stream...</p>
+      </div>
+    );
+  }
 
   return (
     <ProtectedRoute requireAdmin={true}>

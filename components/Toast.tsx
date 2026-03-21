@@ -39,7 +39,7 @@ export const Toast = ({ message, type, duration = 3000, onClose }: ToastProps) =
       initial={{ opacity: 0, y: 50, scale: 0.9 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
-      className={`fixed bottom-8 right-8 z-[100] flex items-center gap-4 px-6 py-4 rounded-2xl border shadow-2xl shadow-gray-200/50 ${bgColors[type]} min-w-[320px]`}
+      className={`fixed bottom-4 left-4 right-4 sm:left-auto sm:bottom-8 sm:right-8 z-[200] flex items-center gap-4 px-6 py-4 rounded-2xl border shadow-2xl shadow-gray-200/50 ${bgColors[type]} sm:min-w-[320px]`}
     >
       <div className="flex-shrink-0">{icons[type]}</div>
       <p className="flex-1 text-sm font-bold text-gray-900 leading-snug">{message}</p>

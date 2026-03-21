@@ -49,6 +49,7 @@ export default function LoginPage() {
       if (response.ok && data.success) {
         localStorage.setItem("adminSession", "active");
         localStorage.setItem("adminEmail", email);
+        localStorage.setItem("adminSessionTime", Date.now().toString());
         router.push("/admin/dashboard");
       } else {
         setError(data.message || "Invalid Admin Protocol. Access Denied.");

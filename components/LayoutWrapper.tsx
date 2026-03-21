@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Sidebar } from "./Sidebar";
 import { Navbar } from "./Navbar";
 import { useAuth } from "@/hooks/useAuth";
@@ -41,11 +41,12 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [toast, setToast] = useState<{ message: string, type: ToastType } | null>(null);
-  const [lastNotificationId, setLastNotificationId] = useState<string | null>(null);
+  const lastNotificationIdRef = useRef<string | null>(null);
   const [minLoadingComplete, setMinLoadingComplete] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [showPwaBanner, setShowPwaBanner] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const requestInProgressRef = useRef(false);
 
   // PWA Handler
   useEffect(() => {
@@ -59,6 +60,14 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
 
   // Lock body scroll when sidebar is open
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
+    if (isSidebarOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    
     return () => {
       document.body.style.overflow = '';
     };
@@ -76,13 +85,40 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
   // Minimum Loading Timer for visual impact
   useEffect(() => {
     const isAdminUser = typeof window !== 'undefined' && localStorage.getItem('adminSession') === 'active';
-    const timer = setTimeout(() => setMinLoadingComplete(true), isAdminUser ? 1000 : 5000);
+    const timer = setTimeout(() => setMinLoadingComplete(true), isAdminUser ? 1000 : 1500);
     return () => clearTimeout(timer);
   }, [pathname]);
 
   useEffect(() => {
     setIsAdmin(typeof window !== 'undefined' && localStorage.getItem('adminSession') === 'active');
   }, [pathname, minLoadingComplete]);
+
+  // Check if admin session is expired
+  useEffect(() => {
+    const checkSessionExpiry = () => {
+      if (typeof window !== 'undefined') {
+        const sessionStatus = localStorage.getItem('adminSession');
+        const sessionTime = localStorage.getItem('adminSessionTime');
+        
+        if (sessionStatus === 'active' && sessionTime) {
+          const sessionAgeMs = Date.now() - parseInt(sessionTime);
+          const ADMIN_SESSION_TIMEOUT = 8 * 60 * 60 * 1000; // 8 hours
+          
+          if (sessionAgeMs > ADMIN_SESSION_TIMEOUT) {
+            // Session expired - clear it
+            localStorage.removeItem('adminSession');
+            localStorage.removeItem('adminEmail');
+            localStorage.removeItem('adminSessionTime');
+            setIsAdmin(false);
+          }
+        }
+      }
+    };
+    
+    // Check every minute if admin session is still valid
+    const interval = setInterval(checkSessionExpiry, 60000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Real-time Announcement Listener
   useEffect(() => {
@@ -101,18 +137,18 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
         const data = newDoc.data();
         
         // Prevent showing on first load of the app or if already seen
-        if (lastNotificationId && id !== lastNotificationId) {
+        if (lastNotificationIdRef.current && id !== lastNotificationIdRef.current) {
             setToast({ 
-                message: `ðŸ“¢ NEW UPDATE: ${data.title}`, 
+                message: `ðŸ"¢ NEW UPDATE: ${data.title}`, 
                 type: "info" 
             });
         }
-        setLastNotificationId(id);
+        lastNotificationIdRef.current = id;
       }
     });
 
     return () => unsubscribe();
-  }, [user, isAdmin, lastNotificationId]);
+  }, [user, isAdmin]);
 
   const isAuthPage = pathname === "/login" || pathname === "/admin/login";
   const showSidebar = (!loading && minLoadingComplete) && (user || isAdmin) && !isAuthPage;
@@ -135,7 +171,7 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
           {/* Subtle Halftone Overlay (Same as Dashboard) */}
           <div className="absolute inset-0 pointer-events-none opacity-[0.05] z-0" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, black 1px, transparent 0)', backgroundSize: '12px 12px' }} />
 
-          <div className="relative z-10 flex flex-col items-center">
+          <div className="relative z-1 flex flex-col items-center">
               {/* Logo Entrance */}
               <div className="mb-12 relative flex flex-col items-center">
                   <motion.div
@@ -218,7 +254,7 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
 
       {/* Mobile Top Bar */}
       {showSidebar && (
-          <header className={`lg:hidden fixed top-0 left-0 right-0 h-20 border-b-4 border-black px-6 flex items-center justify-between shadow-[0px_4px_0_#000] transition-colors duration-200 ${isSidebarOpen ? 'z-[9999] bg-pink-400 text-white' : 'z-[9999] bg-white text-black'} pointer-events-auto`}>
+          <header className={`lg:hidden fixed top-0 left-0 right-0 h-20 border-b-4 border-black px-6 flex items-center justify-between shadow-[0px_4px_0_#000] transition-colors duration-200 ${isSidebarOpen ? 'z-[100] bg-pink-400 text-white' : 'z-[100] bg-white text-black'} pointer-events-auto`}>
                <div className="flex items-center gap-4">
                     <div className="bg-yellow-400 p-2.5 rounded-xl border-2 border-black shadow-[2px_2px_0_#000]">
                          <Zap className="w-5 h-5 text-black fill-black" />
@@ -229,9 +265,9 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
                </div>
                 <button 
                   onClick={() => setIsSidebarOpen(prev => !prev)}
-                  className={`p-3 border-2 border-black shadow-[2px_2px_0_#000] rounded-xl bg-pink-400 text-black pointer-events-auto ${isSidebarOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'} active:translate-y-0.5 active:shadow-none transition-all`}
+                  className={`p-3 border-2 border-black shadow-[2px_2px_0_#000] rounded-xl bg-pink-400 text-black pointer-events-auto active:translate-y-0.5 active:shadow-none transition-all`}
                 >
-                     <Menu className="w-6 h-6 stroke-[3]" />
+                     {isSidebarOpen ? <X className="w-6 h-6 stroke-[3]" /> : <Menu className="w-6 h-6 stroke-[3]" />}
                 </button>
           </header>
       )}
@@ -245,8 +281,10 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
                      initial={{ opacity: 0 }}
                      animate={{ opacity: 1 }}
                      exit={{ opacity: 0 }}
+                     onTap={() => setIsSidebarOpen(false)}
                      onClick={() => setIsSidebarOpen(false)}
-                     className="fixed inset-0 z-[100] lg:hidden bg-black/60 cursor-pointer pointer-events-auto"
+                     className="fixed inset-0 z-[100] lg:hidden bg-black/60 cursor-pointer pointer-events-auto" 
+                     style={{ WebkitTouchCallout: 'none' }}
                   />
                   <motion.aside 
                      key="sidebar-panel"
@@ -264,88 +302,55 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
 
       {showNavbar && <Navbar />}
 
-      <main className={`min-h-screen w-full relative z-10 overflow-x-hidden ${showSidebar && pathname !== "/login" ? 'pt-20 lg:pt-0 lg:border-l-8 lg:border-black' : ''}`}>
+      <main className={`min-h-screen w-full relative z-1 overflow-x-hidden ${showSidebar && pathname !== "/login" ? 'pt-20 lg:pt-0 lg:border-l-8 lg:border-black' : ''}`}>
            {/* Page Transition removed for better performance on mobile/PWA */}
 
-           {/* Global Animated Live Background Pattern */}
-           <div className="fixed inset-0 pointer-events-none z-[-2] overflow-hidden bg-[#fffcf0]">
-               {/* Animated moving halftone grid */}
-               <motion.div 
-                   className="absolute inset-[0%] opacity-20 w-[120%] h-[120%]"
-                   style={{ 
-                       backgroundImage: 'radial-gradient(circle at 2px 2px, #000 1.5px, transparent 0)', 
-                       backgroundSize: '28px 28px' 
-                   }}
-                   animate={{ 
-                       x: ['0px', '-28px'], 
-                       y: ['0px', '-28px'] 
-                   }}
-                   transition={{ 
-                       repeat: Infinity, 
-                       duration: 3, 
-                       ease: "linear" 
-                   }}
-               />
+            {/* Premium Minimal Background System */}
+            {/* Restored Comic Background System (100% Safe) */}
+            <div className="fixed inset-0 pointer-events-none z-[-10] overflow-hidden bg-[#fffcf0]">
+                {/* Moving Dot Grid (Cleaner than halftone) */}
+                <motion.div 
+                    className="absolute inset-0 opacity-[0.06]"
+                    style={{ backgroundImage: 'radial-gradient(#000 1px, transparent 0)', backgroundSize: '32px 32px' }}
+                    animate={{ x: ['0px', '-32px'], y: ['0px', '-32px'] }}
+                    transition={{ repeat: Infinity, duration: 10, ease: 'linear' }}
+                />
 
-               {/* Live Floating Comic Elements */}
-               {showSidebar && (
-                  <div className="absolute inset-0 pointer-events-none select-none">
-                   <motion.div
-                     animate={{ y: [0, -40, 0], rotate: [0, 15, 0], scale: [1, 1.1, 1] }}
-                     transition={{ repeat: Infinity, duration: 7, ease: "easeInOut" }}
-                     className="absolute top-[15%] left-[8%] opacity-[0.25]"
-                   >
-                       <Zap className="w-28 h-28 text-pink-500 fill-pink-500 stroke-black stroke-[1.5]" />
-                   </motion.div>
-                   
-                   <motion.div
-                     animate={{ y: [0, 50, 0], rotate: [0, -20, 0], scale: [1, 1.2, 1] }}
-                     transition={{ repeat: Infinity, duration: 9, ease: "easeInOut", delay: 1 }}
-                     className="absolute top-[55%] right-[10%] opacity-[0.2]"
-                   >
-                       <Star className="w-40 h-40 text-yellow-400 fill-yellow-400 stroke-black stroke-[1.5]" />
-                   </motion.div>
+                {/* Floating Comic Icons (The "HackVeda" Look) */}
+                <div className="absolute inset-0 opacity-[0.15]">
+                    {/* Floating Zap */}
+                    <motion.div
+                      animate={{ y: [0, -30, 0], rotate: [0, 15, 0] }}
+                      transition={{ repeat: Infinity, duration: 8, ease: "easeInOut" }}
+                      className="absolute top-[15%] left-[10%]"
+                    >
+                        <Zap className="w-32 h-32 text-pink-500 fill-pink-500 stroke-black stroke-[1.5]" />
+                    </motion.div>
+                    
+                    {/* Floating Star */}
+                    <motion.div
+                      animate={{ y: [0, 40, 0], rotate: [0, -10, 0] }}
+                      transition={{ repeat: Infinity, duration: 10, ease: "easeInOut", delay: 1 }}
+                      className="absolute bottom-[25%] right-[15%]"
+                    >
+                        <Star className="w-48 h-48 text-yellow-400 fill-yellow-400 stroke-black stroke-[1.5]" />
+                    </motion.div>
 
-                   <motion.div
-                     animate={{ y: [0, -30, 0], rotate: [0, 8, 0] }}
-                     transition={{ repeat: Infinity, duration: 6, ease: "easeInOut", delay: 2 }}
-                     className="absolute top-[75%] left-[15%] opacity-[0.25]"
-                   >
-                       <Circle className="w-24 h-24 text-cyan-400 border-[10px] border-cyan-400 rounded-full bg-transparent" />
-                   </motion.div>
-                   
-                   <motion.div
-                     animate={{ y: [0, 30, 0], rotate: [0, -25, 0], scale: [1, 1.15, 1] }}
-                     transition={{ repeat: Infinity, duration: 5.5, ease: "easeInOut", delay: 0.5 }}
-                     className="absolute top-[25%] right-[20%] opacity-[0.3]"
-                   >
-                       <div className="text-7xl font-comic text-indigo-400 transform -rotate-12 select-none drop-shadow-[4px_4px_0_#000]">POW!</div>
-                   </motion.div>
-
-                   <motion.div
-                     animate={{ x: [200, -200, 200], rotate: [0, 90, 0] }}
-                     transition={{ repeat: Infinity, duration: 30, ease: "linear" }}
-                     className="absolute top-[40%] left-[30%] opacity-[0.1]"
-                   >
-                       <Zap className="w-32 h-32 text-yellow-400 fill-yellow-400 stroke-black stroke-[1]" />
-                   </motion.div>
-
-                   <motion.div
-                     animate={{ scale: [1, 1.3, 1], opacity: [0.15, 0.3, 0.15] }}
-                     transition={{ repeat: Infinity, duration: 4.5, ease: "easeInOut" }}
-                     className="absolute bottom-[20%] right-[30%] opacity-[0.2]"
-                   >
-                       <div className="text-9xl font-comic text-pink-400 transform rotate-12 select-none drop-shadow-[4px_4px_0_#000]">ZAP!</div>
-                   </motion.div>
-                  </div>
-               )}
-           </div>
-           
-           <div className="w-full relative z-10 px-4 sm:px-6 lg:px-12 py-12 max-w-[90rem] mx-auto min-h-screen">
+                    {/* Comic Text elements */}
+                    <motion.div
+                      animate={{ scale: [1, 1.1, 1] }}
+                      transition={{ repeat: Infinity, duration: 12 }}
+                      className="absolute top-[35%] right-[10%] text-8xl font-comic text-indigo-400 opacity-[0.4] -rotate-12 drop-shadow-[4px_4px_0_#000]"
+                    >
+                        POW!
+                    </motion.div>
+                </div>
+            </div>
+           <div className="w-full relative z-1 px-4 sm:px-6 lg:px-12 py-12 max-w-[90rem] mx-auto min-h-screen">
                 <motion.div
                     key={pathname}
-                    initial={{ opacity: 0, y: 10, rotate: -0.5 }}
-                    animate={{ opacity: 1, y: 0, rotate: 0 }}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
                     transition={{ duration: 0.4, ease: "backOut" }}
                 >
                     {children}
@@ -356,7 +361,7 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
        {/* Simplified Footer for Auth/Landing */}
        {!showSidebar && (
          <footer className="border-t border-gray-100 py-32 bg-gray-50/20 relative overflow-hidden">
-             <div className="max-w-7xl mx-auto px-6 text-center relative z-10">
+             <div className="max-w-7xl mx-auto px-6 text-center relative z-1">
                  <div className="inline-flex items-center gap-2 mb-12 opacity-30 group hover:opacity-100 transition-opacity">
                      <div className="bg-gray-900 p-2 rounded-xl">
                          <Zap className="w-5 h-5 text-white fill-white" />
@@ -390,14 +395,14 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
                    {/* Background rays */}
                    <div className="absolute inset-0 z-0 opacity-20 bg-[repeating-conic-gradient(#fff_0_15deg,#000_15deg_30deg)] animate-spin-slow" />
                    
-                   <div className="w-14 h-14 bg-yellow-400 rounded-2xl border-2 border-white flex items-center justify-center shrink-0 relative z-10 shadow-[4px_4px_0_#fff]">
+                   <div className="w-14 h-14 bg-yellow-400 rounded-2xl border-2 border-white flex items-center justify-center shrink-0 relative z-1 shadow-[4px_4px_0_#fff]">
                        <Zap className="w-8 h-8 text-black fill-black" />
                    </div>
-                   <div className="flex-1 relative z-10">
+                   <div className="flex-1 relative z-1">
                        <h4 className="font-comic text-xl uppercase tracking-widest text-yellow-400 leading-none drop-shadow-[2px_2px_0_#000]">INSTALL APP!</h4>
                        <p className="text-[10px] font-bold tracking-widest uppercase mt-1">Faster access + notifications</p>
                    </div>
-                   <div className="flex flex-col gap-2 relative z-10 shrink-0">
+                   <div className="flex flex-col gap-2 relative z-1 shrink-0">
                        <button 
                          onClick={handleInstallClick}
                          className="px-4 py-2 bg-pink-500 border-2 border-white rounded-xl font-comic text-sm uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-[2px_2px_0_#fff]"

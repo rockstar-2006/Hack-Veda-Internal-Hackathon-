@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { useTeam } from "@/hooks/useTeam";
@@ -32,16 +32,13 @@ import {
   Settings,
   ChevronRight,
   Phone,
-  ChevronDown
+  ChevronDown,
+  X
 } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Countdown } from "@/components/Countdown";
 import { Toast, ToastType } from "@/components/Toast";
-import dynamic from "next/dynamic";
-
-// Dynamic import for Lottie to avoid SSR issues
-const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -66,38 +63,53 @@ export default function ProfilePage() {
   const [teamCode, setTeamCode] = useState("");
   const [error, setError] = useState("");
   const [currentTeamName, setCurrentTeamName] = useState("");
+  const isMountedRef = useRef(true);
+  const requestInProgressRef = useRef(false);
 
   const fetchData = async () => {
-    if (user) {
-      setLoading(true);
-      try {
-        const [profileData, annData] = await Promise.all([
-            getUserProfile(user.uid),
-            getAnnouncements()
-        ]);
-        
-        if (annData) setAnnouncements(annData);
-        if (profileData) {
-            setProfile(profileData);
-            setFullName(profileData.full_name || "");
-            setUsn(profileData.usn || "");
-            setBranch(profileData.branch || "CSE");
-            setYear(profileData.year || "3rd Year");
-            setPhone(profileData.phone || "");
-            if (!profileData.full_name) setShowSetup(true);
-        } else {
-            setShowSetup(true);
-        }
-      } catch (err: any) {
+    if (!user || !isMountedRef.current) {
+      setLoading(false);
+      return;
+    }
+    
+    setLoading(true);
+    try {
+      const [profileData, annData] = await Promise.all([
+          getUserProfile(user.uid),
+          getAnnouncements()
+      ]);
+      
+      if (!isMountedRef.current) return;
+      
+      if (annData) setAnnouncements(annData);
+      if (profileData) {
+          setProfile(profileData);
+          setFullName(profileData.full_name || "");
+          setUsn(profileData.usn || "");
+          setBranch(profileData.branch || "CSE");
+          setYear(profileData.year || "3rd Year");
+          setPhone(profileData.phone || "");
+          if (!profileData.full_name) setShowSetup(true);
+      } else {
+          setShowSetup(true);
+      }
+    } catch (err: any) {
+      if (isMountedRef.current) {
         console.error("Error fetching data:", err);
-      } finally {
+      }
+    } finally {
+      if (isMountedRef.current) {
         setLoading(false);
       }
     }
   };
 
   useEffect(() => {
+    isMountedRef.current = true;
     fetchData();
+    return () => {
+      isMountedRef.current = false;
+    };
   }, [user]);
 
   useEffect(() => {
@@ -143,37 +155,65 @@ export default function ProfilePage() {
 
   const handleCreateTeam = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!teamName.trim()) return;
+    if (!teamName.trim() || isSubmitting || requestInProgressRef.current) return;
+    
+    requestInProgressRef.current = true;
     setError("");
     setIsSubmitting(true);
     try {
       await createTeam(user!.uid, teamName);
-      setIsCreating(false);
-      setToast({ message: "TEAM CREATED SUCCESSFULLY!", type: "success" });
+      if (isMountedRef.current) {
+        setIsCreating(false);
+        setToast({ message: "TEAM CREATED SUCCESSFULLY!", type: "success" });
+      }
     } catch (err: any) {
-        setError(err.message || "Something went wrong. Try again.");
+        if (isMountedRef.current) {
+          setError(err.message || "Something went wrong. Try again.");
+        }
     } finally {
-        setIsSubmitting(false);
+        if (isMountedRef.current) {
+          setIsSubmitting(false);
+        }
+        requestInProgressRef.current = false;
     }
   };
 
   const handleJoinTeam = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!teamCode.trim()) return;
+    if (!teamCode.trim() || isSubmitting || requestInProgressRef.current) return;
+    
+    requestInProgressRef.current = true;
     setError("");
     setIsSubmitting(true);
     try {
       await joinTeam(teamCode, user!.uid);
-      setIsJoining(false);
-      setToast({ message: "JOINED TEAM SUCCESSFULLY!", type: "success" });
+      if (isMountedRef.current) {
+        setIsJoining(false);
+        setToast({ message: "JOINED TEAM SUCCESSFULLY!", type: "success" });
+      }
     } catch (err: any) {
-        setError(err.message || "Could not join team. Check the code.");
+        if (isMountedRef.current) {
+          setError(err.message || "Could not join team. Check the code.");
+        }
     } finally {
-        setIsSubmitting(false);
+        if (isMountedRef.current) {
+          setIsSubmitting(false);
+        }
+        requestInProgressRef.current = false;
     }
   };
   
-  if (loading || teamLoading) return null;
+  if (loading || teamLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6">
+          <div className="relative">
+              <div className="w-24 h-24 border-8 border-black border-t-pink-500 rounded-full animate-spin shadow-[8px_8px_0_#000]" />
+              <Zap className="absolute inset-0 m-auto w-10 h-10 text-black fill-yellow-400 animate-pulse" />
+          </div>
+          <p className="font-comic text-2xl tracking-[0.2em] text-black uppercase animate-bounce">Awakening Terminal...</p>
+      </div>
+    );
+  }
 
   if (showSetup) {
       return (
@@ -346,7 +386,7 @@ export default function ProfilePage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-20 min-h-screen font-sans">
         
         {/* Floating Profile Settings Button */}
-        <div className="fixed bottom-8 right-8 z-[1000] pointer-events-auto">
+        <div className="fixed bottom-4 right-4 sm:bottom-8 sm:right-8 z-[1000] pointer-events-auto">
              <motion.button 
                whileHover={{ scale: 1.1, rotate: 180 }}
                whileTap={{ scale: 0.9, rotate: -45 }}
@@ -500,9 +540,7 @@ export default function ProfilePage() {
                     className="group cursor-pointer p-6 md:p-8 rounded-3xl border-4 border-black shadow-[8px_8px_0px_rgba(0,0,0,1)] flex flex-col justify-between min-h-[180px] md:min-h-[200px] bg-white relative overflow-hidden transition-colors duration-200 hover:bg-black"
                     whileHover={{ 
                         scale: 1.05, 
-                        rotate: i % 2 === 0 ? 1 : -1,
-                        x: [0, -1, 1, -1, 1, 0],
-                        y: [0, 1, -1, 1, -1, 0]
+                        rotate: i % 2 === 0 ? 1 : -1
                     }}
                     whileTap={{ scale: 0.95 }}
                     transition={{ 
@@ -649,6 +687,3 @@ export default function ProfilePage() {
     </ProtectedRoute>
   );
 }
-
-// Fixed Redundant Imports
-import { X } from "lucide-react";

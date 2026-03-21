@@ -19,24 +19,39 @@ export async function POST(request: Request) {
 
         console.log(`Uploading ${file.name} for team ${teamId} to universal free host...`);
 
-        const response = await fetch('https://catbox.moe/user/api.php', {
-            method: 'POST',
-            body: catboxFormData,
-        });
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 30000); // 30 second timeout
 
-        if (!response.ok) {
-            throw new Error(`Catbox API error: ${response.statusText}`);
-        }
+        try {
+            const response = await fetch('https://catbox.moe/user/api.php', {
+                method: 'POST',
+                body: catboxFormData,
+                signal: controller.signal,
+            });
 
-        const fileUrl = await response.text();
+            clearTimeout(timeout);
 
-        // Catbox returns a direct string URL (e.g. https://files.catbox.moe/xxxxxx.pdf)
-        if (fileUrl.startsWith('http')) {
-            console.log("Universal Upload Successful:", fileUrl);
-            return NextResponse.json({ url: fileUrl });
-        } else {
-            console.error("Catbox rejected file:", fileUrl);
-            return NextResponse.json({ error: "File hosting service rejected the request." }, { status: 500 });
+            if (!response.ok) {
+                throw new Error(`Catbox API error: ${response.statusText}`);
+            }
+
+            const fileUrl = await response.text();
+
+            // Catbox returns a direct string URL (e.g. https://files.catbox.moe/xxxxxx.pdf)
+            if (fileUrl.startsWith('http')) {
+                console.log("Universal Upload Successful:", fileUrl);
+                return NextResponse.json({ url: fileUrl });
+            } else {
+                console.error("Catbox rejected file:", fileUrl);
+                return NextResponse.json({ error: "File hosting service rejected the request." }, { status: 500 });
+            }
+        } catch (fetchError: any) {
+            clearTimeout(timeout);
+            if (fetchError.name === 'AbortError') {
+                console.error("Upload request timed out after 30 seconds");
+                return NextResponse.json({ error: "Upload timed out. Please try again." }, { status: 504 });
+            }
+            throw fetchError;
         }
     } catch (error: any) {
         console.error("Upload API Route Error:", error);

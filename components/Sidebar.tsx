@@ -45,10 +45,13 @@ export const Sidebar = ({ onClose, announcementCount = 1 }: { onClose?: () => vo
   useEffect(() => {
     setIsAdmin(typeof window !== 'undefined' && localStorage.getItem('adminSession') === 'active');
     
-    window.addEventListener('beforeinstallprompt', (e) => {
+    const handler = (e: any) => {
       e.preventDefault();
       setInstallPrompt(e);
-    });
+    };
+    
+    window.addEventListener('beforeinstallprompt', handler);
+    return () => window.removeEventListener('beforeinstallprompt', handler);
   }, []);
 
   const handleInstall = async () => {

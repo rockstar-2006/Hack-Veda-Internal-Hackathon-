@@ -1,6 +1,6 @@
 
 import { NextResponse } from 'next/server';
-import { adminDb } from '@/lib/firebase-admin';
+import { getAdminDb } from '@/lib/firebase-admin';
 
 export async function POST(request: Request) {
     try {
@@ -10,6 +10,7 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: "Missing team ID" }, { status: 400 });
         }
 
+        const adminDb = getAdminDb();
         await adminDb.collection("teams").doc(teamId).update({
             shortlisted: status
         });

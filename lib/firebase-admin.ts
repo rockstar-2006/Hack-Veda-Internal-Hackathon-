@@ -1,5 +1,7 @@
 import * as admin from "firebase-admin";
 
+let adminInitialized = false;
+
 if (!admin.apps.length) {
   let credential;
 
@@ -15,12 +17,21 @@ if (!admin.apps.length) {
       ? keyMatch[1].replace(/\\n/g, '').replace(/\s+/g, '') // Remove both literal \n and actual whitespace
       : privateKey.replace(/\\n/g, '').replace(/\s+/g, '').replace(/-+BEGIN[^-]*-+/, '').replace(/-+END[^-]*-+/, '').replace(/"/g, ''); // Fallback
 
-    // Robust parsing for Vercel / Production deployment
-    credential = admin.credential.cert({
-      projectId,
-      clientEmail,
-      privateKey: `-----BEGIN PRIVATE KEY-----\n${rawKey}\n-----END PRIVATE KEY-----`,
-    });
+    try {
+      // Robust parsing for Vercel / Production deployment
+      credential = admin.credential.cert({
+        projectId,
+        clientEmail,
+        privateKey: `-----BEGIN PRIVATE KEY-----\n${rawKey}\n-----END PRIVATE KEY-----`,
+      });
+
+      admin.initializeApp({
+        credential,
+      });
+      adminInitialized = true;
+    } catch (error) {
+      console.warn("Failed to initialize Firebase Admin:", error);
+    }
   } else if (process.env.NODE_ENV === "development") {
     // Local development fallback (only attempted locally)
     try {
@@ -28,21 +39,34 @@ if (!admin.apps.length) {
       const saPath = "../app/Credential_ServiceAccount/internal-hacka-firebase-adminsdk-fbsvc-0707ffb503.json";
       const serviceAccount = eval("require")(saPath);
       credential = admin.credential.cert(serviceAccount);
+      
+      admin.initializeApp({
+        credential,
+      });
+      adminInitialized = true;
     } catch (error) {
        console.warn("Local service account JSON not found. Admin APIs will fail unless env variables are set.");
     }
   }
-
-  if (credential) {
-    admin.initializeApp({
-      credential,
-      // You can optionally add databaseURL if you use the Realtime Database
-      // storageBucket: "internal-hacka.firebasestorage.app"
-    });
-  }
 }
 
-export const adminDb = admin.firestore();
-export const adminAuth = admin.auth();
+// Lazy getters to avoid errors at module load time
+export const getAdminDb = () => {
+  if (!adminInitialized && admin.apps.length === 0) {
+    throw new Error("Firebase Admin not initialized. Check your environment variables.");
+  }
+  return admin.firestore();
+};
+
+export const getAdminAuth = () => {
+  if (!adminInitialized && admin.apps.length === 0) {
+    throw new Error("Firebase Admin not initialized. Check your environment variables.");
+  }
+  return admin.auth();
+};
+
+// Keep old exports for backward compatibility but use the initialized check
+export const adminDb = adminInitialized ? admin.firestore() : null;
+export const adminAuth = adminInitialized ? admin.auth() : null;
 
 export default admin;

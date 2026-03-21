@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { db } from "@/lib/firebase";
-import { collection, query, getDocs, orderBy } from "firebase/firestore";
+import { collection, query, getDocs, orderBy, limit } from "firebase/firestore";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { FileCheck, ExternalLink, Download, Search, LayoutDashboard, ArrowLeft, RefreshCcw, MoreHorizontal, FileText, Users, Calendar } from "lucide-react";
 import Link from "next/link";
@@ -16,24 +16,39 @@ export default function AdminSubmissions() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [refreshing, setRefreshing] = useState(false);
+  const isMountedRef = useRef(true);
 
   const fetchSubmissions = async () => {
+    if (!isMountedRef.current) return;
+    
     setLoading(true);
     setRefreshing(true);
     try {
-      const q = query(collection(db, "submissions"), orderBy("submittedAt", "desc"));
+      // Add limit to prevent loading too many documents
+      const q = query(collection(db, "submissions"), orderBy("submittedAt", "desc"), limit(100));
       const snapshot = await getDocs(q);
-      setSubmissions(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      
+      if (isMountedRef.current) {
+        setSubmissions(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      }
     } catch (err) {
-      console.error(err);
+      if (isMountedRef.current) {
+        console.error(err);
+      }
     } finally {
-      setLoading(false);
-      setRefreshing(false);
+      if (isMountedRef.current) {
+        setLoading(false);
+        setRefreshing(false);
+      }
     }
   };
 
   useEffect(() => {
+    isMountedRef.current = true;
     fetchSubmissions();
+    return () => {
+      isMountedRef.current = false;
+    };
   }, []);
 
   const filtered = submissions.filter(s => 

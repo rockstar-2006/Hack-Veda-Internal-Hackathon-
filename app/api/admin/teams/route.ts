@@ -1,12 +1,18 @@
 
 import { NextResponse } from 'next/server';
-import { adminDb } from '@/lib/firebase-admin';
+import { getAdminDb } from '@/lib/firebase-admin';
 
-export async function GET() {
+export async function GET(request: Request) {
     try {
+        // Get pagination limit from URL params
+        const { searchParams } = new URL(request.url);
+        const limitParam = searchParams.get('limit');
+        const limit = limitParam ? Math.min(parseInt(limitParam, 10), 200) : 100; // Max 200 records
+        
+        const adminDb = getAdminDb();
         const [teamsSnap, submissionsSnap] = await Promise.all([
-            adminDb.collection("teams").where("archived", "==", false).get(),
-            adminDb.collection("submissions").get()
+            adminDb.collection("teams").where("archived", "==", false).limit(limit).get(),
+            adminDb.collection("submissions").limit(limit * 2).get()
         ]);
 
         const submissions = submissionsSnap.docs.map(doc => ({ 

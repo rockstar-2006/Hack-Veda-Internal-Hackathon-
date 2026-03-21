@@ -25,6 +25,11 @@ export const loginWithGoogle = async () => {
 
 export const signOut = async () => {
   try {
+    // Clear admin session if exists
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('adminSession');
+      localStorage.removeItem('adminEmail');
+    }
     await firebaseSignOut(auth);
   } catch (error) {
     console.error("Sign Out Error:", error);

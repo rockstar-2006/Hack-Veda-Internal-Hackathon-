@@ -80,7 +80,10 @@ export default function SubmissionPage() {
   };
 
   const handleSubmit = async () => {
-    if (!team) return;
+    if (!team || !team.id) {
+      setError("Team not found. Please create or join a team first.");
+      return;
+    }
     
     // Team Size Validation
     if (team.memberIds.length < 2 || team.memberIds.length > 4) {
@@ -138,7 +141,17 @@ export default function SubmissionPage() {
     }
   };
 
-  if (loading) return null;
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6">
+          <div className="relative">
+              <div className="w-24 h-24 border-8 border-black border-t-pink-500 rounded-full animate-spin shadow-[8px_8px_0_#000]" />
+              <Zap className="absolute inset-0 m-auto w-10 h-10 text-black fill-yellow-400 animate-pulse" />
+          </div>
+          <p className="font-comic text-2xl tracking-[0.2em] text-black uppercase animate-bounce">Accessing Documentation Terminal...</p>
+      </div>
+    );
+  }
 
   if (!team && !error) return (
     <ProtectedRoute>
@@ -412,7 +425,7 @@ export default function SubmissionPage() {
                                         FINALIZE SUBMISSION <ShieldCheck className="w-6 h-6 stroke-[3]" />
                                     </>
                                 )}
-                            </button>
+                            </button> 
                         </div>
 
                         <div className="mt-8 p-4 bg-white border-2 border-black rounded-xl inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-gray-500">

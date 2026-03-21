@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { getUserProfile, addTeammateByUSN, leaveTeam } from "@/lib/db";
@@ -37,6 +37,21 @@ export default function TeamPage() {
   const [inviteUSN, setInviteUSN] = useState("");
   const [inviting, setInviting] = useState(false);
   const [toast, setToast] = useState<{ message: string, type: ToastType } | null>(null);
+  const isMountedRef = useRef(true);
+  const copyTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const navigateTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const requestInProgressRef = useRef(false);
+
+  useEffect(() => {
+    return () => {
+      if (copyTimerRef.current) {
+        clearTimeout(copyTimerRef.current);
+      }
+      if (navigateTimerRef.current) {
+        clearTimeout(navigateTimerRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (!team || team.memberIds.length === 0) {
@@ -45,11 +60,17 @@ export default function TeamPage() {
         return;
     }
 
+    isMountedRef.current = true;
+    
     const fetchOrderlyMembers = async () => {
+        if (!isMountedRef.current) return;
+        
         setLoading(true);
         try {
             const profilePromises = team.memberIds.map(id => getUserProfile(id));
             const profiles = await Promise.all(profilePromises);
+            
+            if (!isMountedRef.current) return;
             
             const enriched = team.memberIds.map((id, index) => {
                 const teamSnippet = team.memberProfiles?.find(p => p.userId === id);
@@ -65,29 +86,49 @@ export default function TeamPage() {
                 } as UserProfile;
             });
             
-            setMembers(enriched);
+            if (isMountedRef.current) {
+              setMembers(enriched);
+            }
         } catch (err) {
-            console.error("Fetch members error:", err);
+            if (isMountedRef.current) {
+              console.error("Fetch members error:", err);
+            }
         } finally {
-            setLoading(false);
+            if (isMountedRef.current) {
+              setLoading(false);
+            }
         }
     };
 
     fetchOrderlyMembers();
+    return () => {
+      isMountedRef.current = false;
+    };
   }, [team?.memberIds, team?.id, user]);
 
   const handleCopy = () => {
     if (team?.teamCode) {
       navigator.clipboard.writeText(team.teamCode);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      
+      // Clear any existing timer
+      if (copyTimerRef.current) {
+        clearTimeout(copyTimerRef.current);
+      }
+      
+      copyTimerRef.current = setTimeout(() => {
+        if (isMountedRef.current) {
+          setCopied(false);
+        }
+      }, 2000);
+      
       setToast({ message: "TEAM CODE COPIED!", type: "success" });
     }
   };
 
   const handleAddTeammate = async (e: React.FormEvent) => {
       e.preventDefault();
-      if (!team || !inviteUSN.trim()) return;
+      if (!team || !team.id || !inviteUSN.trim() || inviting || requestInProgressRef.current) return;
       if (team.leaderId !== user?.uid) {
           setToast({ message: "ONLY LEADERS CAN ADD MEMBERS!", type: "error" });
           return;
@@ -97,37 +138,61 @@ export default function TeamPage() {
           return;
       }
 
+      requestInProgressRef.current = true;
       setInviting(true);
       try {
-          await addTeammateByUSN(team.id!, inviteUSN);
-          setToast({ message: `${inviteUSN} ADDED TO TEAM!`, type: "success" });
-          setInviteUSN("");
-          refreshTeam?.();
+          await addTeammateByUSN(team.id, inviteUSN);
+          if (isMountedRef.current) {
+            setToast({ message: `${inviteUSN} ADDED TO TEAM!`, type: "success" });
+            setInviteUSN("");
+            refreshTeam?.();
+          }
       } catch (err: any) {
-          setToast({ message: err.message || "FAILED TO ADD MEMBER", type: "error" });
+          if (isMountedRef.current) {
+            setToast({ message: err.message || "FAILED TO ADD MEMBER", type: "error" });
+          }
       } finally {
-          setInviting(false);
+          if (isMountedRef.current) {
+            setInviting(false);
+          }
+          requestInProgressRef.current = false;
       }
   };
 
   const handleLeaveTeam = async () => {
-      if (!team || !user?.uid) return;
+      if (!team || !team.id || !user?.uid || requestInProgressRef.current) return;
       if (confirm("Are you sure you want to leave this team? If you are the leader, the entire team will be deleted!")) {
+          requestInProgressRef.current = true;
           setLoading(true);
           try {
-              await leaveTeam(team.id!, user.uid);
+              await leaveTeam(team.id, user.uid);
               setToast({ message: "SUCCESSFULLY LEFT TEAM!", type: "success" });
-              setTimeout(() => {
-                  router.push('/profile');
-              }, 1000);
+              if (isMountedRef.current) {
+                navigateTimerRef.current = setTimeout(() => {
+                    if (isMountedRef.current) {
+                      router.push('/profile');
+                    }
+                }, 1000);
+              }
           } catch (err: any) {
               setToast({ message: err.message || "FAILED TO LEAVE TEAM", type: "error" });
               setLoading(false);
+              requestInProgressRef.current = false;
           }
       }
   };
 
-  if (teamLoading || (team && loading)) return null;
+  if (teamLoading || (team && loading)) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6">
+          <div className="relative">
+              <div className="w-24 h-24 border-8 border-black border-t-cyan-400 rounded-full animate-spin shadow-[8px_8px_0_#000]" />
+              <Zap className="absolute inset-0 m-auto w-10 h-10 text-black fill-yellow-400 animate-pulse" />
+          </div>
+          <p className="font-comic text-2xl tracking-[0.2em] text-black uppercase animate-bounce">Scanning Team Unit...</p>
+      </div>
+    );
+  }
 
   return (
     <ProtectedRoute>
