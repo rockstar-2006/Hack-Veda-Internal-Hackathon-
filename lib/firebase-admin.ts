@@ -3,13 +3,17 @@ import * as admin from "firebase-admin";
 if (!admin.apps.length) {
   let credential;
 
-  if (process.env.FIREBASE_PRIVATE_KEY) {
-    // Vercel / Production deployment using environment variables
+  const privateKey = process.env.FIREBASE_PRIVATE_KEY;
+  const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
+  const projectId = process.env.FIREBASE_PROJECT_ID || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
+
+  if (privateKey && clientEmail && projectId) {
+    // Robust parsing for Vercel / Production deployment
     credential = admin.credential.cert({
-      projectId: process.env.FIREBASE_PROJECT_ID || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-      // Replace literal string "\n" with actual line breaks for Vercel
-      privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+      projectId,
+      clientEmail,
+      // Handle both literal \n and actual newlines, and strip any accidental quotes
+      privateKey: privateKey.replace(/\\n/g, '\n').replace(/"/g, ''),
     });
   } else {
     // Local development fallback
@@ -17,7 +21,7 @@ if (!admin.apps.length) {
       const serviceAccount = require("../app/Credential_ServiceAccount/internal-hacka-firebase-adminsdk-fbsvc-0707ffb503.json");
       credential = admin.credential.cert(serviceAccount);
     } catch (error) {
-      console.error("Firebase Admin credentials not found. Ensure env vars or local service account JSON exists.");
+      console.warn("Firebase Admin environment variables missing and local service account JSON not found. Admin APIs will fail.");
     }
   }
 
