@@ -53,11 +53,20 @@ export default function TeamPage() {
         return;
     }
 
+    const validMemberIds = team.memberIds.filter(id => !!id);
+    if (validMemberIds.length === 0) {
+        setMembers([]);
+        setLoading(false);
+        return;
+    }
+
     setLoading(true);
+    console.log("SYNC: Listening for profiles of", validMemberIds);
+    
     // Real-time listener for the team members' profiles
     const q = query(
         collection(db, "users"), 
-        where("userId", "in", team.memberIds)
+        where("userId", "in", validMemberIds)
     );
     
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -196,13 +205,24 @@ export default function TeamPage() {
                     </div>
 
                     <div className="grid sm:grid-cols-2 gap-6">
-                        {members.map((member, index) => {
+                        {team.memberIds.map((memberId, index) => {
+                            const member = members.find(m => m.userId === memberId);
+                            // Fallback if profile not found yet in the state
+                            const memberData = member || {
+                                userId: memberId,
+                                full_name: "STUDENT JOINED",
+                                usn: "PROFILE PENDING",
+                                role: "student" as any,
+                                branch: "...",
+                                year: "..."
+                            };
+
                             const colors = ['bg-pink-400', 'bg-yellow-400', 'bg-cyan-400', 'bg-purple-400'];
                             const color = colors[index % colors.length];
                             
                             return (
                                 <motion.div 
-                                    key={member.userId}
+                                    key={memberId + "-" + index}
                                     initial={{ opacity: 0, scale: 0.95 }}
                                     animate={{ opacity: 1, scale: 1 }}
                                     className={`p-6 rounded-3xl ${color} border-4 border-black shadow-[6px_6px_0_#000] hover:-translate-y-2 hover:shadow-[10px_10px_0_#000] transition-all group flex flex-col justify-between h-[180px] relative overflow-hidden`}
@@ -214,29 +234,29 @@ export default function TeamPage() {
                                         <div className="w-14 h-14 bg-white border-4 border-black rounded-2xl flex items-center justify-center text-black shadow-[4px_4px_0_#000] group-hover:scale-110 transition-transform">
                                             <UserCheck className="w-8 h-8 stroke-[3]" />
                                         </div>
-                                        {member.userId === team.leaderId && (
+                                        {memberId === team.leaderId && (
                                             <div className="bg-black text-yellow-400 px-4 py-2 border-2 border-white rounded-xl text-xs font-bold uppercase tracking-widest shadow-[2px_2px_0_#fff] rotate-3">Leader</div>
                                         )}
                                     </div>
                                     
                                     <div className="relative z-10 bg-white p-4 border-4 border-black rounded-xl shadow-[4px_4px_0_#000] w-full mt-auto">
-                                         <h4 className="font-comic text-black text-2xl uppercase tracking-wider leading-none mb-3 truncate">{member.full_name || "INITIATING..."}</h4>
+                                         <h4 className="font-comic text-black text-2xl uppercase tracking-wider leading-none mb-3 truncate">{memberData.full_name || "INITIATING..."}</h4>
                                          
                                          <div className="space-y-2">
                                              <div className="flex items-center justify-between">
                                                   <div className="flex items-center gap-2">
                                                        <div className="w-2.5 h-2.5 rounded-full bg-green-500 border-2 border-black animate-pulse" />
-                                                       <p className="text-xs font-black text-gray-700 tracking-widest uppercase">{member.usn || "NOT SET"}</p>
+                                                       <p className="text-xs font-black text-gray-700 tracking-widest uppercase">{memberData.usn || "NOT SET"}</p>
                                                   </div>
-                                                  <span className="text-[10px] font-black bg-black text-white px-2 py-0.5 rounded border border-white uppercase">{member.branch || "???"}</span>
+                                                  <span className="text-[10px] font-black bg-black text-white px-2 py-0.5 rounded border border-white uppercase">{memberData.branch || "???"}</span>
                                              </div>
                                              
                                              <div className="flex items-center justify-between border-t border-gray-100 pt-2">
                                                   <div className="flex items-center gap-1.5 text-gray-500">
                                                        <GraduationCap className="w-3.5 h-3.5" />
-                                                       <span className="text-[10px] font-bold uppercase">{member.year || "YEAR?"}</span>
+                                                       <span className="text-[10px] font-bold uppercase">{memberData.year || "YEAR?"}</span>
                                                   </div>
-                                                  {member.userId !== team.leaderId && (
+                                                  {memberId !== team.leaderId && (
                                                        <span className="text-[10px] font-bold text-gray-400 uppercase italic">Active Team Member</span>
                                                   )}
                                              </div>
