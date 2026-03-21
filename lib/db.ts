@@ -92,7 +92,8 @@ export const joinTeam = async (teamCode: string, userId: string) => {
       full_name: profile?.full_name || "STUDENT",
       usn: profile?.usn || "...",
       branch: profile?.branch || "...",
-      year: profile?.year || "..."
+      year: profile?.year || "...",
+      phone: profile?.phone || "..."
   };
 
   // Max members check
@@ -110,11 +111,19 @@ export const joinTeam = async (teamCode: string, userId: string) => {
 
 export const addTeammateByUSN = async (teamId: string, usn: string) => {
   // 1. Find user by USN
-  const uq = query(collection(db, "users"), where("usn", "==", usn.toUpperCase()));
-  const usnap = await withTimeout(getDocs(uq), 8000);
+  let usnap;
+  try {
+    const uq = query(collection(db, "users"), where("usn", "==", usn.toUpperCase()));
+    usnap = await withTimeout(getDocs(uq), 8000);
+  } catch (err: any) {
+    if (err.message?.includes("permissions") || err.code === "permission-denied") {
+        throw new Error("ACCESS DENIED: Your Firebase Security Rules prevent reading other users' profiles. Please allow basic read access to the 'users' collection for logged-in users.");
+    }
+    throw err;
+  }
   
   if (usnap.empty) {
-    throw new Error("Student with this USN not found. Ask them to setup their profile first!");
+    throw new Error(`USN NOT FOUND: '${usn.toUpperCase()}' is not registered. Ask your teammate to setup their profile first!`);
   }
 
   const userData = usnap.docs[0].data();
@@ -124,7 +133,8 @@ export const addTeammateByUSN = async (teamId: string, usn: string) => {
       full_name: userData.full_name || "STUDENT",
       usn: userData.usn || usn.toUpperCase(),
       branch: userData.branch || "...",
-      year: userData.year || "..."
+      year: userData.year || "...",
+      phone: userData.phone || "..."
   };
 
   // 2. Check current team size
@@ -160,16 +170,22 @@ export const leaveTeam = async (teamId: string, userId: string) => {
     
     const team = teamSnap.data() as Team;
     
-    // If the leader leaves, or it's the last member, we dissolve the team softly to bypass strict Firebase delete rules
+    // Remove the user from both memberIds and memberProfiles (caching)
+    const updatedMemberIds = team.memberIds.filter(id => id !== userId);
+    const updatedMemberProfiles = (team.memberProfiles || []).filter(p => p.userId !== userId);
+    
+    // If the leader leaves, or it's the last member, we dissolve the team softly
     if (team.leaderId === userId || team.memberIds.length === 1) {
         await withTimeout(updateDoc(teamRef, {
             archived: true,
-            memberIds: arrayRemove(userId)
+            memberIds: updatedMemberIds,
+            memberProfiles: updatedMemberProfiles
         }), 8000);
         return { deleted: true };
     } else {
         await withTimeout(updateDoc(teamRef, {
-            memberIds: arrayRemove(userId)
+            memberIds: updatedMemberIds,
+            memberProfiles: updatedMemberProfiles
         }), 8000);
         return { deleted: false };
     }
@@ -235,14 +251,19 @@ export const getAnnouncements = async () => {
 };
 
 export const getMyTeam = async (userId: string) => {
-    const q = query(
-        collection(db, "teams"), 
-        where("memberIds", "array-contains", userId),
-        where("archived", "==", false)
-    );
-    const snapshot = await getDocs(q);
-    if (snapshot.empty) return null;
-    return { id: snapshot.docs[0].id, ...snapshot.docs[0].data() } as Team & { id: string };
+    try {
+        const q = query(
+            collection(db, "teams"), 
+            where("memberIds", "array-contains", userId),
+            where("archived", "==", false)
+        );
+        const snapshot = await withTimeout(getDocs(q), 8000);
+        if (snapshot.empty) return null;
+        return { id: snapshot.docs[0].id, ...snapshot.docs[0].data() } as Team & { id: string };
+    } catch (err: any) {
+        console.error("Error in getMyTeam:", err);
+        return null;
+    }
 };
 
 export const getAllTeamsForAdmin = async () => {

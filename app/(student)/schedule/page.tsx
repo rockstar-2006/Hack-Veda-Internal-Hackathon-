@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useMotionValue, useSpring, useTransform, useScroll } from "framer-motion";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { format, parseISO } from "date-fns";
 import { 
   Calendar, 
@@ -166,11 +166,6 @@ function TiltCard({ children, isEven, isToday }: { children: React.ReactNode, is
 export default function SchedulePage() {
   const now = new Date();
   const containerRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start end", "end end"],
-    layoutEffect: false
-  });
 
   return (
     <ProtectedRoute>
@@ -198,12 +193,9 @@ export default function SchedulePage() {
         {/* Vertical Timeline */}
         <div ref={containerRef} className="relative z-10">
              
-             {/* Center Line */}
-             <div className="absolute left-8 md:left-1/2 top-0 bottom-0 w-4 bg-white border-4 border-black md:-translate-x-1/2 shadow-[4px_4px_0_#000]">
-                <motion.div 
-                   style={{ scaleY: scrollYProgress }}
-                   className="absolute inset-0 bg-cyan-400 origin-top border-b-4 border-black"
-                />
+             {/* Center Line (Simplified for performance) */}
+             <div className="absolute left-8 md:left-1/2 top-0 bottom-0 w-2 md:w-4 bg-white border-2 md:border-4 border-black md:-translate-x-1/2 shadow-[4px_4px_0_#000]">
+                <div className="absolute inset-0 bg-cyan-400" />
              </div>
 
              <div className="space-y-16 md:space-y-24">

@@ -196,9 +196,6 @@ export default function SubmissionPage() {
                            <Link href="/profile" className="flex-1 max-w-[200px] h-12 bg-gray-900 text-white rounded-xl flex items-center justify-center font-bold uppercase text-xs tracking-widest hover:bg-black transition-all active:scale-95 shadow-md">
                                Dashboard
                            </Link>
-                           <button onClick={() => setSuccess(false)} className="flex-1 max-w-[200px] h-12 bg-white border border-green-200 text-green-700 rounded-xl flex items-center justify-center font-bold uppercase text-xs tracking-widest hover:border-green-600 transition-all active:scale-[0.98]">
-                               Revise PDF
-                           </button>
                        </div>
                    </motion.div>
               </div>

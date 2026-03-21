@@ -67,31 +67,56 @@ export default function TeamPage() {
         
         setLoading(true);
         try {
-            const profilePromises = team.memberIds.map(id => getUserProfile(id));
-            const profiles = await Promise.all(profilePromises);
+            // Fetch profiles individually to handle permission errors per-user
+            const profilePromises = team.memberIds.map(async (id) => {
+                try {
+                    return await getUserProfile(id);
+                } catch (err) {
+                    console.warn(`Could not fetch profile for user ${id}:`, err);
+                    return null;
+                }
+            });
+            
+            const fetchedProfiles = await Promise.all(profilePromises);
             
             if (!isMountedRef.current) return;
             
             const enriched = team.memberIds.map((id, index) => {
                 const teamSnippet = team.memberProfiles?.find(p => p.userId === id);
-                const fetchedProfile = profiles[index];
+                const fetchedProfile = fetchedProfiles[index];
                 
-                return {
+                // Construct a robust profile object from available data sources
+                const profileData = {
                     userId: id,
-                    full_name: fetchedProfile?.full_name || teamSnippet?.full_name || (id === user?.uid ? (user.displayName || "YOU") : "STUDENT JOINED"),
-                    usn: fetchedProfile?.usn || teamSnippet?.usn || (id === user?.uid ? "..." : "PROFILE PENDING"),
-                    branch: fetchedProfile?.branch || teamSnippet?.branch || "...",
-                    year: fetchedProfile?.year || teamSnippet?.year || "...",
+                    full_name: fetchedProfile?.full_name || teamSnippet?.full_name,
+                    usn: fetchedProfile?.usn || teamSnippet?.usn,
+                    branch: fetchedProfile?.branch || teamSnippet?.branch,
+                    year: fetchedProfile?.year || teamSnippet?.year,
+                    phone: fetchedProfile?.phone || teamSnippet?.phone,
                     role: "student" as any
-                } as UserProfile;
+                };
+
+                return profileData as UserProfile;
             });
             
             if (isMountedRef.current) {
-              setMembers(enriched);
+                setMembers(enriched);
             }
         } catch (err) {
             if (isMountedRef.current) {
-              console.error("Fetch members error:", err);
+                console.error("Critical fetch members error:", err);
+                // Fallback to snippets if the whole process fails
+                const snippets = team.memberIds.map(id => {
+                    const s = team.memberProfiles?.find(p => p.userId === id);
+                    return {
+                        userId: id,
+                        full_name: s?.full_name || (id === user?.uid ? (user.displayName || "YOU") : "STUDENT JOINED"),
+                        usn: s?.usn || "...",
+                        branch: s?.branch || "...",
+                        role: "student"
+                    } as UserProfile;
+                });
+                setMembers(snippets);
             }
         } finally {
             if (isMountedRef.current) {
@@ -247,47 +272,54 @@ export default function TeamPage() {
                         </div>
 
                         <div className="divide-y-4 divide-black bg-[#f8f9fa]">
-                            {team.memberIds.map((memberId, index) => {
-                                const member = members.find(m => m.userId === memberId);
-                                const isLeader = memberId === team.leaderId;
-                                const isYou = memberId === user?.uid;
+                                {team.memberIds.map((memberId, index) => {
+                                    const member = members.find(m => m.userId === memberId);
+                                    const isLeader = memberId === team.leaderId;
+                                    const isYou = memberId === user?.uid;
+                                    const teamSnippet = team.memberProfiles?.find(p => p.userId === memberId);
+                                    
+                                    // Primary Data Source: Fetched Firestore Profile
+                                    // Fallback Data Source: Team Roster Snapshot (Cached in team doc)
+                                    // Final Fallback: Display placeholders while data propagates
+                                    const name = member?.full_name || teamSnippet?.full_name || (isYou ? (user?.displayName || "YOU") : "HACKER JOINED");
+                                    const usn = member?.usn || teamSnippet?.usn || (isYou ? "YOUR PROFILE" : "VERIFYING...");
+                                    const classification = (member?.year || teamSnippet?.year) 
+                                        ? `${member?.year || teamSnippet?.year} ${member?.branch || teamSnippet?.branch || ""}`.trim()
+                                        : "ENGINEERING";
                                 
-                                const name = member?.full_name || (isYou ? (user?.displayName || "YOU") : "STUDENT JOINED");
-                                const usn = member?.usn || (isYou ? "YOUR PROFILE" : "VERIFYING...");
-                                
-                                return (
-                                    <motion.div 
-                                        key={memberId + "-" + index}
-                                        initial={{ x: -20, opacity: 0 }}
-                                        animate={{ x: 0, opacity: 1 }}
-                                        transition={{ delay: index * 0.1 }}
-                                        className={`p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 group transition-colors ${isYou ? 'bg-cyan-50' : 'hover:bg-white'}`}
-                                    >
-                                        <div className="flex items-center gap-4">
-                                            <div className={`w-14 h-14 rounded-2xl border-4 border-black flex items-center justify-center shadow-[4px_4px_0_#000] ${isLeader ? 'bg-yellow-400' : 'bg-white'}`}>
-                                                {isLeader ? <ShieldCheck className="w-8 h-8" /> : <UserCheck className="w-8 h-8" />}
-                                            </div>
-                                            <div>
-                                                <div className="flex items-center gap-2">
-                                                    <h4 className="font-comic text-2xl text-black leading-none uppercase">{name}</h4>
-                                                    {isYou && <span className="text-[10px] bg-black text-white px-2 py-1 rounded font-black uppercase">YOU</span>}
+                                    return (
+                                        <motion.div 
+                                            key={memberId + "-" + index}
+                                            initial={{ x: -20, opacity: 0 }}
+                                            animate={{ x: 0, opacity: 1 }}
+                                            transition={{ delay: index * 0.1 }}
+                                            className={`p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 group transition-colors ${isYou ? 'bg-cyan-50' : 'hover:bg-white'}`}
+                                        >
+                                            <div className="flex items-center gap-4">
+                                                <div className={`w-14 h-14 rounded-2xl border-4 border-black flex items-center justify-center shadow-[4px_4px_0_#000] ${isLeader ? 'bg-yellow-400' : 'bg-white'}`}>
+                                                    {isLeader ? <ShieldCheck className="w-8 h-8" /> : <UserCheck className="w-8 h-8" />}
                                                 </div>
-                                                <p className="text-xs font-black text-gray-400 mt-2 uppercase tracking-widest">{usn}</p>
+                                                <div>
+                                                    <div className="flex items-center gap-2">
+                                                        <h4 className="font-comic text-2xl text-black leading-none uppercase">{name}</h4>
+                                                        {isYou && <span className="text-[10px] bg-black text-white px-2 py-1 rounded font-black uppercase">YOU</span>}
+                                                    </div>
+                                                    <p className="text-xs font-black text-gray-400 mt-2 uppercase tracking-widest">{usn}</p>
+                                                </div>
                                             </div>
-                                        </div>
-
-                                        <div className="flex items-center gap-4">
-                                             <div className="hidden md:flex flex-col items-end">
-                                                  <span className="text-[10px] font-black text-gray-300 uppercase mb-1">Classification</span>
-                                                  <span className="text-xs font-black text-black uppercase tracking-wider">{member?.branch || member?.year || "ENGINEERING"}</span>
-                                             </div>
-                                             <div className={`px-6 py-3 rounded-2xl border-4 border-black font-black text-sm uppercase shadow-[4px_4px_0_#000] ${isLeader ? 'bg-black text-yellow-400' : 'bg-white text-black'}`}>
-                                                 {isLeader ? "Lead" : "Member"}
-                                             </div>
-                                        </div>
-                                    </motion.div>
-                                );
-                            })}
+    
+                                            <div className="flex items-center gap-4">
+                                                 <div className="hidden md:flex flex-col items-end">
+                                                      <span className="text-[10px] font-black text-gray-300 uppercase mb-1">Classification</span>
+                                                      <span className="text-xs font-black text-black uppercase tracking-wider">{classification}</span>
+                                                 </div>
+                                                 <div className={`px-6 py-3 rounded-2xl border-4 border-black font-black text-sm uppercase shadow-[4px_4px_0_#000] ${isLeader ? 'bg-black text-yellow-400' : 'bg-white text-black'}`}>
+                                                     {isLeader ? "Lead" : "Member"}
+                                                 </div>
+                                            </div>
+                                        </motion.div>
+                                    );
+                                })}
                         </div>
                     </div>
 

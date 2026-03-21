@@ -349,7 +349,9 @@ export default function AdminDashboard() {
                               <div className="space-y-6">
                                    <h4 className="font-comic text-2xl uppercase tracking-widest mb-6 bg-pink-400 border-4 border-black px-4 py-2 inline-block -rotate-1 shadow-[4px_4px_0_#000]">Member Roster</h4>
                                    <div className="space-y-4">
-                                        {(selectedTeam.memberProfiles || []).map((member: any, i: number) => (
+                                        {(selectedTeam.memberProfiles || [])
+                                        .filter((p: any) => selectedTeam.memberIds.includes(p.userId))
+                                        .map((member: any, i: number) => (
                                             <div key={i} className="bg-white border-4 border-black p-5 rounded-3xl flex items-center gap-4 shadow-[6px_6px_0_#000] group hover:-translate-y-1 transition-transform">
                                                 <div className="w-12 h-12 bg-cyan-400 border-4 border-black rounded-xl flex items-center justify-center shrink-0">
                                                      <UserCircle className="w-6 h-6" />

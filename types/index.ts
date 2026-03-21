@@ -31,6 +31,7 @@ export interface Team {
       usn: string;
       branch: string;
       year: string;
+      phone?: string;
   }[];
 }
 
