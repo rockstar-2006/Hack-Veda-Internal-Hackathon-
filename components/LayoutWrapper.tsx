@@ -68,13 +68,14 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
 
   // Minimum Loading Timer for visual impact
   useEffect(() => {
-    const timer = setTimeout(() => setMinLoadingComplete(true), 5000);
+    const isAdminUser = typeof window !== 'undefined' && localStorage.getItem('adminSession') === 'active';
+    const timer = setTimeout(() => setMinLoadingComplete(true), isAdminUser ? 1000 : 5000);
     return () => clearTimeout(timer);
-  }, []);
+  }, [pathname]);
 
   useEffect(() => {
     setIsAdmin(typeof window !== 'undefined' && localStorage.getItem('adminSession') === 'active');
-  }, [pathname]);
+  }, [pathname, minLoadingComplete]);
 
   // Real-time Announcement Listener
   useEffect(() => {

@@ -56,6 +56,7 @@ export default function ProfilePage() {
   const [usn, setUsn] = useState("");
   const [branch, setBranch] = useState("CSE");
   const [year, setYear] = useState("1st Year");
+  const [phone, setPhone] = useState("");
 
   const [isCreating, setIsCreating] = useState(false);
   const [isJoining, setIsJoining] = useState(false);
@@ -80,6 +81,7 @@ export default function ProfilePage() {
             setUsn(profileData.usn || "");
             setBranch(profileData.branch || "CSE");
             setYear(profileData.year || "3rd Year");
+            setPhone(profileData.phone || "");
             if (!profileData.full_name) setShowSetup(true);
         } else {
             setShowSetup(true);
@@ -114,6 +116,7 @@ export default function ProfilePage() {
                   usn: usn,
                   branch: branch,
                   year: year,
+                  phone: phone,
                   email: user.email
               })
           ];
@@ -124,7 +127,7 @@ export default function ProfilePage() {
 
           await Promise.all(promises);
 
-          setProfile({ userId: user.uid, email: user.email, role: "student", full_name: fullName, usn, branch, year });
+          setProfile({ userId: user.uid, email: user.email, role: "student", full_name: fullName, usn, branch, year, phone });
           setShowSetup(false);
       } catch (err: any) {
           setError("Failed to update settings. " + err.message);
@@ -261,6 +264,7 @@ export default function ProfilePage() {
                                         <option value="CSE">CSE</option>
                                         <option value="ISE">ISE</option>
                                         <option value="AIML">AIML</option>
+                                        <option value="AI-DS">AI-DS</option>
                                         <option value="ECE">ECE</option>
                                         <option value="EEE">EEE</option>
                                         <option value="ME">ME</option>
@@ -269,19 +273,32 @@ export default function ProfilePage() {
                                 </div>
                              </div>
 
-                             <div className="space-y-2">
-                                 <label className="text-xs font-bold text-black uppercase tracking-widest pl-2 block">Year of Study</label>
-                                 <select 
-                                      value={year}
-                                      onChange={(e) => setYear(e.target.value)}
-                                      className="w-full h-14 px-4 rounded-xl bg-purple-100 border-4 border-black focus:bg-purple-200 outline-none transition-all font-bold text-sm appearance-none cursor-pointer shadow-[4px_4px_0_#000] focus:translate-y-1 focus:shadow-[0_0_0_#000]"
+                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-black uppercase tracking-widest pl-2 block">Phone Number</label>
+                                    <input 
+                                      type="tel" 
+                                      value={phone}
+                                      onChange={(e) => setPhone(e.target.value)}
+                                      placeholder="Ex: 9876543210"
+                                      className="w-full h-14 px-4 rounded-xl bg-gray-50 border-4 border-black focus:bg-white outline-none transition-all font-bold text-sm shadow-[4px_4px_0_#000] focus:translate-y-1 focus:shadow-[0_0_0_#000]"
                                       required
-                                    >
-                                        <option value="1st Year">1st Year</option>
-                                        <option value="2nd Year">2nd Year</option>
-                                        <option value="3rd Year">3rd Year</option>
-                                        <option value="Final Year">Final Year</option>
-                                    </select>
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-black uppercase tracking-widest pl-2 block">Year of Study</label>
+                                    <select 
+                                         value={year}
+                                         onChange={(e) => setYear(e.target.value)}
+                                         className="w-full h-14 px-4 rounded-xl bg-purple-100 border-4 border-black focus:bg-purple-200 outline-none transition-all font-bold text-sm appearance-none cursor-pointer shadow-[4px_4px_0_#000] focus:translate-y-1 focus:shadow-[0_0_0_#000]"
+                                         required
+                                       >
+                                           <option value="1st Year">1st Year</option>
+                                           <option value="2nd Year">2nd Year</option>
+                                           <option value="3rd Year">3rd Year</option>
+                                           <option value="Final Year">Final Year</option>
+                                       </select>
+                                </div>
                              </div>
 
                              <motion.button 
@@ -291,15 +308,24 @@ export default function ProfilePage() {
                                disabled={profileSaving}
                                className="w-full h-14 rounded-xl bg-yellow-400 text-black border-4 border-black flex items-center justify-center gap-2 text-lg font-comic tracking-widest uppercase mt-6 shadow-[6px_6px_0px_#000] transition-all disabled:opacity-50"
                              >
-                                 {profileSaving ? <Loader2 className="w-6 h-6 animate-spin" /> : "Save Changes!"}
+                                 {profileSaving ? <Loader2 className="w-6 h-6 animate-spin" /> : "Save Profile & Finish!"}
                              </motion.button>
-                             <button 
-                               type="button"
-                               onClick={() => setShowSetup(false)}
-                               className="w-full h-10 mt-2 rounded-lg text-gray-500 font-bold uppercase text-[10px] tracking-widest hover:text-black transition-colors"
-                             >
-                                 DISCARD
-                             </button>
+                             
+                             {profile?.full_name ? (
+                                 <button 
+                                   type="button"
+                                   onClick={() => setShowSetup(false)}
+                                   className="w-full h-10 mt-2 rounded-lg text-gray-400 font-bold uppercase text-[10px] tracking-widest hover:text-black transition-colors"
+                                 >
+                                     DISCARD CHANGES
+                                 </button>
+                             ) : (
+                                 <div className="w-full text-center mt-6 p-4 bg-black/5 rounded-xl border-2 border-dashed border-black/20">
+                                     <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] leading-relaxed">
+                                         You must complete your profile to access the Hackathon Terminal.
+                                     </p>
+                                 </div>
+                             )}
                         </form>
                   </motion.div>
               </div>

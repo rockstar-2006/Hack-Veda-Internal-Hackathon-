@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { getMyTeam, submitIdea } from "@/lib/db";
+import { getMyTeam, submitIdea, getSubmission } from "@/lib/db";
 import { uploadPDF } from "@/lib/storage";
 import { Team, Submission } from "@/types";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
@@ -21,7 +21,10 @@ import {
   UploadCloud,
   Zap,
   Info,
-  Users
+  Users,
+  Link as LinkIcon,
+  Globe,
+  ExternalLink
 } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -35,6 +38,8 @@ export default function SubmissionPage() {
   const [progress, setProgress] = useState(0); 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [submissionMode, setSubmissionMode] = useState<"upload" | "link">("upload");
+  const [externalUrl, setExternalUrl] = useState("");
 
   useEffect(() => {
     const fetchTeam = async () => {
@@ -42,6 +47,10 @@ export default function SubmissionPage() {
         try {
           const teamData = await getMyTeam(user.uid);
           setTeam(teamData);
+          if (teamData) {
+              const existing = await getSubmission(teamData.id);
+              if (existing) setSuccess(true);
+          }
         } catch (err: any) {
           console.error(err);
         } finally {
@@ -71,23 +80,54 @@ export default function SubmissionPage() {
   };
 
   const handleSubmit = async () => {
-    if (!file || !team) return;
+    if (!team) return;
     
     // Team Size Validation
     if (team.memberIds.length < 2 || team.memberIds.length > 4) {
-        setError(`Team Composition Invalid: Your team must have between 2 and 4 members to submit. Currently you have ${team.memberIds.length}.`);
+        setError(`Team Composition Invalid: Your team must have between 2 and 4 members to submit.`);
+        return;
+    }
+
+    if (submissionMode === "link") {
+        if (!externalUrl.trim()) {
+            setError("Project URL Required: Please provide a valid link to your project.");
+            return;
+        }
+        if (!externalUrl.startsWith("http")) {
+            setError("Invalid Link Format: Your project link must start with http:// or https://");
+            return;
+        }
+
+        setUploading(true);
+        setError("");
+        try {
+            await submitIdea(team.id!, externalUrl);
+            setSuccess(true);
+            setExternalUrl("");
+        } catch (err: any) {
+            setError(err.message || "Link Submission Failed: Database write error.");
+        } finally {
+            setUploading(false);
+        }
+        return;
+    }
+
+    if (!file) {
+        setError("File Required: Please select your project PDF to continue.");
         return;
     }
 
     setUploading(true);
     setError("");
-    setProgress(20);
+    setProgress(0);
 
     try {
-      const url = await uploadPDF(file, team.id!);
-      setProgress(70);
+      // Use the new progress-capable upload function
+      const url = await uploadPDF(file, team.id!, (percentage) => {
+          setProgress(percentage);
+      });
+      
       await submitIdea(team.id!, url);
-      setProgress(100);
       setSuccess(true);
       setFile(null);
     } catch (err: any) {
@@ -215,6 +255,28 @@ export default function SubmissionPage() {
             )}
         </div>
 
+        {/* Tab Switcher */}
+        <div className="flex flex-col md:flex-row gap-4 mb-2 relative z-20">
+             <button 
+                onClick={() => setSubmissionMode("upload")}
+                className={`flex-1 h-14 rounded-2xl border-4 border-black font-comic text-lg uppercase tracking-widest transition-all ${submissionMode === "upload" ? "bg-cyan-400 shadow-[4px_4px_0_#000]" : "bg-white text-gray-400 border-gray-200"}`}
+             >
+                <div className="flex items-center justify-center gap-3">
+                    <Cloud className="w-6 h-6" />
+                    Direct Upload
+                </div>
+             </button>
+             <button 
+                onClick={() => setSubmissionMode("link")}
+                className={`flex-1 h-14 rounded-2xl border-4 border-black font-comic text-lg uppercase tracking-widest transition-all ${submissionMode === "link" ? "bg-pink-400 shadow-[4px_4px_0_#000]" : "bg-white text-gray-400 border-gray-200"}`}
+             >
+                <div className="flex items-center justify-center gap-3">
+                    <LinkIcon className="w-6 h-6" />
+                    Project Link
+                </div>
+             </button>
+        </div>
+
         {/* Upload Container */}
         <div className="space-y-8">
             {isTeamSizeInvalid && (
@@ -249,68 +311,117 @@ export default function SubmissionPage() {
                 </motion.div>
             )}
 
-            <div className={`p-8 md:p-16 rounded-3xl bg-white transition-all duration-300 border-4 shadow-[12px_12px_0_#000] ${file ? 'border-black bg-yellow-100' : 'border-dashed border-black'} ${isTeamSizeInvalid ? 'opacity-50 cursor-not-allowed' : 'hover:-translate-y-1 hover:shadow-[16px_16px_0_#000]'} relative group overflow-hidden`}>
-                <input 
-                    type="file" 
-                    id="pdf-upload" 
-                    className="hidden" 
-                    onChange={handleFileChange}
-                    accept=".pdf"
-                    disabled={isTeamSizeInvalid}
-                />
-                
-                {/* Halftone Pattern */}
-                <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, black 1px, transparent 0)', backgroundSize: '16px 16px' }} />
+            {submissionMode === "upload" ? (
+                <div className={`p-8 md:p-16 rounded-3xl bg-white transition-all duration-300 border-4 shadow-[12px_12px_0_#000] ${file ? 'border-black bg-yellow-100' : 'border-dashed border-black'} ${isTeamSizeInvalid ? 'opacity-50 cursor-not-allowed' : 'hover:-translate-y-1 hover:shadow-[16px_16px_0_#000]'} relative group overflow-hidden`}>
+                    <input 
+                        type="file" 
+                        id="pdf-upload" 
+                        className="hidden" 
+                        onChange={handleFileChange}
+                        accept=".pdf"
+                        disabled={isTeamSizeInvalid}
+                    />
+                    
+                    {/* Halftone Pattern */}
+                    <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, black 1px, transparent 0)', backgroundSize: '16px 16px' }} />
 
-                {!file ? (
-                    <label htmlFor="pdf-upload" className={`cursor-pointer group/label block text-center relative z-10 ${isTeamSizeInvalid ? 'pointer-events-none' : ''}`}>
-                        <div className="absolute top-0 right-10 bg-pink-500 text-white font-black text-[12px] px-3 py-1.5 rounded-xl border-4 border-black rotate-12 animate-bounce z-30 shadow-[4px_4px_0_#000]">CLICK HERE!</div>
-                        <div className="w-24 h-24 bg-pink-400 border-4 border-black rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-[8px_8px_0_#000] group-hover/label:-translate-y-2 group-hover/label:shadow-[12px_12px_0_#000] transition-all duration-300 relative transform rotate-2 group-hover/label:rotate-0">
-                            <Cloud className="w-12 h-12 text-black stroke-[3]" />
+                    {!file ? (
+                        <label htmlFor="pdf-upload" className={`cursor-pointer group/label block text-center relative z-10 ${isTeamSizeInvalid ? 'pointer-events-none' : ''}`}>
+                            <div className="absolute top-0 right-10 bg-pink-500 text-white font-black text-[12px] px-3 py-1.5 rounded-xl border-4 border-black rotate-12 animate-bounce z-30 shadow-[4px_4px_0_#000]">CLICK HERE!</div>
+                            <div className="w-24 h-24 bg-pink-400 border-4 border-black rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-[8px_8px_0_#000] group-hover/label:-translate-y-2 group-hover/label:shadow-[12px_12px_0_#000] transition-all duration-300 relative transform rotate-2 group-hover/label:rotate-0">
+                                <Cloud className="w-12 h-12 text-black stroke-[3]" />
+                            </div>
+                            <h3 className="text-3xl md:text-5xl font-comic text-black mb-4 tracking-widest uppercase drop-shadow-[2px_2px_0_#00f0ff] bg-white inline-block px-4 py-2 border-4 border-black rounded-xl">CHOOSE YOUR PDF!</h3>
+                            <p className="text-gray-900 font-bold mb-8 text-sm leading-relaxed bg-yellow-300 inline-block px-4 py-2 border-2 border-black rounded-lg transform -rotate-1">Select your project proposal for evaluation. <br/><span className="text-xs uppercase tracking-widest text-black font-black mt-1 block px-2 py-1 bg-white border-2 border-black rounded">SUPPORTED: PDF ONLY (MAX 10MB)</span></p>
+                            
+                            <div className="flex h-16 items-center justify-center gap-3 px-8 rounded-2xl bg-cyan-400 text-black border-4 border-black font-comic text-xl uppercase tracking-widest shadow-[8px_8px_0_#000] hover:bg-cyan-300 active:-translate-y-0 active:shadow-none transition-all w-full max-w-sm mx-auto">
+                                BROWSE FILE SYSTEM <ArrowRight className="w-6 h-6 stroke-[3]" />
+                            </div>
+                        </label>
+                    ) : (
+                        <div className="animate-fade-in text-center relative z-10 w-full overflow-hidden bg-white p-8 border-4 border-black rounded-3xl shadow-[8px_8px_0_#000]">
+                            <div className="w-24 h-24 bg-pink-400 border-4 border-black rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-[6px_6px_0_#00f0ff] transform -rotate-3">
+                                <FileText className="w-10 h-10 text-black stroke-[3]" />
+                            </div>
+                            <h3 className="text-2xl md:text-3xl font-comic text-black mb-2 truncate px-4 tracking-widest uppercase max-w-full drop-shadow-[2px_2px_0_#ff007f]">{file.name}</h3>
+                            <p className="text-sm font-bold text-black uppercase tracking-widest mb-8 bg-yellow-300 inline-block px-3 py-1 border-2 border-black rounded-lg">READY TO SUBMIT ({(file.size / (1024 * 1024)).toFixed(2)} MB)</p>
+                            
+                            <div className="flex flex-col sm:flex-row gap-6 justify-center">
+                                <button 
+                                    onClick={handleSubmit}
+                                    disabled={uploading || isTeamSizeInvalid}
+                                    className="h-16 px-10 bg-cyan-400 text-black border-4 border-black rounded-2xl flex items-center justify-center gap-3 active:translate-y-2 active:shadow-none disabled:opacity-50 font-comic text-xl uppercase tracking-widest shadow-[8px_8px_0_#000] hover:-translate-y-1 hover:shadow-[12px_12px_0_#000] transition-all w-full sm:w-auto"
+                                >
+                                    {uploading ? (
+                                        <>
+                                            <Loader2 className="w-6 h-6 animate-spin stroke-[3]" />
+                                            UPLOADING {progress}% 
+                                        </>
+                                    ) : (
+                                        <>
+                                            SUBMIT PROPOSAL <ArrowRight className="w-6 h-6 stroke-[3]" />
+                                        </>
+                                    )}
+                                </button>
+                                <button 
+                                   onClick={() => setFile(null)}
+                                   disabled={uploading}
+                                   className="h-16 w-full sm:w-16 bg-red-400 text-black border-4 border-black rounded-2xl flex items-center justify-center hover:bg-red-500 hover:-translate-y-1 transition-all disabled:opacity-50 shadow-[8px_8px_0_#000] hover:shadow-[12px_12px_0_#000] active:translate-y-2 active:shadow-none shrink-0"
+                                >
+                                    <Trash2 className="w-6 h-6 stroke-[3]" />
+                                </button>
+                            </div>
                         </div>
-                        <h3 className="text-3xl md:text-5xl font-comic text-black mb-4 tracking-widest uppercase drop-shadow-[2px_2px_0_#00f0ff] bg-white inline-block px-4 py-2 border-4 border-black rounded-xl">CHOOSE YOUR PDF!</h3>
-                        <p className="text-gray-900 font-bold mb-8 text-sm leading-relaxed bg-yellow-300 inline-block px-4 py-2 border-2 border-black rounded-lg transform -rotate-1">Select your project proposal for evaluation. <br/><span className="text-xs uppercase tracking-widest text-black font-black mt-1 block px-2 py-1 bg-white border-2 border-black rounded">SUPPORTED: PDF ONLY (MAX 10MB)</span></p>
+                    )}
+                </div>
+            ) : (
+                <div className={`p-8 md:p-16 rounded-3xl bg-white transition-all duration-300 border-4 shadow-[12px_12px_0_#000] border-black bg-pink-50 relative group overflow-hidden`}>
+                     {/* Halftone Pattern */}
+                    <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, black 1px, transparent 0)', backgroundSize: '16px 16px' }} />
+                    <div className="relative z-10 text-center">
+                        <div className="w-24 h-24 bg-yellow-400 border-4 border-black rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-[8px_8px_0_#000] transform rotate-3">
+                            <Globe className="w-12 h-12 text-black stroke-[3]" />
+                        </div>
+                        <h3 className="text-3xl md:text-5xl font-comic text-black mb-4 tracking-widest uppercase drop-shadow-[2px_2px_0_#00f0ff] bg-white inline-block px-4 py-2 border-4 border-black rounded-xl">SUBMIT VIA LINK!</h3>
+                        <p className="text-gray-900 font-bold mb-8 text-sm leading-relaxed bg-cyan-300 inline-block px-4 py-2 border-2 border-black rounded-lg transform -rotate-1">Upload to Google Drive / GitHub and paste the link below.</p>
                         
-                        <div className="flex h-16 items-center justify-center gap-3 px-8 rounded-2xl bg-cyan-400 text-black border-4 border-black font-comic text-xl uppercase tracking-widest shadow-[8px_8px_0_#000] hover:bg-cyan-300 active:-translate-y-0 active:shadow-none transition-all w-full max-w-sm mx-auto">
-                             BROWSE FILE SYSTEM <ArrowRight className="w-6 h-6 stroke-[3]" />
-                        </div>
-                    </label>
-                ) : (
-                    <div className="animate-fade-in text-center relative z-10 w-full overflow-hidden bg-white p-8 border-4 border-black rounded-3xl shadow-[8px_8px_0_#000]">
-                        <div className="w-24 h-24 bg-pink-400 border-4 border-black rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-[6px_6px_0_#00f0ff] transform -rotate-3">
-                            <FileText className="w-10 h-10 text-black stroke-[3]" />
-                        </div>
-                        <h3 className="text-2xl md:text-3xl font-comic text-black mb-2 truncate px-4 tracking-widest uppercase max-w-full drop-shadow-[2px_2px_0_#ff007f]">{file.name}</h3>
-                        <p className="text-sm font-bold text-black uppercase tracking-widest mb-8 bg-yellow-300 inline-block px-3 py-1 border-2 border-black rounded-lg">READY TO SUBMIT ({(file.size / (1024 * 1024)).toFixed(2)} MB)</p>
-                        
-                        <div className="flex flex-col sm:flex-row gap-6 justify-center">
+                        <div className="max-w-xl mx-auto space-y-4">
+                            <div className="relative">
+                                <LinkIcon className="absolute left-6 top-1/2 -translate-y-1/2 w-8 h-8 text-black opacity-30" />
+                                <input 
+                                    type="url" 
+                                    value={externalUrl}
+                                    onChange={(e) => setExternalUrl(e.target.value)}
+                                    placeholder="https://drive.google.com/..."
+                                    className="w-full h-20 pl-16 pr-8 rounded-2xl bg-white border-4 border-black text-xl font-comic tracking-widest focus:ring-0 outline-none shadow-[8px_8px_0_#000] focus:shadow-[12px_12px_0_#000] transition-all"
+                                />
+                            </div>
+                            
                             <button 
                                 onClick={handleSubmit}
                                 disabled={uploading || isTeamSizeInvalid}
-                                className="h-16 px-10 bg-cyan-400 text-black border-4 border-black rounded-2xl flex items-center justify-center gap-3 active:translate-y-2 active:shadow-none disabled:opacity-50 font-comic text-xl uppercase tracking-widest shadow-[8px_8px_0_#000] hover:-translate-y-1 hover:shadow-[12px_12px_0_#000] transition-all w-full sm:w-auto"
+                                className="h-16 w-full bg-cyan-400 text-black border-4 border-black rounded-2xl flex items-center justify-center gap-3 font-comic text-xl uppercase tracking-widest shadow-[8px_8px_0_#000] hover:-translate-y-1 hover:shadow-[12px_12px_0_#000] active:translate-y-2 active:shadow-none transition-all"
                             >
                                 {uploading ? (
                                     <>
                                         <Loader2 className="w-6 h-6 animate-spin stroke-[3]" />
-                                        UPLOADING {progress}% 
+                                        SUBMITTING LINK...
                                     </>
                                 ) : (
                                     <>
-                                        SUBMIT PROPOSAL <ArrowRight className="w-6 h-6 stroke-[3]" />
+                                        FINALIZE SUBMISSION <ShieldCheck className="w-6 h-6 stroke-[3]" />
                                     </>
                                 )}
                             </button>
-                            <button 
-                               onClick={() => setFile(null)}
-                               disabled={uploading}
-                               className="h-16 w-full sm:w-16 bg-red-400 text-black border-4 border-black rounded-2xl flex items-center justify-center hover:bg-red-500 hover:-translate-y-1 transition-all disabled:opacity-50 shadow-[8px_8px_0_#000] hover:shadow-[12px_12px_0_#000] active:translate-y-2 active:shadow-none shrink-0"
-                            >
-                                <Trash2 className="w-6 h-6 stroke-[3]" />
-                            </button>
+                        </div>
+
+                        <div className="mt-8 p-4 bg-white border-2 border-black rounded-xl inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-gray-500">
+                             <Info className="w-3 h-3" />
+                             Make sure the link is set to "Anyone with the link can view"
                         </div>
                     </div>
-                )}
-
+                </div>
+            )}
                 {/* Background Decoration */}
                 <div className="absolute bottom-0 right-0 p-8 opacity-10 -z-10 group-hover:scale-110 group-hover:rotate-12 transition-all duration-700 pointer-events-none">
                     <Zap className="w-80 h-80 fill-black stroke-black stroke-[2]" />
@@ -345,7 +456,6 @@ export default function SubmissionPage() {
                 </div>
             </div>
         </div>
-      </div>
     </ProtectedRoute>
   );
 }

@@ -12,6 +12,7 @@ export interface UserProfile {
   branch?: string;
   usn?: string;
   year?: string;
+  phone?: string;
 }
 
 export interface Team {
@@ -24,6 +25,13 @@ export interface Team {
   rsvpStatus: "pending" | "confirmed";
   archived: boolean;
   createdAt: FieldValue | Timestamp;
+  memberProfiles?: {
+      userId: string;
+      full_name: string;
+      usn: string;
+      branch: string;
+      year: string;
+  }[];
 }
 
 export interface Submission {

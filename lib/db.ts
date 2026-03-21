@@ -28,11 +28,21 @@ export const createTeam = async (userId: string, teamName: string) => {
   }
 
   const teamCode = generateCode();
+  const profile = await getUserProfile(userId);
+  const leaderSnippet = {
+      userId: userId,
+      full_name: profile?.full_name || "LEADER",
+      usn: profile?.usn || "...",
+      branch: profile?.branch || "...",
+      year: profile?.year || "...",
+      phone: profile?.phone || "..."
+  };
 
   const teamData: Omit<Team, "id"> = {
     teamName,
     leaderId: userId,
     memberIds: [userId],
+    memberProfiles: [leaderSnippet],
     teamCode,
     shortlisted: false,
     rsvpStatus: "pending",
@@ -65,6 +75,14 @@ export const joinTeam = async (teamCode: string, userId: string) => {
 
   const teamDoc = snapshot.docs[0];
   const data = teamDoc.data() as Team;
+  const profile = await getUserProfile(userId);
+  const snippet = {
+      userId: userId,
+      full_name: profile?.full_name || "STUDENT",
+      usn: profile?.usn || "...",
+      branch: profile?.branch || "...",
+      year: profile?.year || "..."
+  };
 
   // Max members check
   if (data.memberIds.length >= 5) {
@@ -73,6 +91,7 @@ export const joinTeam = async (teamCode: string, userId: string) => {
 
   await updateDoc(teamDoc.ref, {
     memberIds: arrayUnion(userId),
+    memberProfiles: arrayUnion(snippet)
   });
 
   return { id: teamDoc.id, ...data, memberIds: [...data.memberIds, userId] };
@@ -88,7 +107,14 @@ export const addTeammateByUSN = async (teamId: string, usn: string) => {
   }
 
   const userData = usnap.docs[0].data();
-  const targetUserId = usnap.docs[0].id; // The document ID is the userId in our system
+  const targetUserId = usnap.docs[0].id;
+  const snippet = {
+      userId: targetUserId,
+      full_name: userData.full_name || "STUDENT",
+      usn: userData.usn || usn.toUpperCase(),
+      branch: userData.branch || "...",
+      year: userData.year || "..."
+  };
 
   // 2. Check current team size
   const teamRef = doc(db, "teams", teamId);
@@ -109,7 +135,8 @@ export const addTeammateByUSN = async (teamId: string, usn: string) => {
 
   // 4. Add to our team
   await updateDoc(teamRef, {
-    memberIds: arrayUnion(targetUserId)
+    memberIds: arrayUnion(targetUserId),
+    memberProfiles: arrayUnion(snippet)
   });
 
   return userData;
@@ -145,8 +172,17 @@ export const submitIdea = async (teamId: string, fileUrl: string) => {
     submittedAt: serverTimestamp(),
   };
 
-  const docRef = await addDoc(collection(db, "submissions"), submissionData);
-  return { id: docRef.id, ...submissionData };
+  // We use teamId as document ID to ensure only one submission per team
+  const docRef = doc(db, "submissions", teamId);
+  await setDoc(docRef, submissionData);
+  return { id: teamId, ...submissionData };
+};
+
+export const getSubmission = async (teamId: string) => {
+    const docRef = doc(db, "submissions", teamId);
+    const snapshot = await getDoc(docRef);
+    if (!snapshot.exists()) return null;
+    return { id: snapshot.id, ...snapshot.data() } as Submission & { id: string };
 };
 
 // RSVP Operations
@@ -198,14 +234,29 @@ export const getMyTeam = async (userId: string) => {
     return { id: snapshot.docs[0].id, ...snapshot.docs[0].data() } as Team & { id: string };
 };
 
-export const getAllTeamsForAdmin = async (lastDoc?: any) => {
-    // Pagination logic (simplified for now but structure is here)
+export const getAllTeamsForAdmin = async () => {
     const q = query(
-        collection(db, "teams"),
-        where("archived", "==", false)
+        collection(db, "teams")
+        // Removed archived filter to ensure all teams are visible initially
     );
     const snapshot = await getDocs(q);
     return snapshot.docs.map(d => ({ id: d.id, ...d.data() })) as (Team & { id: string })[];
+};
+
+export const getAdminStats = async () => {
+    const [teamsSnap, submissionsSnap] = await Promise.all([
+        getDocs(collection(db, "teams")),
+        getDocs(collection(db, "submissions"))
+    ]);
+
+    const teams = teamsSnap.docs.map(d => d.data() as Team);
+    
+    return {
+        totalTeams: teams.filter(t => !t.archived).length,
+        shortlisted: teams.filter(t => t.shortlisted).length,
+        confirmed: teams.filter(t => t.rsvpStatus === 'confirmed').length,
+        submissions: submissionsSnap.size
+    };
 };
 
 export const updateTeamName = async (teamId: string, teamName: string) => {
@@ -220,6 +271,35 @@ import { UserProfile } from "@/types";
 export const updateUserProfile = async (userId: string, data: Partial<UserProfile>) => {
     const userRef = doc(db, "users", userId);
     await setDoc(userRef, { ...data, userId }, { merge: true });
+
+    // Sync to team if they are in one (Bypasses rules issues by caching name in team doc)
+    try {
+        const myTeam = await getMyTeam(userId);
+        if (myTeam && myTeam.id) {
+            const teamRef = doc(db, "teams", myTeam.id);
+            const snippet = {
+                userId,
+                full_name: data.full_name || "STUDENT",
+                usn: data.usn || "...",
+                branch: data.branch || "...",
+                year: data.year || "...",
+                phone: data.phone || "..."
+            };
+            
+            // Remove old snippet and add new one
+            const currentProfiles = myTeam.memberProfiles || [];
+            const updatedProfiles = [
+                ...currentProfiles.filter(p => p.userId !== userId),
+                snippet
+            ];
+            
+            await updateDoc(teamRef, {
+                memberProfiles: updatedProfiles
+            });
+        }
+    } catch (err) {
+        console.warn("Could not sync profile to team doc:", err);
+    }
 };
 
 export const getUserProfile = async (userId: string) => {

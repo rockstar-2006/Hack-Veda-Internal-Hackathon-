@@ -43,6 +43,8 @@ export const Sidebar = ({ onClose, announcementCount = 1 }: { onClose?: () => vo
   const [installPrompt, setInstallPrompt] = useState<any>(null);
 
   useEffect(() => {
+    setIsAdmin(typeof window !== 'undefined' && localStorage.getItem('adminSession') === 'active');
+    
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       setInstallPrompt(e);

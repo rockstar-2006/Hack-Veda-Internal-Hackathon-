@@ -1,47 +1,61 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { getAllTeamsForAdmin, shortlistTeam } from "@/lib/db";
 import { Team } from "@/types";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { 
-  LayoutDashboard, 
   Users, 
   FileCheck, 
   ShieldCheck, 
-  Mail, 
-  ArrowRight, 
-  Table, 
   Search, 
   RefreshCcw, 
   MoreHorizontal, 
   Download, 
-  ToggleLeft, 
-  ToggleRight, 
   Check, 
-  X,
   Zap,
-  Filter
+  Filter,
+  AlertTriangle,
+  ChevronRight,
+  Database,
+  ExternalLink,
+  X,
+  UserCheck,
+  UserCircle
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function AdminDashboard() {
   const { user } = useAuth();
-  const [teams, setTeams] = useState<(Team & { id: string })[]>([]);
+  const [teams, setTeams] = useState<(Team & { id: string, submissionUrl?: string | null })[]>([]);
+  const [stats, setStats] = useState({ totalTeams: 0, shortlisted: 0, confirmed: 0, submissions: 0 });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [refreshing, setRefreshing] = useState(false);
+  const [selectedTeam, setSelectedTeam] = useState<any>(null);
 
-  const fetchTeams = async () => {
-    setLoading(true);
+  const fetchData = async () => {
     setRefreshing(true);
     try {
-      const data = await getAllTeamsForAdmin();
-      setTeams(data);
+      const [statsRes, teamsRes] = await Promise.all([
+          fetch('/api/admin/stats'),
+          fetch('/api/admin/teams')
+      ]);
+
+      if (!statsRes.ok || !teamsRes.ok) throw new Error("Database link synchronization failed");
+      
+      const [statsData, teamsData] = await Promise.all([
+          statsRes.json(),
+          teamsRes.json()
+      ]);
+
+      setStats(statsData);
+      setTeams(teamsData);
+      setError("");
     } catch (err: any) {
-      setError(err.message || "Failed to load teams.");
+      setError(err.message || "Failed to establish secure data link.");
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -49,21 +63,29 @@ export default function AdminDashboard() {
   };
 
   useEffect(() => {
-    fetchTeams();
+    fetchData();
   }, []);
 
   const handleShortlist = async (teamId: string, currentStatus: boolean) => {
     try {
-      await shortlistTeam(teamId, !currentStatus);
-      setTeams(prev => prev.map(t => t.id === teamId ? { ...t, shortlisted: !currentStatus } : t));
+        const response = await fetch('/api/admin/teams/shortlist', {
+            method: 'POST',
+            body: JSON.stringify({ teamId, status: !currentStatus })
+        });
+        
+        if (!response.ok) throw new Error("Action denied");
+
+        setTeams(prev => prev.map(t => t.id === teamId ? { ...t, shortlisted: !currentStatus } : t));
+        setStats(prev => ({ ...prev, shortlisted: prev.shortlisted + (currentStatus ? -1 : 1) }));
     } catch (err: any) {
-      console.error(err);
+        console.error(err);
+        setError("Failed to update team status.");
     }
   };
 
   const filteredTeams = teams.filter(t => 
-    t.teamName.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    t.teamCode.toLowerCase().includes(searchTerm.toLowerCase())
+    t.teamName?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    t.teamCode?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   if (loading) return null;
@@ -72,141 +94,304 @@ export default function AdminDashboard() {
     <ProtectedRoute requireAdmin={true}>
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-10 min-h-screen">
         
-        {/* Admin Header */}
-        <section className="mb-8 md:mb-12 flex flex-col md:flex-row md:items-end justify-between gap-4 md:gap-6">
-            <div className="flex-1 space-y-3 md:space-y-4">
-                 <motion.div 
-                   initial={{ x: -20, opacity: 0 }}
-                   animate={{ x: 0, opacity: 1 }}
-                   className="inline-flex items-center gap-2 bg-indigo-50 text-indigo-700 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-widest border border-indigo-100 w-fit"
-                 >
-                      <Zap className="w-3.5 h-3.5 fill-indigo-600" />
-                      Admin Control Center
-                 </motion.div>
-                 <h1 className="text-2xl md:text-3xl lg:text-4xl font-black text-gray-900 leading-tight tracking-tight italic">
-                    Event Overview.
-                 </h1>
-                 <p className="text-xs md:text-sm text-gray-500 font-medium max-w-2xl leading-relaxed">
-                    View team participation, update statuses, and manage the overall hackathon progress.
-                 </p>
+        {/* Connection Status Log */}
+        <AnimatePresence>
+            {error && (
+                <motion.div 
+                   initial={{ height: 0, opacity: 0 }}
+                   animate={{ height: 'auto', opacity: 1 }}
+                   exit={{ height: 0, opacity: 0 }}
+                   className="mb-8 bg-red-50 border-4 border-red-500 p-4 rounded-2xl flex items-center gap-4 text-red-700 overflow-hidden shadow-[4px_4px_0_#000]"
+                >
+                    <AlertTriangle className="w-6 h-6 shrink-0 stroke-[3]" />
+                    <p className="font-comic text-lg font-black uppercase tracking-widest leading-none mt-1">{error}</p>
+                    <button onClick={fetchData} className="ml-auto bg-black text-white px-4 py-2 rounded-xl text-xs font-black uppercase">REBOOT DATA STREAM</button>
+                </motion.div>
+            )}
+        </AnimatePresence>
+
+        {/* Simplified Header */}
+        <section className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="space-y-2">
+                 <div className="flex items-center gap-3">
+                      <div className="bg-yellow-400 p-3 rounded-2xl border-4 border-black shadow-[4px_4px_0_#000]">
+                           <Database className="w-6 h-6 text-black fill-black" />
+                      </div>
+                      <div>
+                           <h1 className="text-5xl font-comic text-black tracking-tighter uppercase leading-none drop-shadow-[2px_2px_0_#00f0ff]">
+                                Admin Portal?
+                           </h1>
+                           <p className="text-xs font-black text-gray-500 uppercase tracking-widest mt-1">Live Database Connection Established</p>
+                      </div>
+                 </div>
             </div>
             
-            <div className="flex flex-wrap items-center gap-2 md:gap-3">
+            <div className="flex items-center gap-3">
                  <button 
-                   onClick={fetchTeams}
+                   onClick={fetchData}
                    disabled={refreshing}
-                   className="h-10 px-4 rounded-xl bg-white border border-gray-200 text-gray-700 flex items-center gap-2 font-bold text-xs md:text-sm hover:border-indigo-600 hover:text-indigo-600 transition-all active:scale-95 shadow-sm flex-1 md:flex-none justify-center"
+                   className="h-16 px-8 rounded-2xl bg-white border-4 border-black text-black flex items-center gap-4 font-comic text-lg uppercase tracking-widest shadow-[6px_6px_0_#000] hover:bg-gray-50 active:translate-y-2 active:shadow-none transition-all"
                  >
-                      <RefreshCcw className={`w-3.5 h-3.5 md:w-4 md:h-4 ${refreshing ? 'animate-spin' : ''}`} />
-                      Sync Data
-                 </button>
-                 <button className="h-10 px-4 rounded-xl bg-indigo-600 text-white flex items-center justify-center gap-2 font-bold text-xs md:text-sm hover:bg-indigo-700 shadow-sm active:scale-95 transition-all flex-1 md:flex-none">
-                      <Download className="w-3.5 h-3.5 md:w-4 md:h-4" /> Export Assets
+                      <RefreshCcw className={`w-6 h-6 stroke-[3] ${refreshing ? 'animate-spin' : ''}`} />
+                      Refresh Data
                  </button>
             </div>
         </section>
 
-        {/* Stats Summary */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-8 md:mb-12">
+        {/* Improved Stats Card Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
              {[
-                 { label: 'Total Teams', value: teams.length, icon: Users, color: 'indigo', desc: 'Active Formations' },
-                 { label: 'Shortlisted', value: teams.filter(t => t.shortlisted).length, icon: ShieldCheck, color: 'emerald', desc: 'Elite Finalists' },
-                 { label: 'Confirmed', value: teams.filter(t => t.rsvpStatus === 'confirmed').length, icon: Check, color: 'amber', desc: 'Event Ready' },
-                 { label: 'Submissions', value: teams.filter(t => t.archived === false).length, icon: FileCheck, color: 'blue', desc: 'Proposal Archives' }
+                 { label: 'Registered Teams', value: stats.totalTeams, icon: Users, color: 'bg-cyan-400', desc: 'Active Units' },
+                 { label: 'PDF Submissions', value: stats.submissions, icon: FileCheck, color: 'bg-pink-400', desc: 'Evaluations' },
+                 { label: 'RSVP Checkins', value: stats.confirmed, icon: Check, color: 'bg-green-400', desc: 'Ready Status' },
+                 { label: 'Shortlists', value: stats.shortlisted, icon: ShieldCheck, color: 'bg-yellow-400', desc: 'Finalists' }
              ].map((stat, i) => (
-                 <div key={i} className="p-4 md:p-6 rounded-2xl bg-white border border-gray-100 shadow-sm flex flex-col justify-between">
-                      <div className="flex items-center justify-between mb-2 md:mb-4">
-                          <p className="text-[10px] md:text-xs font-bold text-gray-500 uppercase tracking-widest">{stat.label}</p>
-                          <stat.icon className="w-4 h-4 md:w-5 md:h-5 text-indigo-600" />
+                 <div key={i} className="group relative bg-white border-4 border-black p-8 rounded-[2.5rem] shadow-[8px_8px_0_#000] hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all">
+                      <div className={`absolute -top-4 -right-4 w-16 h-16 ${stat.color} border-4 border-black rounded-2xl flex items-center justify-center rotate-12 group-hover:rotate-0 transition-transform shadow-[4px_4px_0_#000]`}>
+                          <stat.icon className="w-8 h-8 text-black stroke-[2.5]" />
                       </div>
-                      <p className="text-2xl md:text-3xl font-black text-gray-900 tracking-tight mb-0.5 md:mb-1">{stat.value}</p>
-                      <p className="text-[9px] md:text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none">{stat.desc}</p>
+                      <p className="font-comic text-sm text-gray-400 uppercase tracking-widest mb-4">{stat.label}</p>
+                      <div className="flex items-end gap-3">
+                           <p className="text-6xl font-comic text-black tracking-tighter leading-none">{stat.value}</p>
+                           <div className="text-[10px] font-black uppercase mb-1.5 opacity-40">{stat.desc}</div>
+                      </div>
                  </div>
              ))}
         </div>
 
-        {/* Search & Filter Bar */}
-        <div className="flex flex-col md:flex-row items-center gap-3 md:gap-4 mb-6 md:mb-8">
-             <div className="relative flex-1 w-full group">
-                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 group-focus-within:text-indigo-600 transition-colors" />
-                 <input 
-                    type="text" 
-                    placeholder="Search teams by name or code..." 
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full h-10 md:h-12 pl-10 md:pl-12 pr-4 md:pr-6 rounded-xl bg-white border border-gray-200 focus:border-indigo-600 outline-none font-medium text-xs md:text-sm transition-all shadow-sm"
-                 />
+        {/* Team Activity Table */}
+        <div className="bg-white border-4 border-black rounded-[2.5rem] shadow-[12px_12px_0_#000] overflow-hidden">
+             <div className="p-8 border-b-4 border-black bg-white flex flex-col md:flex-row items-center gap-8">
+                  <div className="relative flex-1 w-full group">
+                       <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-8 h-8 text-black opacity-20 group-focus-within:opacity-100 transition-all" />
+                       <input 
+                          type="text" 
+                          placeholder="SCAN TEAMS BY NAME OR CODE..." 
+                          value={searchTerm}
+                          onChange={(e) => setSearchTerm(e.target.value)}
+                          className="w-full h-20 pl-16 pr-8 rounded-2xl bg-[#f8f9fa] border-4 border-black font-comic text-2xl uppercase tracking-widest placeholder:text-gray-200 outline-none focus:bg-yellow-50 focus:shadow-[4px_4px_0_#000] transition-all"
+                       />
+                  </div>
              </div>
-             <button className="w-full md:w-auto h-10 md:h-12 px-6 rounded-xl bg-white border border-gray-200 flex items-center justify-center gap-2 font-bold text-xs md:text-sm text-gray-600 hover:border-indigo-600 hover:text-indigo-600 transition-all active:scale-95 shrink-0 shadow-sm">
-                  <Filter className="w-3.5 h-3.5 md:w-4 md:h-4" /> Filter
-             </button>
+
+             <div className="overflow-x-auto min-h-[400px]">
+                  <table className="w-full text-left">
+                      <thead>
+                          <tr className="bg-white text-[10px] font-black text-black opacity-40 uppercase tracking-[0.3em] border-b-4 border-black">
+                              <th className="px-10 py-6">Team Unit</th>
+                              <th className="px-10 py-6">Status</th>
+                              <th className="px-10 py-6">Shortlisted</th>
+                              <th className="px-10 py-6">Submission</th>
+                              <th className="px-10 py-6 text-right">View Detail</th>
+                          </tr>
+                      </thead>
+                      <tbody className="divide-y-4 divide-black">
+                          {filteredTeams.length > 0 ? (
+                              filteredTeams.map((team) => (
+                                <tr key={team.id} className="group hover:bg-cyan-50 transition-colors">
+                                    <td className="px-10 py-8">
+                                        <div 
+                                          onClick={() => setSelectedTeam(team)}
+                                          className="flex items-center gap-6 cursor-pointer"
+                                        >
+                                            <div className="w-16 h-16 rounded-2xl bg-black border-4 border-black flex items-center justify-center font-comic text-white text-3xl shadow-[4px_4px_0_#00f0ff] group-hover:scale-105 transition-transform">
+                                                {team.teamName.charAt(0)}
+                                            </div>
+                                            <div>
+                                                <p className="font-comic text-3xl text-black tracking-tighter uppercase mb-0.5">{team.teamName}</p>
+                                                <div className="flex items-center gap-3">
+                                                    <span className="text-[10px] font-black text-black bg-yellow-400 px-2 py-0.5 rounded-lg border-2 border-black drop-shadow-[2px_2px_0_#000]">{team.teamCode}</span>
+                                                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{team.memberIds.length} Members Registered</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td className="px-10 py-8">
+                                        <div className={`inline-flex h-12 items-center gap-3 px-6 rounded-2xl text-sm font-black uppercase tracking-widest border-4 border-black shadow-[4px_4px_0_#000] ${
+                                            team.rsvpStatus === 'confirmed' ? 'bg-green-400' : 'bg-white'
+                                        }`}>
+                                            <div className={`w-3 h-3 rounded-full ${team.rsvpStatus === 'confirmed' ? 'bg-black animate-pulse' : 'bg-gray-200'}`} />
+                                            {team.rsvpStatus}
+                                        </div>
+                                    </td>
+                                    <td className="px-10 py-8">
+                                        <button 
+                                          onClick={() => handleShortlist(team.id, team.shortlisted)}
+                                          className={`relative inline-flex h-10 w-20 items-center rounded-full border-4 border-black transition-all ${team.shortlisted ? 'bg-pink-500 shadow-[2px_2px_0_#000]' : 'bg-gray-100 shadow-none'}`}
+                                        >
+                                            <span className={`inline-block h-6 w-6 transform rounded-full bg-white border-2 border-black transition-transform ${team.shortlisted ? 'translate-x-12' : 'translate-x-2'}`} />
+                                        </button>
+                                    </td>
+                                    <td className="px-10 py-8">
+                                        {team.submissionUrl ? (
+                                             <a 
+                                               href={team.submissionUrl} 
+                                               target="_blank" 
+                                               rel="noreferrer"
+                                               className="w-14 h-14 bg-cyan-400 border-4 border-black rounded-2xl flex items-center justify-center hover:-translate-y-1 hover:shadow-[4px_4px_0_#000] active:translate-y-0 transition-all"
+                                             >
+                                                  <FileCheck className="w-7 h-7 stroke-[2.5]" />
+                                             </a>
+                                        ) : (
+                                            <div className="w-14 h-14 bg-gray-100 border-4 border-black rounded-2xl flex items-center justify-center opacity-20">
+                                                 <X className="w-7 h-7" />
+                                            </div>
+                                        )}
+                                    </td>
+                                    <td className="px-10 py-8 text-right">
+                                        <button 
+                                          onClick={() => setSelectedTeam(team)}
+                                          className="w-14 h-14 rounded-2xl bg-white border-4 border-black text-black flex items-center justify-center hover:bg-black hover:text-white hover:-translate-y-1 transition-all shadow-[6px_6px_0_#000] active:translate-y-2 active:shadow-none"
+                                        >
+                                            <ChevronRight className="w-8 h-8 stroke-[3]" />
+                                        </button>
+                                    </td>
+                                </tr>
+                              ))
+                          ) : (
+                              <tr>
+                                  <td colSpan={5} className="px-8 py-32 text-center">
+                                      <div className="flex flex-col items-center">
+                                          <div className="w-24 h-24 bg-gray-50 border-4 border-black rounded-[3rem] flex items-center justify-center mb-6 opacity-20 grayscale">
+                                              <Database className="w-12 h-12 text-black" />
+                                          </div>
+                                          <p className="text-4xl font-comic text-gray-200 uppercase tracking-widest drop-shadow-[2px_2px_0_#000]">Zero Nodes Found</p>
+                                          <p className="text-xs font-black text-gray-400 uppercase tracking-[0.4em] mt-4">Database link is vacant</p>
+                                      </div>
+                                  </td>
+                              </tr>
+                          )}
+                      </tbody>
+                  </table>
+             </div>
         </div>
 
-        {/* Teams Table */}
-        <div className="rounded-2xl bg-white border border-gray-200 shadow-sm overflow-hidden mb-8 md:mb-12">
-             <div className="overflow-x-auto">
-                 <table className="w-full text-left min-w-[600px]">
-                     <thead>
-                         <tr className="bg-gray-50 text-[10px] md:text-xs font-bold text-gray-500 uppercase tracking-widest border-b border-gray-200">
-                             <th className="px-4 md:px-6 py-3 md:py-4">Team Name</th>
-                             <th className="px-4 md:px-6 py-3 md:py-4">Members</th>
-                             <th className="px-4 md:px-6 py-3 md:py-4">Status</th>
-                             <th className="px-4 md:px-6 py-3 md:py-4">Shortlisted</th>
-                             <th className="px-4 md:px-6 py-3 md:py-4 text-right">Actions</th>
-                         </tr>
-                     </thead>
-                     <tbody className="divide-y divide-gray-100">
-                         {filteredTeams.map((team) => (
-                            <tr key={team.id} className="group hover:bg-gray-50/50 transition-colors">
-                                <td className="px-4 md:px-6 py-3 md:py-4">
-                                    <div className="flex items-center gap-3 md:gap-4">
-                                        <div className={`w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl flex items-center justify-center font-bold text-xs md:text-sm shadow-sm border ${team.shortlisted ? 'bg-indigo-600 text-white border-indigo-700' : 'bg-white text-indigo-600 border-gray-200'} transition-all group-hover:scale-105 shrink-0`}>
-                                            {team.teamName.charAt(0).toUpperCase()}
+        {/* Team Details Modal */}
+        <AnimatePresence>
+            {selectedTeam && (
+                <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4">
+                    <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onClick={() => setSelectedTeam(null)}
+                        className="absolute inset-0 bg-black/80 backdrop-blur-md"
+                    />
+                    <motion.div 
+                        initial={{ scale: 0.9, opacity: 0, y: 50 }}
+                        animate={{ scale: 1, opacity: 1, y: 0 }}
+                        exit={{ scale: 0.9, opacity: 0, y: 50 }}
+                        className="bg-[#fffcf0] border-8 border-black w-full max-w-4xl relative z-10 rounded-[4rem] shadow-[20px_20px_0_#ff007f] overflow-hidden"
+                    >
+                         {/* Modal Header */}
+                         <div className="bg-yellow-400 p-8 md:p-12 border-b-8 border-black flex items-center justify-between">
+                              <div className="flex items-center gap-6">
+                                   <div className="w-24 h-24 bg-white border-8 border-black rounded-[2.5rem] flex items-center justify-center text-4xl font-comic shadow-[8px_8px_0_#000]">
+                                       {selectedTeam.teamName.charAt(0)}
+                                   </div>
+                                   <div>
+                                       <h3 className="text-5xl font-comic uppercase tracking-tighter leading-none">{selectedTeam.teamName}</h3>
+                                       <p className="text-sm font-black uppercase tracking-widest mt-2">{selectedTeam.teamCode} // ID_{selectedTeam.id.substring(0,8)}</p>
+                                   </div>
+                              </div>
+                              <button 
+                                 onClick={() => setSelectedTeam(null)}
+                                 className="w-16 h-16 bg-white border-4 border-black rounded-2xl flex items-center justify-center hover:bg-red-500 hover:text-white transition-colors shadow-[4px_4px_0_#000] active:translate-y-1 active:shadow-none"
+                              >
+                                  <X className="w-8 h-8 stroke-[3]" />
+                              </button>
+                         </div>
+
+                         <div className="p-8 md:p-12 grid md:grid-cols-2 gap-12">
+                              {/* Left: Member List */}
+                              <div className="space-y-6">
+                                   <h4 className="font-comic text-2xl uppercase tracking-widest mb-6 bg-pink-400 border-4 border-black px-4 py-2 inline-block -rotate-1 shadow-[4px_4px_0_#000]">Member Roster</h4>
+                                   <div className="space-y-4">
+                                        {(selectedTeam.memberProfiles || []).map((member: any, i: number) => (
+                                            <div key={i} className="bg-white border-4 border-black p-5 rounded-3xl flex items-center gap-4 shadow-[6px_6px_0_#000] group hover:-translate-y-1 transition-transform">
+                                                <div className="w-12 h-12 bg-cyan-400 border-4 border-black rounded-xl flex items-center justify-center shrink-0">
+                                                     <UserCircle className="w-6 h-6" />
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="font-comic text-xl uppercase leading-none truncate">{member.full_name}</p>
+                                                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">
+                                                        {member.usn} // {member.branch}
+                                                    </p>
+                                                    {member.phone && (
+                                                        <p className="text-[10px] font-black text-indigo-600 uppercase tracking-widest mt-1">
+                                                            📞 {member.phone}
+                                                        </p>
+                                                    )}
+                                                </div>
+                                                {selectedTeam.leaderId === member.userId && (
+                                                    <div className="px-3 py-1 bg-black text-yellow-400 rounded-lg text-[9px] font-black uppercase border-2 border-black transform -rotate-12">Leader</div>
+                                                )}
+                                            </div>
+                                        ))}
+                                   </div>
+                              </div>
+
+                              {/* Right: Submission & Meta */}
+                              <div className="space-y-8">
+                                   <div className="bg-white border-4 border-black p-8 rounded-[3rem] shadow-[8px_8px_0_#000] relative isolate overflow-hidden group">
+                                        <div className="absolute top-0 right-0 p-6 opacity-5 -z-10 group-hover:scale-110 transition-transform">
+                                             <FileCheck className="w-40 h-40" />
                                         </div>
-                                        <div>
-                                            <p className="font-bold text-gray-900 text-xs md:text-sm tracking-tight mb-0.5">{team.teamName}</p>
-                                            <p className="text-[9px] md:text-[10px] font-mono font-medium text-gray-500 uppercase">{team.teamCode}</p>
+                                        <h4 className="font-comic text-2xl uppercase mb-6 tracking-widest">Team Proposal</h4>
+                                        {selectedTeam.submissionUrl ? (
+                                             <div className="space-y-4">
+                                                  <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">A PDF documentation node has been detected.</p>
+                                                  <a 
+                                                    href={selectedTeam.submissionUrl}
+                                                    target="_blank"
+                                                    rel="noreferrer"
+                                                    className="w-full h-16 bg-cyan-400 border-4 border-black rounded-2xl flex items-center justify-center gap-3 font-comic text-xl uppercase tracking-widest shadow-[6px_6px_0_#000] hover:bg-cyan-300 active:translate-y-1 active:shadow-none transition-all"
+                                                  >
+                                                      <ExternalLink className="w-6 h-6 stroke-[3]" /> View Project Link
+                                                  </a>
+                                                  <div className="bg-green-50 border-2 border-green-200 p-3 rounded-xl flex items-center gap-2 text-green-700 text-[10px] font-bold uppercase">
+                                                       <Check className="w-4 h-4" /> Submission Verified by Admin Protocol
+                                                  </div>
+                                             </div>
+                                        ) : (
+                                            <div className="space-y-4">
+                                                 <div className="w-20 h-20 bg-gray-50 border-4 border-black rounded-2xl flex items-center justify-center opacity-20 mx-auto">
+                                                      <AlertTriangle className="w-10 h-10" />
+                                                 </div>
+                                                 <p className="text-center text-xs font-bold text-gray-400 uppercase tracking-widest">No proposal node uploaded yet.</p>
+                                            </div>
+                                        )}
+                                   </div>
+
+                                   <div className="grid grid-cols-2 gap-4">
+                                        <div className="bg-white border-4 border-black p-4 rounded-2xl text-center shadow-[4px_4px_0_#000]">
+                                             <p className="text-[10px] font-black text-gray-400 uppercase mb-1">Check-in Status</p>
+                                             <p className="font-comic text-lg uppercase">{selectedTeam.rsvpStatus}</p>
                                         </div>
-                                    </div>
-                                </td>
-                                <td className="px-4 md:px-6 py-3 md:py-4">
-                                    <p className="text-xs md:text-sm font-medium text-gray-900 mb-0.5">{team.memberIds.length} Members</p>
-                                </td>
-                                <td className="px-4 md:px-6 py-3 md:py-4">
-                                    <div className={`inline-flex items-center gap-1.5 md:gap-2 px-2 md:px-3 py-1 rounded-full text-[9px] md:text-[10px] font-bold uppercase tracking-widest border ${
-                                        team.rsvpStatus === 'confirmed' ? 'bg-green-50 text-green-700 border-green-200' : 
-                                        'bg-gray-50 text-gray-500 border-gray-200'
-                                    }`}>
-                                        <div className={`w-1 h-1 md:w-1.5 md:h-1.5 rounded-full ${team.rsvpStatus === 'confirmed' ? 'bg-green-600' : 'bg-gray-400'}`} />
-                                        {team.rsvpStatus === 'confirmed' ? 'Confirmed' : 'Pending'}
-                                    </div>
-                                </td>
-                                <td className="px-4 md:px-6 py-3 md:py-4">
-                                    <button 
-                                      onClick={() => handleShortlist(team.id, team.shortlisted)}
-                                      className={`relative inline-flex h-5 w-9 md:h-6 md:w-11 items-center rounded-full transition-colors focus:outline-none ${team.shortlisted ? 'bg-indigo-600' : 'bg-gray-200'}`}
-                                    >
-                                        <span className={`inline-block h-3.5 w-3.5 md:h-4 md:w-4 transform rounded-full bg-white transition-transform ${team.shortlisted ? 'translate-x-[1.1rem] md:translate-x-[1.3rem]' : 'translate-x-[0.15rem] md:translate-x-1'}`} />
-                                    </button>
-                                </td>
-                                <td className="px-4 md:px-6 py-3 md:py-4 text-right">
-                                    <div className="flex items-center justify-end gap-1.5 md:gap-2">
-                                        <button className="p-1.5 md:p-2 rounded-lg bg-white border border-gray-200 text-indigo-600 hover:border-indigo-600 transition-colors shadow-sm" title="View Submission">
-                                            <FileCheck className="w-3.5 h-3.5 md:w-4 md:h-4" />
-                                        </button>
-                                        <button className="p-1.5 md:p-2 rounded-lg border border-transparent text-gray-400 hover:text-gray-900 hover:bg-gray-100 transition-colors">
-                                            <MoreHorizontal className="w-3.5 h-3.5 md:w-4 md:h-4" />
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                         ))}
-                     </tbody>
-                 </table>
+                                        <div className="bg-white border-4 border-black p-4 rounded-2xl text-center shadow-[4px_4px_0_#000]">
+                                             <p className="text-[10px] font-black text-gray-400 uppercase mb-1">Shortlist Rank</p>
+                                             <p className="font-comic text-lg uppercase">{selectedTeam.shortlisted ? "ELITE" : "CANDIDATE"}</p>
+                                        </div>
+                                   </div>
+                              </div>
+                         </div>
+                    </motion.div>
+                </div>
+            )}
+        </AnimatePresence>
+
+        {/* Console Legend */}
+        <div className="mt-12 flex flex-col md:flex-row items-center justify-between text-gray-400 gap-4">
+             <div className="flex items-center gap-4">
+                  <p className="text-[10px] font-black uppercase tracking-[0.5em]">HackVeda Admin Protocol v4.0</p>
+             </div>
+             <div className="flex items-center gap-2 bg-white border-4 border-black px-4 py-1.5 rounded-xl shadow-[4px_4px_0_#000] text-black">
+                  <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                  <p className="text-[10px] font-black uppercase tracking-widest leading-none">Terminal: {localStorage.getItem('adminEmail')}</p>
              </div>
         </div>
-
       </div>
     </ProtectedRoute>
   );
 }
+
