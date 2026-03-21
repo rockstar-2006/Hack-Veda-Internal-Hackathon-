@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { useAuth } from "./useAuth";
 import { getMyTeam } from "@/lib/db";
 import { Team } from "@/types";
+import { collection, query, where, onSnapshot } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
 export const useTeam = () => {
   const { user, loading: authLoading } = useAuth();
@@ -11,25 +13,37 @@ export const useTeam = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const fetchTeam = async () => {
-    if (user) {
-      setLoading(true);
-      try {
-        const teamData = await getMyTeam(user.uid);
-        setTeam(teamData);
-      } catch (err: any) {
-        setError(err.message || "Failed to load team data.");
-      } finally {
-        setLoading(false);
-      }
-    } else if (!authLoading) {
-        setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchTeam();
+    if (!user) {
+        if (!authLoading) setLoading(false);
+        return;
+    }
+
+    setLoading(true);
+    const q = query(
+        collection(db, "teams"), 
+        where("memberIds", "array-contains", user.uid),
+        where("archived", "==", false)
+    );
+    
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+        if (snapshot.empty) {
+            setTeam(null);
+        } else {
+            setTeam({ id: snapshot.docs[0].id, ...snapshot.docs[0].data() } as Team & { id: string });
+        }
+        setLoading(false);
+    }, (err) => {
+        console.error(err);
+        setError(err.message);
+        setLoading(false);
+    });
+
+    return () => unsubscribe();
   }, [user, authLoading]);
+
+  // Dummy refreshTeam for compatibility
+  const fetchTeam = async () => {};
 
   return { team, loading, error, refreshTeam: fetchTeam };
 };

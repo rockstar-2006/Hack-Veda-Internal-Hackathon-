@@ -16,6 +16,7 @@ import {
   ShieldOff,
   CheckCircle2,
   UserPlus,
+  GraduationCap,
   Trophy,
   Loader2,
   AlertCircle,
@@ -24,18 +25,24 @@ import {
   ShieldAlert
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-import { updateUserProfile, getUserProfile } from "@/lib/db";
+import { updateUserProfile, getUserProfile, addTeammateByUSN, leaveTeam } from "@/lib/db";
 import { UserProfile } from "@/types";
+import { Toast, ToastType } from "@/components/Toast";
 
 export default function TeamPage() {
+  const router = useRouter();
   const { user } = useAuth();
-  const { team, loading: teamLoading } = useTeam();
+  const { team, loading: teamLoading, refreshTeam } = useTeam();
   const [copied, setCopied] = useState(false);
   const [members, setMembers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
+  const [inviteUSN, setInviteUSN] = useState("");
+  const [inviting, setInviting] = useState(false);
+  const [toast, setToast] = useState<{ message: string, type: ToastType } | null>(null);
 
   const fetchMembers = async () => {
     if (team) {
@@ -61,7 +68,51 @@ export default function TeamPage() {
       navigator.clipboard.writeText(team.teamCode);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
+      setToast({ message: "TEAM CODE COPIED!", type: "success" });
     }
+  };
+
+  const handleAddTeammate = async (e: React.FormEvent) => {
+      e.preventDefault();
+      if (!team || !inviteUSN.trim()) return;
+      if (team.leaderId !== user?.uid) {
+          setToast({ message: "ONLY LEADERS CAN ADD MEMBERS!", type: "error" });
+          return;
+      }
+      if (members.length >= 4) {
+          setToast({ message: "TEAM IS FULL!", type: "error" });
+          return;
+      }
+
+      setInviting(true);
+      try {
+          await addTeammateByUSN(team.id!, inviteUSN);
+          setToast({ message: `${inviteUSN} ADDED TO TEAM!`, type: "success" });
+          setInviteUSN("");
+          refreshTeam?.();
+          fetchMembers();
+      } catch (err: any) {
+          setToast({ message: err.message || "FAILED TO ADD MEMBER", type: "error" });
+      } finally {
+          setInviting(false);
+      }
+  };
+
+  const handleLeaveTeam = async () => {
+      if (!team || !user?.uid) return;
+      if (confirm("Are you sure you want to leave this team? If you are the leader, the entire team will be deleted!")) {
+          setLoading(true);
+          try {
+              await leaveTeam(team.id!, user.uid);
+              setToast({ message: "SUCCESSFULLY LEFT TEAM!", type: "success" });
+              setTimeout(() => {
+                  router.push('/profile');
+              }, 1000);
+          } catch (err: any) {
+              setToast({ message: err.message || "FAILED TO LEAVE TEAM", type: "error" });
+              setLoading(false);
+          }
+      }
   };
 
   if (teamLoading || (team && loading)) return null;
@@ -84,11 +135,11 @@ export default function TeamPage() {
                  <h1 className="text-5xl md:text-7xl lg:text-8xl font-comic text-black leading-none drop-shadow-[4px_4px_0_#ff007f] uppercase mb-4">
                     MY TEAM <br />
                     <span className="text-white drop-shadow-[4px_4px_0_#000]">
-                        SQUAD!
+                        TEAM!
                     </span>
                  </h1>
                  <p className="text-sm md:text-base text-gray-800 font-bold max-w-xl bg-white p-4 border-4 border-black shadow-[4px_4px_0_#00f0ff] rounded-xl transform -rotate-1">
-                    Manage your elite formation. Invite collaborators and synchronize your innovation protocols.
+                    Manage your team. Invite members to join your group.
                  </p>
             </div>
             
@@ -97,11 +148,11 @@ export default function TeamPage() {
                     <div className="absolute top-0 right-0 p-4 opacity-20 group-hover:rotate-12 transition-transform duration-500">
                         <Users className="w-16 h-16 text-black" />
                     </div>
-                    <p className="text-xs font-bold text-black uppercase tracking-widest mb-1 relative z-10 bg-white inline-block px-2 py-1 border-2 border-black rounded-lg">Reporting Name</p>
+                    <p className="text-xs font-bold text-black uppercase tracking-widest mb-1 relative z-10 bg-white inline-block px-2 py-1 border-2 border-black rounded-lg">Team Name</p>
                     <p className="text-4xl font-comic text-white drop-shadow-[2px_2px_0_#000] leading-none uppercase mt-2 relative z-10">{team.teamName}</p>
                     <div className="flex items-center justify-end gap-2 mt-4 relative z-10">
                          <div className="w-3 h-3 rounded-full bg-green-500 border-2 border-black animate-pulse" />
-                         <span className="text-xs font-bold uppercase tracking-widest text-black">Active Cycle</span>
+                         <span className="text-xs font-bold uppercase tracking-widest text-black">Active Status</span>
                     </div>
                 </div>
             )}
@@ -113,7 +164,7 @@ export default function TeamPage() {
                 {/* Team Members List */}
                 <div className="lg:col-span-2 space-y-6">
                     <div className="flex items-center justify-between bg-white p-4 border-4 border-black shadow-[4px_4px_0_#000] rounded-2xl">
-                        <h3 className="text-xl font-comic text-black tracking-widest uppercase">Squad Personnel ({members.length}/4)</h3>
+                        <h3 className="text-xl font-comic text-black tracking-widest uppercase">Team Members ({members.length}/4)</h3>
                         <Users className="w-6 h-6 stroke-[3]" />
                     </div>
 
@@ -141,12 +192,28 @@ export default function TeamPage() {
                                         )}
                                     </div>
                                     
-                                    <div className="relative z-10 bg-white p-4 border-4 border-black rounded-xl shadow-[4px_4px_0_#000]">
-                                        <h4 className="font-comic text-black text-2xl uppercase tracking-wider leading-none mb-2 truncate">{member.full_name || "INITIATING..."}</h4>
-                                        <div className="flex items-center gap-2">
-                                            <div className="w-2.5 h-2.5 rounded-full bg-green-500 border-2 border-black animate-pulse" />
-                                            <p className="text-xs font-bold text-gray-700 tracking-widest uppercase">{member.usn || "NOT SET"}</p>
-                                        </div>
+                                    <div className="relative z-10 bg-white p-4 border-4 border-black rounded-xl shadow-[4px_4px_0_#000] w-full mt-auto">
+                                         <h4 className="font-comic text-black text-2xl uppercase tracking-wider leading-none mb-3 truncate">{member.full_name || "INITIATING..."}</h4>
+                                         
+                                         <div className="space-y-2">
+                                             <div className="flex items-center justify-between">
+                                                  <div className="flex items-center gap-2">
+                                                       <div className="w-2.5 h-2.5 rounded-full bg-green-500 border-2 border-black animate-pulse" />
+                                                       <p className="text-xs font-black text-gray-700 tracking-widest uppercase">{member.usn || "NOT SET"}</p>
+                                                  </div>
+                                                  <span className="text-[10px] font-black bg-black text-white px-2 py-0.5 rounded border border-white uppercase">{member.branch || "???"}</span>
+                                             </div>
+                                             
+                                             <div className="flex items-center justify-between border-t border-gray-100 pt-2">
+                                                  <div className="flex items-center gap-1.5 text-gray-500">
+                                                       <GraduationCap className="w-3.5 h-3.5" />
+                                                       <span className="text-[10px] font-bold uppercase">{member.year || "YEAR?"}</span>
+                                                  </div>
+                                                  {member.userId !== team.leaderId && (
+                                                       <span className="text-[10px] font-bold text-gray-400 uppercase italic">Active Team Member</span>
+                                                  )}
+                                             </div>
+                                         </div>
                                     </div>
                                 </motion.div>
                             );
@@ -154,14 +221,15 @@ export default function TeamPage() {
 
                         {/* Leave Action Card */}
                         <motion.div 
+                            onClick={handleLeaveTeam}
                             className="p-6 rounded-3xl border-4 border-black bg-white flex flex-col justify-between h-[180px] group cursor-pointer hover:bg-red-400 transition-colors relative overflow-hidden shrink-0 shadow-[6px_6px_0_#000] hover:-translate-y-2 hover:shadow-[10px_10px_0_#000]"
                         >
                             <div className="w-14 h-14 bg-red-400 border-4 border-black rounded-2xl flex items-center justify-center text-black shadow-[4px_4px_0_#000] group-hover:bg-white transition-colors mb-4 relative z-10">
                                 <ShieldOff className="w-8 h-8 stroke-[3]" />
                             </div>
                             <div className="relative z-10 bg-black p-4 rounded-xl text-white transform group-hover:rotate-1 transition-transform">
-                                <h4 className="font-comic text-2xl uppercase tracking-wider leading-none mb-1">Disconnect</h4>
-                                <p className="text-[10px] font-bold text-gray-300 tracking-widest uppercase">Exit Combat Unit</p>
+                                <h4 className="font-comic text-2xl uppercase tracking-wider leading-none mb-1">Leave Team</h4>
+                                <p className="text-[10px] font-bold text-gray-300 tracking-widest uppercase">Remove yourself</p>
                             </div>
                         </motion.div>
                     </div>
@@ -172,8 +240,8 @@ export default function TeamPage() {
                                 <ShieldAlert className="w-8 h-8 text-black stroke-[3]" />
                             </div>
                             <div className="text-center sm:text-left bg-white p-4 border-4 border-black rounded-xl">
-                                <h4 className="font-comic text-2xl mb-2 tracking-wider uppercase text-black">MINIMUM SQUAD BREACH</h4>
-                                <p className="font-bold text-sm text-gray-800">HackVeda standards require exactly MAX **2 to 4 members** for deployment eligibility. Your formation is currently incomplete.</p>
+                                <h4 className="font-comic text-2xl mb-2 tracking-wider uppercase text-black">INCOMPLETE TEAM</h4>
+                                <p className="font-bold text-sm text-gray-800">HackVeda requires teams to have 2 to 4 members to participate. Your team is currently incomplete.</p>
                             </div>
                          </div>
                     )}
@@ -204,22 +272,68 @@ export default function TeamPage() {
                             </div>
                         ) : (
                             <div className="space-y-6 relative z-10 w-full">
+                                {/* Option 1: Add by USN (Direct) */}
+                                {team.leaderId === user?.uid && (
+                                    <form onSubmit={handleAddTeammate} className="bg-white p-6 border-4 border-black rounded-2xl shadow-[6px_6px_0_#000] space-y-4">
+                                         <p className="text-xs font-black text-black uppercase tracking-widest bg-cyan-100 border-2 border-black inline-block px-2 py-1 rounded-lg">Add By Profile Code (USN)</p>
+                                         <div className="flex flex-col gap-3">
+                                            <input 
+                                                type="text"
+                                                value={inviteUSN}
+                                                onChange={(e) => setInviteUSN(e.target.value.toUpperCase())}
+                                                placeholder="ENTER USN (Ex: 4SO22CS001)"
+                                                className="w-full h-12 px-4 border-4 border-black rounded-xl font-comic text-lg uppercase outline-none focus:bg-yellow-50 transition-all shadow-[4px_4px_0_#000]"
+                                                required
+                                            />
+                                            <motion.button
+                                                whileTap={{ scale: 0.95 }}
+                                                type="submit"
+                                                disabled={inviting}
+                                                className="w-full h-12 bg-pink-400 border-4 border-black rounded-xl font-comic text-xl uppercase tracking-widest shadow-[4px_4px_0_#000] hover:translate-y-1 hover:shadow-none transition-all flex items-center justify-center gap-2"
+                                            >
+                                                {inviting ? <Loader2 className="w-5 h-5 animate-spin" /> : <>ADD TO TEAM <UserPlus className="w-5 h-5 stroke-[3]" /></>}
+                                            </motion.button>
+                                         </div>
+                                    </form>
+                                )}
+
                                 <div className="p-4 sm:p-6 bg-white border-4 border-black rounded-2xl shadow-[6px_6px_0_#000] relative group/code cursor-pointer overflow-hidden transform -rotate-1 hover:rotate-0 transition-transform" onClick={handleCopy}>
-                                    <p className="text-xs font-bold text-black uppercase tracking-widest mb-4 bg-cyan-300 border-2 border-black inline-block px-2 py-1 rounded-lg">Invite Code</p>
+                                    <div className="absolute top-2 right-2 bg-cyan-400 text-black font-black text-[10px] px-2 py-1 rounded-lg border-2 border-black rotate-6 animate-pulse z-20 shadow-[2px_2px_0_#000]">CLICK TO COPY!</div>
+                                    <p className="text-xs font-bold text-black uppercase tracking-widest mb-4 bg-yellow-300 border-2 border-black inline-block px-2 py-1 rounded-lg mt-2">Share Team Code</p>
                                     <div className="flex items-center justify-between w-full">
                                         <span className="text-3xl sm:text-4xl font-comic text-black tracking-widest leading-none drop-shadow-[2px_2px_0_#ff007f]">{team.teamCode}</span>
                                         {copied ? <Check className="w-8 h-8 text-black stroke-[4] shrink-0 ml-2 animate-bounce" /> : <Copy className="w-8 h-8 text-black group-hover/code:scale-110 stroke-[3] transition-all shrink-0 ml-2" />}
                                     </div>
                                 </div>
                                 
-                                <motion.button 
+                                <div className="relative w-full">
+                                  <div className="absolute -top-3 -right-2 bg-pink-500 text-white font-black text-[10px] px-2 py-1 rounded-lg border-2 border-black rotate-12 animate-bounce z-20 shadow-[2px_2px_0_#000]">CLICK HERE!</div>
+                                  <motion.button 
                                   whileHover={{ scale: 1.02 }}
                                   whileTap={{ scale: 0.95, y: 4, boxShadow: "0 0 0 #000" }}
-                                  onClick={handleCopy}
-                                  className="w-full h-16 bg-yellow-400 text-black border-4 border-black rounded-2xl flex items-center justify-center gap-3 font-comic text-xl uppercase tracking-widest shadow-[8px_8px_0_#000] transition-all"
+                                  onClick={() => {
+                                      const text = `Hey! Join my team on HackVeda. Use this team code: ${team.teamCode}`;
+                                      if (navigator.share) {
+                                          navigator.share({
+                                              title: 'Join my HackVeda Team!',
+                                              text: text,
+                                              url: window.location.origin
+                                          });
+                                      } else {
+                                          handleCopy();
+                                      }
+                                  }}
+                                  className="w-full h-16 bg-yellow-400 text-black border-4 border-black rounded-2xl flex items-center justify-center gap-3 font-comic text-xl uppercase tracking-widest shadow-[8px_8px_0_#000] transition-all relative overflow-hidden"
                                 >
-                                    {copied ? "COPIED!" : <>COPY TEAM CODE <ArrowRight className="w-6 h-6 stroke-[3]" /></>}
-                                </motion.button>
+                                    <div className="absolute inset-0 opacity-10 pointer-events-none bg-[repeating-linear-gradient(45deg,transparent,transparent_10px,#000_10px,#000_20px)]" />
+                                    <span className="relative z-10 flex items-center gap-3">
+                                      {copied ? "COPIED!" : <>SHARE TEAM CODE <Zap className="w-6 h-6 stroke-[3] fill-black" /></>}
+                                    </span>
+                                  </motion.button>
+                                </div>
+                                <p className="text-[10px] font-black text-black/50 uppercase tracking-widest text-center mt-4">
+                                     Teammates must enter this code on their dashboard to join!
+                                </p>
                             </div>
                         )}
                     </div>
@@ -247,7 +361,7 @@ export default function TeamPage() {
                                  <span className="text-xs font-bold text-black uppercase tracking-widest">ELIGIBILITY</span>
                                  <div className={`flex items-center gap-2 px-3 py-1 border-2 border-black rounded-lg shadow-[2px_2px_0_#000] ${members.length >= 2 ? 'bg-indigo-400' : 'bg-red-400'}`}>
                                      <span className={`text-[10px] font-bold uppercase text-white tracking-widest`}>
-                                         {members.length >= 2 ? 'READY TO DEPLOY' : 'INCOMPLETE SQUAD'}
+                                         {members.length >= 2 ? 'READY TO DEPLOY' : 'INCOMPLETE TEAM'}
                                      </span>
                                  </div>
                              </div>

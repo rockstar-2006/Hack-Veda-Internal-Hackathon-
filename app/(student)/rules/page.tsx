@@ -73,7 +73,7 @@ export default function RulesPage() {
                    </div>
                 </div>
                 <p className="text-sm md:text-lg text-black bg-yellow-300 font-bold max-w-xl mx-auto md:mx-0 leading-relaxed p-4 border-4 border-black rounded-xl shadow-[4px_4px_0_#000] rotate-1">
-                   Read our official protocols carefully. Failure to comply with these guidelines may lead to immediate disqualification. NO EXCUSES!
+                   Read our official rules carefully. Failure to comply with these guidelines may lead to immediate disqualification. NO EXCUSES!
                 </p>
              </motion.div>
         </section>

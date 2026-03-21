@@ -180,7 +180,7 @@ export default function SubmissionPage() {
                     <div className="absolute top-0 right-0 p-4 opacity-20 group-hover:scale-110 transition-transform pointer-events-none">
                         <Users className="w-16 h-16 text-black" />
                     </div>
-                    <p className="text-xs font-bold text-black bg-white inline-block px-2 py-1 border-2 border-black rounded-lg uppercase tracking-widest mb-1 relative z-10">Your Squad</p>
+                    <p className="text-xs font-bold text-black bg-white inline-block px-2 py-1 border-2 border-black rounded-lg uppercase tracking-widest mb-1 relative z-10">Your Team</p>
                     <p className="text-3xl font-comic text-white drop-shadow-[2px_2px_0_#000] leading-none uppercase tracking-widest mt-2 relative z-10">{team.teamName}</p>
                     <div className="flex items-center justify-end gap-2 mt-4 relative z-10">
                          <div className={`w-3 h-3 rounded-full border-2 border-black ${isTeamSizeInvalid ? 'bg-red-500 animate-pulse' : 'bg-green-500'} shadow-[2px_2px_0_#000]`} />
@@ -239,6 +239,7 @@ export default function SubmissionPage() {
 
                 {!file ? (
                     <label htmlFor="pdf-upload" className={`cursor-pointer group/label block text-center relative z-10 ${isTeamSizeInvalid ? 'pointer-events-none' : ''}`}>
+                        <div className="absolute top-0 right-10 bg-pink-500 text-white font-black text-[12px] px-3 py-1.5 rounded-xl border-4 border-black rotate-12 animate-bounce z-30 shadow-[4px_4px_0_#000]">CLICK HERE!</div>
                         <div className="w-24 h-24 bg-pink-400 border-4 border-black rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-[8px_8px_0_#000] group-hover/label:-translate-y-2 group-hover/label:shadow-[12px_12px_0_#000] transition-all duration-300 relative transform rotate-2 group-hover/label:rotate-0">
                             <Cloud className="w-12 h-12 text-black stroke-[3]" />
                         </div>
@@ -314,7 +315,7 @@ export default function SubmissionPage() {
                     <div className="bg-white p-6 border-4 border-black rounded-2xl shadow-[6px_6px_0_#000] transform hover:-translate-y-2 transition-transform mt-8 md:mt-0">
                         <div className="text-cyan-400 font-comic text-5xl tracking-widest drop-shadow-[2px_2px_0_#000]">03.</div>
                         <p className="text-[10px] font-bold text-black uppercase tracking-widest leading-relaxed mt-2 bg-pink-300 p-2 border-2 border-black rounded">VERSION CONTROL</p>
-                        <p className="text-gray-800 font-medium text-xs mt-3">Only the final uploaded PDF protocol will be evaluated.</p>
+                        <p className="text-gray-800 font-medium text-xs mt-3">Only the final uploaded PDF document will be evaluated.</p>
                     </div>
                 </div>
             </div>

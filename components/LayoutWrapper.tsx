@@ -43,6 +43,28 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
   const [toast, setToast] = useState<{ message: string, type: ToastType } | null>(null);
   const [lastNotificationId, setLastNotificationId] = useState<string | null>(null);
   const [minLoadingComplete, setMinLoadingComplete] = useState(false);
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [showPwaBanner, setShowPwaBanner] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // PWA Handler
+  useEffect(() => {
+    const handler = (e: any) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+    window.addEventListener('beforeinstallprompt', handler);
+    return () => window.removeEventListener('beforeinstallprompt', handler);
+  }, []);
+
+  const handleInstallClick = async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+      setDeferredPrompt(null);
+    }
+  };
 
   // Minimum Loading Timer for visual impact
   useEffect(() => {
@@ -73,7 +95,7 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
         // Prevent showing on first load of the app or if already seen
         if (lastNotificationId && id !== lastNotificationId) {
             setToast({ 
-                message: `📢 NEW UPDATE: ${data.title}`, 
+                message: `ðŸ“¢ NEW UPDATE: ${data.title}`, 
                 type: "info" 
             });
         }
@@ -185,21 +207,21 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
 
       {/* Mobile Top Bar */}
       {showSidebar && (
-          <header className="lg:hidden fixed top-0 left-0 right-0 h-20 bg-white border-b-4 border-black z-[90] px-6 flex items-center justify-between shadow-[0px_4px_0_#000]">
+          <header className={`lg:hidden fixed top-0 left-0 right-0 h-20 border-b-4 border-black px-6 flex items-center justify-between shadow-[0px_4px_0_#000] transition-all duration-300 ${isSidebarOpen ? 'z-[20005] bg-pink-400' : 'z-[10002] bg-white'} pointer-events-auto`}>
                <div className="flex items-center gap-4">
                     <div className="bg-yellow-400 p-2.5 rounded-xl border-2 border-black shadow-[2px_2px_0_#000]">
                          <Zap className="w-5 h-5 text-black fill-black" />
                     </div>
-                    <span className="text-3xl font-comic text-black tracking-widest uppercase drop-shadow-[2px_2px_0_#00f0ff]">
+                    <span className={`text-3xl font-comic tracking-widest uppercase drop-shadow-[2px_2px_0_#00f0ff] ${isSidebarOpen ? 'text-white' : 'text-black'}`}>
                          HACKVEDA
                     </span>
                </div>
                <motion.button 
                  whileTap={{ scale: 0.9, y: 2, boxShadow: "0 0 0 #000" }}
-                 onClick={() => setIsSidebarOpen(true)}
-                 className="p-3 bg-pink-400 text-black border-2 border-black shadow-[2px_2px_0_#000] rounded-xl transition-all"
+                 onClick={() => setIsSidebarOpen(prev => !prev)}
+                 className={`p-3 border-2 border-black shadow-[2px_2px_0_#000] rounded-xl transition-all ${isSidebarOpen ? 'bg-white text-black' : 'bg-pink-400 text-black'} pointer-events-auto`}
                >
-                    <Menu className="w-6 h-6 stroke-[3]" />
+                    {isSidebarOpen ? <X className="w-6 h-6 stroke-[3]" /> : <Menu className="w-6 h-6 stroke-[3]" />}
                </motion.button>
           </header>
       )}
@@ -207,24 +229,24 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
       {/* Mobile Sidebar Overlay */}
       <AnimatePresence>
           {isSidebarOpen && (
-              <>
-                <motion.div 
-                   initial={{ opacity: 0 }}
-                   animate={{ opacity: 1 }}
-                   exit={{ opacity: 0 }}
-                   onClick={() => setIsSidebarOpen(false)}
-                   className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[110] lg:hidden"
-                />
-                <motion.aside 
-                   initial={{ x: "-100%" }}
-                   animate={{ x: 0 }}
-                   exit={{ x: "-100%" }}
-                   transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                   className="fixed top-0 left-0 bottom-0 w-[300px] bg-white border-r-4 border-black z-[120] lg:hidden shadow-[10px_0px_0_rgba(0,0,0,1)]"
-                >
-                   <Sidebar onClose={() => setIsSidebarOpen(false)} />
-                </motion.aside>
-              </>
+              <div className="fixed inset-0 z-[20000] lg:hidden pointer-events-auto">
+                  <motion.div 
+                     initial={{ opacity: 0 }}
+                     animate={{ opacity: 1 }}
+                     exit={{ opacity: 0 }}
+                     onClick={() => setIsSidebarOpen(false)}
+                     className="absolute inset-0 bg-black/80 backdrop-blur-md cursor-pointer pointer-events-auto"
+                  />
+                  <motion.aside 
+                     initial={{ x: "-100%" }}
+                     animate={{ x: 0 }}
+                     exit={{ x: "-100%" }}
+                     transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                     className="absolute top-0 left-0 bottom-0 w-[300px] bg-white border-r-4 border-black z-10 shadow-[20px_0px_0_rgba(0,0,0,0.5)] flex flex-col pointer-events-auto"
+                  >
+                     <Sidebar onClose={() => setIsSidebarOpen(false)} />
+                  </motion.aside>
+              </div>
           )}
       </AnimatePresence>
 
@@ -232,30 +254,27 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
 
       <main className={`min-h-screen w-full relative overflow-hidden bg-[#fdfdfd] border-black ${showSidebar ? (pathname !== "/login" ? 'pt-20 lg:pt-0 lg:border-l-8' : '') : ''}`}>
            {/* Navigation Transition Effect (ZAP!) */}
-           <AnimatePresence mode="wait">
-               <motion.div
-                  key={pathname + "-transition"}
-                  initial={{ opacity: 1, scale: 2 }}
-                  animate={{ opacity: 0, scale: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3, ease: "easeOut" }}
-                  className="fixed inset-0 z-[150] pointer-events-none flex items-center justify-center"
-               >
-                   <div className="absolute inset-0 bg-yellow-400 opacity-20" />
-                   {/* Speed lines on transition */}
-                   {[...Array(12)].map((_, i) => (
-                        <div 
-                            key={i} 
-                            className="absolute bg-black w-[200%] h-4" 
-                            style={{ 
-                                top: '50%', 
-                                left: '50%', 
-                                transform: `translate(-50%, -50%) rotate(${i * 30}deg)` 
-                            }} 
-                        />
-                   ))}
-               </motion.div>
-           </AnimatePresence>
+           <motion.div
+              key={pathname + "-transition"}
+              initial={{ opacity: 1, scale: 2 }}
+              animate={{ opacity: 0, scale: 1 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+              className="fixed inset-0 z-[150] pointer-events-none flex items-center justify-center"
+           >
+               <div className="absolute inset-0 bg-yellow-400 opacity-20" />
+               {/* Speed lines on transition */}
+               {[...Array(12)].map((_, i) => (
+                    <div 
+                        key={i} 
+                        className="absolute bg-black w-[200%] h-4" 
+                        style={{ 
+                            top: '50%', 
+                            left: '50%', 
+                            transform: `translate(-50%, -50%) rotate(${i * 30}deg)` 
+                        }} 
+                    />
+               ))}
+           </motion.div>
 
            {/* Global Animated Live Background Pattern */}
            <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden bg-white">
@@ -279,7 +298,7 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
 
                {/* Live Floating Comic Elements */}
                {showSidebar && (
-                 <>
+                  <div className="absolute inset-0 pointer-events-none select-none">
                    <motion.div
                      animate={{ y: [0, -40, 0], rotate: [0, 15, 0], scale: [1, 1.1, 1] }}
                      transition={{ repeat: Infinity, duration: 7, ease: "easeInOut" }}
@@ -327,22 +346,19 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
                    >
                        <div className="text-9xl font-comic text-pink-400 transform rotate-12 select-none drop-shadow-[4px_4px_0_#000]">ZAP!</div>
                    </motion.div>
-                 </>
+                  </div>
                )}
            </div>
            
            <div className="w-full relative z-10 px-4 sm:px-6 lg:px-12 py-12 max-w-[90rem] mx-auto min-h-screen">
-                <AnimatePresence mode="wait">
-                    <motion.div
-                        key={pathname}
-                        initial={{ opacity: 0, y: 10, rotate: -0.5 }}
-                        animate={{ opacity: 1, y: 0, rotate: 0 }}
-                        exit={{ opacity: 0, y: -10, rotate: 0.5 }}
-                        transition={{ duration: 0.3, ease: "backOut" }}
-                    >
-                        {children}
-                    </motion.div>
-                </AnimatePresence>
+                <motion.div
+                    key={pathname}
+                    initial={{ opacity: 0, y: 10, rotate: -0.5 }}
+                    animate={{ opacity: 1, y: 0, rotate: 0 }}
+                    transition={{ duration: 0.4, ease: "backOut" }}
+                >
+                    {children}
+                </motion.div>
            </div>
       </main>
 
@@ -369,6 +385,48 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full h-px bg-gradient-to-r from-transparent via-indigo-100 to-transparent" />
          </footer>
        )}
+
+      {/* Persistent PWA Install Banner */}
+      <AnimatePresence>
+        {deferredPrompt && showPwaBanner && !isAdmin && (
+           <motion.div 
+              initial={{ y: 100, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 100, opacity: 0 }}
+              className="fixed bottom-0 left-0 right-0 z-[50000] p-4 pointer-events-auto"
+           >
+               <div className="max-w-md mx-auto bg-black text-white p-4 rounded-3xl border-4 border-yellow-400 shadow-[0_-8px_20px_rgba(0,0,0,0.5)] flex items-center gap-4 relative isolate overflow-hidden">
+                   {/* Background rays */}
+                   <div className="absolute inset-0 z-0 opacity-20 bg-[repeating-conic-gradient(#fff_0_15deg,#000_15deg_30deg)] animate-spin-slow" />
+                   
+                   <div className="w-14 h-14 bg-yellow-400 rounded-2xl border-2 border-white flex items-center justify-center shrink-0 relative z-10 shadow-[4px_4px_0_#fff]">
+                       <Zap className="w-8 h-8 text-black fill-black" />
+                   </div>
+                   <div className="flex-1 relative z-10">
+                       <h4 className="font-comic text-xl uppercase tracking-widest text-yellow-400 leading-none drop-shadow-[2px_2px_0_#000]">INSTALL APP!</h4>
+                       <p className="text-[10px] font-bold tracking-widest uppercase mt-1">Faster access + notifications</p>
+                   </div>
+                   <div className="flex flex-col gap-2 relative z-10 shrink-0">
+                       <button 
+                         onClick={handleInstallClick}
+                         className="px-4 py-2 bg-pink-500 border-2 border-white rounded-xl font-comic text-sm uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-[2px_2px_0_#fff]"
+                       >
+                           INSTALL
+                       </button>
+                       <button 
+                          onClick={(e) => {
+                             e.stopPropagation();
+                             setShowPwaBanner(false);
+                          }}
+                          className="text-[10px] uppercase font-black tracking-widest text-gray-400 hover:text-white"
+                       >
+                           NOT NOW
+                       </button>
+                   </div>
+               </div>
+           </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Notifications */}
       <AnimatePresence>

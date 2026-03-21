@@ -1,0 +1,35 @@
+﻿      {showSidebar && (
+          <header className="lg:hidden fixed top-0 left-0 right-0 h-20 bg-white border-b-4 border-black z-[90] px-6 flex items-center justify-between shadow-[0px_4px_0_#000]">
+               <div className="flex items-center gap-4">
+                    <div className="bg-yellow-400 p-2.5 rounded-xl border-2 border-black shadow-[2px_2px_0_#000]">
+                         <Zap className="w-5 h-5 text-black fill-black" />
+                    </div>
+                    <span className="text-3xl font-comic text-black tracking-widest uppercase drop-shadow-[2px_2px_0_#00f0ff]">
+                         HACKVEDA
+                    </span>
+               </div>
+               <motion.button 
+                 whileTap={{ scale: 0.9, y: 2, boxShadow: "0 0 0 #000" }}
+                 onClick={() => setIsSidebarOpen(true)}
+                 className="p-3 bg-pink-400 text-black border-2 border-black shadow-[2px_2px_0_#000] rounded-xl transition-all"
+               >
+                    <Menu className="w-6 h-6 stroke-[3]" />
+               </motion.button>
+          </header>
+      )}
+
+      {/* Mobile Sidebar Overlay */}
+      <AnimatePresence>
+          {isSidebarOpen && (
+              <>
+                <motion.div 
+                   initial={{ opacity: 0 }}
+                   animate={{ opacity: 1 }}
+                   exit={{ opacity: 0 }}
+                   onClick={() => setIsSidebarOpen(false)}
+                   className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[110] lg:hidden"
+                />
+                <motion.aside 
+                   initial={{ x: "-100%" }}
+                   animate={{ x: 0 }}
+                   exit={{ x: "-100%" }}

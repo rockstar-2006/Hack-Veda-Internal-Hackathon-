@@ -68,7 +68,7 @@ export default function LeaderboardPage() {
                       <Search className="w-6 h-6 text-black stroke-[3]" />
                       <input 
                          type="text" 
-                         placeholder="FIND SQUAD..." 
+                         placeholder="FIND TEAM..." 
                          value={searchTerm}
                          onChange={(e) => setSearchTerm(e.target.value)}
                          className="flex-1 bg-transparent border-0 focus:outline-none focus:ring-0 text-lg font-comic tracking-widest uppercase placeholder:text-gray-400"
@@ -160,7 +160,7 @@ export default function LeaderboardPage() {
                                     <div className="flex items-center gap-4">
                                         <div className="flex items-center gap-2 bg-gray-100 border-2 border-black px-3 py-1 rounded-xl">
                                             <Users className="w-4 h-4 text-black" />
-                                            <span className="text-xs font-bold text-black uppercase tracking-widest">{t.memberIds.length} SQUAD MEMBERS</span>
+                                            <span className="text-xs font-bold text-black uppercase tracking-widest">{t.memberIds.length} TEAM MEMBERS</span>
                                         </div>
                                     </div>
                                 </div>
@@ -183,7 +183,7 @@ export default function LeaderboardPage() {
                         className="text-center py-40 bg-white border-4 border-black rounded-3xl shadow-[12px_12px_0_#000]"
                     >
                          <Search className="w-32 h-32 text-gray-200 mx-auto mb-8 animate-bounce" />
-                         <p className="text-4xl font-comic text-black uppercase tracking-widest drop-shadow-[2px_2px_0_#fff]">NO MATCHING SQUADS FOUND!</p>
+                         <p className="text-4xl font-comic text-black uppercase tracking-widest drop-shadow-[2px_2px_0_#fff]">NO MATCHING TEAMS FOUND!</p>
                          <button onClick={() => setSearchTerm("")} className="mt-8 bg-yellow-400 text-black border-4 border-black px-8 py-3 rounded-xl font-comic text-xl uppercase tracking-widest shadow-[6px_6px_0_#000] hover:translate-y-1 hover:shadow-none transition-all">CLEAR SCAN</button>
                     </motion.div>
                  )}

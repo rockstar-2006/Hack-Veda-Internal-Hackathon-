@@ -67,7 +67,7 @@ export default function AdminLoginPage() {
                 <ShieldCheck className="w-10 h-10 text-white" />
             </div>
             <h1 className="text-5xl font-black text-gray-900 italic tracking-tighter uppercase leading-none mb-4">Admin Vault.</h1>
-            <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.5em] italic">Authorized Personnel Only</p>
+            <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.5em] italic">Authorized Admins Only</p>
         </div>
 
         {error && (

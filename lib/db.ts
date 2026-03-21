@@ -9,6 +9,8 @@ import {
   serverTimestamp, 
   DocumentReference,
   arrayUnion,
+  arrayRemove,
+  deleteDoc,
   getDoc,
   orderBy,
   limit
@@ -19,6 +21,12 @@ import { Team, Submission, Announcement } from "@/types";
 
 // Team Operations
 export const createTeam = async (userId: string, teamName: string) => {
+  // Check if user is already in a team
+  const existingTeam = await getMyTeam(userId);
+  if (existingTeam) {
+    throw new Error("You are already part of a team!");
+  }
+
   const teamCode = generateCode();
 
   const teamData: Omit<Team, "id"> = {
@@ -37,6 +45,12 @@ export const createTeam = async (userId: string, teamName: string) => {
 };
 
 export const joinTeam = async (teamCode: string, userId: string) => {
+  // Check if user is already in a team
+  const existingTeam = await getMyTeam(userId);
+  if (existingTeam) {
+    throw new Error("You are already part of a team!");
+  }
+
   const q = query(
     collection(db, "teams"), 
     where("teamCode", "==", teamCode.toUpperCase()),
@@ -52,12 +66,7 @@ export const joinTeam = async (teamCode: string, userId: string) => {
   const teamDoc = snapshot.docs[0];
   const data = teamDoc.data() as Team;
 
-  // Check if user is already in team
-  if (data.memberIds.includes(userId)) {
-    throw new Error("Already a member of this team.");
-  }
-  
-  // Max members check (standard hackathon usually 4-5)
+  // Max members check
   if (data.memberIds.length >= 5) {
       throw new Error("Team is already full (max 5 members).");
   }
@@ -67,6 +76,65 @@ export const joinTeam = async (teamCode: string, userId: string) => {
   });
 
   return { id: teamDoc.id, ...data, memberIds: [...data.memberIds, userId] };
+};
+
+export const addTeammateByUSN = async (teamId: string, usn: string) => {
+  // 1. Find user by USN
+  const uq = query(collection(db, "users"), where("usn", "==", usn.toUpperCase()));
+  const usnap = await getDocs(uq);
+  
+  if (usnap.empty) {
+    throw new Error("Student with this USN not found. Ask them to setup their profile first!");
+  }
+
+  const userData = usnap.docs[0].data();
+  const targetUserId = usnap.docs[0].id; // The document ID is the userId in our system
+
+  // 2. Check current team size
+  const teamRef = doc(db, "teams", teamId);
+  const teamSnap = await getDoc(teamRef);
+  if (!teamSnap.exists()) throw new Error("Team not found.");
+  
+  const teamData = teamSnap.data() as Team;
+  if (teamData.memberIds.length >= 5) {
+      throw new Error("Team is already full (max 5 members).");
+  }
+
+  // 3. Check if user already in any team
+  const tq = query(collection(db, "teams"), where("memberIds", "array-contains", targetUserId), where("archived", "==", false));
+  const tsnap = await getDocs(tq);
+  if (!tsnap.empty) {
+    throw new Error("This student is already in a team!");
+  }
+
+  // 4. Add to our team
+  await updateDoc(teamRef, {
+    memberIds: arrayUnion(targetUserId)
+  });
+
+  return userData;
+};
+
+export const leaveTeam = async (teamId: string, userId: string) => {
+    const teamRef = doc(db, "teams", teamId);
+    const teamSnap = await getDoc(teamRef);
+    if (!teamSnap.exists()) throw new Error("Team not found.");
+    
+    const team = teamSnap.data() as Team;
+    
+    // If the leader leaves, or it's the last member, we dissolve the team softly to bypass strict Firebase delete rules
+    if (team.leaderId === userId || team.memberIds.length === 1) {
+        await updateDoc(teamRef, {
+            archived: true,
+            memberIds: arrayRemove(userId)
+        });
+        return { deleted: true };
+    } else {
+        await updateDoc(teamRef, {
+            memberIds: arrayRemove(userId)
+        });
+        return { deleted: false };
+    }
 };
 
 // Submission Operations

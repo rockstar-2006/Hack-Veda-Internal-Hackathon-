@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
-import { getMyTeam, createTeam, joinTeam, getUserProfile, updateUserProfile, getAnnouncements, updateTeamName } from "@/lib/db";
+import { useTeam } from "@/hooks/useTeam";
+import { createTeam, joinTeam, getUserProfile, updateUserProfile, getAnnouncements, updateTeamName } from "@/lib/db";
 import { Team, UserProfile, Announcement } from "@/types";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { 
@@ -14,6 +16,7 @@ import {
   ArrowRight, 
   UserPlus, 
   Key, 
+  Copy,
   Info, 
   Calendar, 
   MessageSquare, 
@@ -32,14 +35,16 @@ import {
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Countdown } from "@/components/Countdown";
+import { Toast, ToastType } from "@/components/Toast";
 import dynamic from "next/dynamic";
 
 // Dynamic import for Lottie to avoid SSR issues
 const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
 
 export default function ProfilePage() {
+  const router = useRouter();
   const { user } = useAuth();
-  const [team, setTeam] = useState<Team | null>(null);
+  const { team, loading: teamLoading } = useTeam();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [loading, setLoading] = useState(true);
@@ -63,16 +68,11 @@ export default function ProfilePage() {
     if (user) {
       setLoading(true);
       try {
-        const [teamData, profileData, annData] = await Promise.all([
-            getMyTeam(user.uid),
+        const [profileData, annData] = await Promise.all([
             getUserProfile(user.uid),
             getAnnouncements()
         ]);
         
-        if (teamData) {
-            setTeam(teamData);
-            setCurrentTeamName(teamData.teamName);
-        }
         if (annData) setAnnouncements(annData);
         if (profileData) {
             setProfile(profileData);
@@ -95,6 +95,12 @@ export default function ProfilePage() {
   useEffect(() => {
     fetchData();
   }, [user]);
+
+  useEffect(() => {
+    if (team) {
+       setCurrentTeamName(team.teamName);
+    }
+  }, [team]);
 
   const handleProfileUpdate = async (e: React.FormEvent) => {
       e.preventDefault();
@@ -119,9 +125,6 @@ export default function ProfilePage() {
           await Promise.all(promises);
 
           setProfile({ userId: user.uid, email: user.email, role: "student", full_name: fullName, usn, branch, year });
-          if (team && team.leaderId === user.uid) {
-              setTeam({ ...team, teamName: currentTeamName });
-          }
           setShowSetup(false);
       } catch (err: any) {
           setError("Failed to update settings. " + err.message);
@@ -130,16 +133,22 @@ export default function ProfilePage() {
       }
   };
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [toast, setToast] = useState<{ message: string, type: ToastType } | null>(null);
+
   const handleCreateTeam = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!teamName.trim()) return;
     setError("");
+    setIsSubmitting(true);
     try {
-      const newTeam = await createTeam(user!.uid, teamName);
-      setTeam(newTeam);
+      await createTeam(user!.uid, teamName);
       setIsCreating(false);
+      setToast({ message: "TEAM CREATED SUCCESSFULLY!", type: "success" });
     } catch (err: any) {
         setError(err.message || "Something went wrong. Try again.");
+    } finally {
+        setIsSubmitting(false);
     }
   };
 
@@ -147,16 +156,19 @@ export default function ProfilePage() {
     e.preventDefault();
     if (!teamCode.trim()) return;
     setError("");
+    setIsSubmitting(true);
     try {
-      const joinedTeam = await joinTeam(teamCode, user!.uid);
-      setTeam(joinedTeam);
+      await joinTeam(teamCode, user!.uid);
       setIsJoining(false);
+      setToast({ message: "JOINED TEAM SUCCESSFULLY!", type: "success" });
     } catch (err: any) {
         setError(err.message || "Could not join team. Check the code.");
+    } finally {
+        setIsSubmitting(false);
     }
   };
   
-  if (loading) return null;
+  if (loading || teamLoading) return null;
 
   if (showSetup) {
       return (
@@ -185,10 +197,12 @@ export default function ProfilePage() {
                                    <h2 className="text-4xl md:text-5xl font-comic text-white drop-shadow-[2px_2px_0_#000] tracking-wider uppercase">UPDATE PROFILE!</h2>
                               </div>
                               <button 
+                                type="button"
                                 onClick={() => setShowSetup(false)}
-                                className="p-3 bg-white border-4 border-black rounded-2xl shadow-[4px_4px_0_#000] hover:bg-red-500 hover:text-white transition-all transform hover:rotate-6"
+                                className="flex items-center gap-2 px-4 py-2 md:py-3 bg-red-400 border-4 border-black rounded-2xl shadow-[4px_4px_0_#000] hover:bg-red-500 text-black transition-all transform hover:-translate-y-1 hover:shadow-[6px_6px_0_#000]"
                               >
-                                  <X className="w-8 h-8 stroke-[4]" />
+                                  <span className="font-comic text-xl tracking-widest uppercase">CLOSE</span>
+                                  <X className="w-6 h-6 stroke-[4]" />
                               </button>
                          </div>
 
@@ -298,16 +312,19 @@ export default function ProfilePage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-20 min-h-screen font-sans">
         
         {/* Floating Profile Settings Button */}
-        <div className="fixed bottom-8 right-8 z-[100] md:top-24 md:bottom-auto">
+        <div className="fixed bottom-8 right-8 z-[1000] pointer-events-auto">
              <motion.button 
                whileHover={{ scale: 1.1, rotate: 180 }}
                whileTap={{ scale: 0.9, rotate: -45 }}
-               onClick={() => setShowSetup(true)}
-               className="group p-4 bg-cyan-100 border-4 border-black text-black rounded-3xl shadow-[6px_6px_0_#000] hover:shadow-[0_0_20px_rgba(34,211,238,0.4)] transition-all flex items-center justify-center relative"
+               onClick={() => {
+                   console.log("Settings clicked!");
+                   setShowSetup(true);
+               }}
+               className="group p-4 bg-cyan-100 border-4 border-black text-black rounded-3xl shadow-[6px_6px_0_#000] hover:shadow-[0_0_20px_rgba(34,211,238,0.4)] transition-all flex items-center justify-center relative active:translate-y-1 active:shadow-none"
              >
                  <Settings className="w-8 h-8 md:w-10 md:h-10 group-active:animate-spin" />
-                 <div className="absolute -top-10 right-0 bg-black text-white text-[10px] font-black px-2 py-1 rounded border-2 border-white opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                      SETUP PROFILE
+                 <div className="absolute -top-12 right-0 bg-black text-white text-[10px] font-black px-3 py-1.5 rounded-lg border-2 border-white opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap shadow-[4px_4px_0_#000]">
+                      SETUP PROFILE (CLICK!)
                  </div>
              </motion.button>
         </div>
@@ -332,15 +349,92 @@ export default function ProfilePage() {
                     </span>
                   </h1>
                  
-                 <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4">
-                      <motion.div whileHover={{ y: -4 }} className="px-5 py-3 bg-purple-400 border-4 border-black text-black font-bold uppercase tracking-wider text-xs md:text-sm rounded-xl shadow-[4px_4px_0_#000] flex items-center gap-2">
-                           <Users className="w-5 h-5" />
-                           {team?.teamName || "JOIN A TEAM"}
-                      </motion.div>
-                      <motion.div whileHover={{ y: -4 }} className="bg-white border-4 border-black px-5 py-3 rounded-xl font-bold uppercase tracking-wider text-xs md:text-sm flex items-center gap-2 text-black shadow-[4px_4px_0_#000]">
-                           <div className="w-3 h-3 rounded-full bg-green-500 border-2 border-black animate-pulse" />
-                           {profile?.usn || "NO USN"}
-                      </motion.div>
+                  <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4">
+                       <motion.div whileHover={{ y: -4 }} className="px-5 py-3 bg-purple-400 border-4 border-black text-black font-bold uppercase tracking-wider text-xs md:text-sm rounded-xl shadow-[4px_4px_0_#000] flex items-center gap-2">
+                            <Users className="w-5 h-5" />
+                            {team?.teamName || "READY TO JOIN?"}
+                       </motion.div>
+                       
+                       {profile?.usn && (
+                           <motion.div 
+                             initial={{ opacity: 0, scale: 0.8 }}
+                             animate={{ opacity: 1, scale: 1 }}
+                             className="flex flex-col gap-2"
+                           >
+                                <motion.div 
+                                    whileHover={{ scale: 1.02 }}
+                                    whileTap={{ scale: 0.98 }}
+                                    className="flex items-center gap-3 bg-white border-4 border-black p-2 pr-6 rounded-2xl shadow-[6px_6px_0_#000] group cursor-pointer relative overflow-hidden"
+                                    onClick={() => {
+                                        if (profile?.usn) {
+                                            navigator.clipboard.writeText(profile.usn);
+                                            alert("PROFILE CODE COPIED!");
+                                        }
+                                    }}
+                                >
+                                    <div className="absolute inset-0 bg-cyan-400/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                    <div className="bg-cyan-400 p-3 rounded-xl border-4 border-black shadow-[3px_3px_0_#000] relative z-10">
+                                         <Key className="w-5 h-5 text-black" />
+                                    </div>
+                                    <div className="flex flex-col relative z-10">
+                                         <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest leading-none mb-1">YOUR PROFILE CODE (USN)</span>
+                                         <span className="text-xl font-comic text-black uppercase tracking-widest">{profile.usn}</span>
+                                    </div>
+                                    <div className="flex flex-col items-center gap-1 ml-4 border-l-2 border-gray-100 pl-4 relative z-10">
+                                         <Copy className="w-5 h-5 text-gray-400 group-hover:text-black group-hover:scale-110 transition-all" />
+                                         <span className="text-[8px] font-black text-gray-400 group-hover:text-black uppercase">COPY!</span>
+                                    </div>
+                                </motion.div>
+                                <p className="text-[10px] font-black text-pink-500 uppercase tracking-[0.2em] px-2 animate-pulse">
+                                    Send this code to your Leader to get added! 🚀
+                                </p>
+                           </motion.div>
+                       )}
+                  </div>
+
+                 {/* Team Code & Action Buttons */}
+                 <div className="flex flex-col items-center lg:items-start gap-6 mt-8">
+                     {team ? (
+                         <motion.div 
+                           initial={{ opacity: 0, y: 20 }}
+                           animate={{ opacity: 1, y: 0 }}
+                           className="inline-flex items-center gap-4 bg-black p-4 rounded-2xl border-4 border-black shadow-[6px_6px_0_#ff007f]"
+                         >
+                              <div className="flex flex-col text-left">
+                                   <span className="text-[10px] font-black text-pink-400 uppercase tracking-widest">YOUR TEAM CODE</span>
+                                   <span className="text-2xl font-comic text-white tracking-[0.2em] leading-none mt-1">{team.teamCode || "------"}</span>
+                              </div>
+                              <button 
+                                onClick={() => {
+                                   navigator.clipboard.writeText(team.teamCode || "");
+                                   alert("TEAM CODE COPIED! GIVE THIS TO YOUR FRIENDS TO INVITE THEM!");
+                                }}
+                                className="p-3 bg-yellow-400 border-2 border-black rounded-xl hover:scale-110 active:scale-95 transition-all shadow-[2px_2px_0_#000]"
+                                title="Copy Team Code"
+                              >
+                                   <Key className="w-5 h-5 text-black stroke-[3]" />
+                               </button>
+                         </motion.div>
+                     ) : (
+                         <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4">
+                              <motion.button 
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                onClick={() => setIsCreating(true)}
+                                className="px-6 py-4 bg-pink-400 border-4 border-black text-black font-comic text-xl uppercase tracking-widest rounded-2xl shadow-[6px_6px_0_#000] flex items-center gap-2 transition-all"
+                              >
+                                   <Plus className="w-6 h-6 stroke-[3]" /> CREATE TEAM!
+                              </motion.button>
+                              <motion.button 
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                onClick={() => setIsJoining(true)}
+                                className="px-6 py-4 bg-cyan-400 border-4 border-black text-black font-comic text-xl uppercase tracking-widest rounded-2xl shadow-[6px_6px_0_#000] flex items-center gap-2 transition-all"
+                              >
+                                   <UserPlus className="w-6 h-6 stroke-[3]" /> JOIN TEAM
+                              </motion.button>
+                         </div>
+                     )}
                  </div>
             </div>
 
@@ -367,36 +461,34 @@ export default function ProfilePage() {
                 { label: 'SCHEDULE', desc: 'Full Program', href: '/schedule', icon: Calendar, color: 'bg-pink-400' },
                 { label: 'PRIZES', desc: 'Winning Gifts', href: '/prizes', icon: Trophy, color: 'bg-purple-400' }
             ].map((box, i) => (
-                <Link 
+                <motion.div
                     key={i} 
-                    href={box.href}
-                >
-                    <motion.div
-                      whileHover={{ 
+                    onClick={() => router.push(box.href)}
+                    className="group cursor-pointer p-6 md:p-8 rounded-3xl border-4 border-black shadow-[8px_8px_0px_rgba(0,0,0,1)] flex flex-col justify-between min-h-[180px] md:min-h-[200px] bg-white relative overflow-hidden transition-colors duration-200 hover:bg-black"
+                    whileHover={{ 
                         scale: 1.05, 
                         rotate: i % 2 === 0 ? 1 : -1,
                         x: [0, -1, 1, -1, 1, 0],
                         y: [0, 1, -1, 1, -1, 0]
-                      }}
-                      whileTap={{ scale: 0.95 }}
-                      transition={{ 
+                    }}
+                    whileTap={{ scale: 0.95 }}
+                    transition={{ 
                         x: { repeat: Infinity, duration: 0.1 },
                         y: { repeat: Infinity, duration: 0.1 },
                         scale: { type: "spring", stiffness: 400, damping: 10 }
-                      }}
-                      className={`p-6 md:p-8 rounded-3xl border-4 border-black shadow-[8px_8px_0px_rgba(0,0,0,1)] flex flex-col justify-between min-h-[180px] md:min-h-[200px] bg-white relative overflow-hidden group hover:bg-black group transition-colors duration-200`}
-                    >
+                    }}
+                >
                         <div className={`w-14 h-14 md:w-16 md:h-16 rounded-2xl border-4 border-black flex items-center justify-center mb-4 transition-all duration-300 shadow-[4px_4px_0_#000] ${box.color}`}>
                             <box.icon className="w-8 h-8 md:w-10 md:h-10 text-black stroke-[2.5]" />
                         </div>
-                        <div className="relative z-10 transition-colors">
+                        <div className="relative z-10">
                             <h4 className="text-2xl md:text-3xl font-comic tracking-widest uppercase mb-1 text-black group-hover:text-white transition-colors">{box.label}</h4>
                             <p className="text-xs md:text-sm font-bold text-gray-700 uppercase tracking-widest group-hover:text-gray-300 transition-colors">{box.desc}</p>
                         </div>
 
                         {/* Animated "CLICK HERE" Peek-a-boo */}
-                        <div className="absolute top-4 right-4 bg-pink-500 text-white font-black text-[10px] px-2 py-1 rounded border-2 border-black -rotate-12 group-hover:block transition-all transform group-hover:scale-125 opacity-0 group-hover:opacity-100 z-20">
-                             CLICK!
+                        <div className="absolute top-4 right-4 bg-pink-500 text-white font-black text-[11px] px-3 py-1.5 rounded-lg border-2 border-black -rotate-12 transition-all transform group-hover:scale-125 z-20 shadow-[2px_2px_0_#000] animate-bounce">
+                             CLICK HERE!
                         </div>
 
                         {/* Halftone hover effect */}
@@ -404,8 +496,7 @@ export default function ProfilePage() {
                         <div className="absolute right-6 bottom-6 opacity-0 group-hover:opacity-100 group-hover:translate-x-2 transition-all duration-300 z-10">
                             <ArrowRight className="w-8 h-8 text-white stroke-[3]" />
                         </div>
-                    </motion.div>
-                </Link>
+                </motion.div>
             ))}
         </section>
 
@@ -472,7 +563,12 @@ export default function ProfilePage() {
                          <h3 className="text-4xl md:text-5xl font-comic text-black mb-2 tracking-wider drop-shadow-[2px_2px_0_#00f0ff] uppercase relative z-10">
                             {isCreating ? "CREATE TEAM!" : "JOIN PROJECT!"}
                          </h3>
-                         <p className="text-sm md:text-base font-bold text-gray-600 mb-8 relative z-10">{isCreating ? "PICK A GREAT TEAM NAME" : "ENTER YOUR TEAM CODE"}</p>
+                         <p className="text-sm md:text-base font-bold text-gray-600 mb-8 relative z-10">
+                            {isCreating ? "PICK A GREAT TEAM NAME" : "ENTER YOUR TEAM CODE"}
+                            <span className="block text-[10px] text-gray-400 mt-1 italic">
+                                {!isCreating && "Ask your team leader for the code!"}
+                            </span>
+                         </p>
                          
                          <form onSubmit={isCreating ? handleCreateTeam : handleJoinTeam} className="space-y-6 relative z-10">
                               <div className="space-y-2">
@@ -481,7 +577,7 @@ export default function ProfilePage() {
                                     type="text" 
                                     value={isCreating ? teamName : teamCode}
                                     onChange={(e) => isCreating ? setTeamName(e.target.value) : setTeamCode(e.target.value.toUpperCase())}
-                                    placeholder={isCreating ? "e.g. SQUAD_ALPHA" : "e.g. 000000"}
+                                    placeholder={isCreating ? "e.g. TEAM_ALPHA" : "e.g. 000000"}
                                     className="w-full h-16 px-6 rounded-2xl bg-white border-4 border-black outline-none font-comic text-2xl uppercase transition-all shadow-[6px_6px_0_#000] focus:shadow-[0_0_0_#000] focus:translate-y-1"
                                     required
                                   />
@@ -490,9 +586,16 @@ export default function ProfilePage() {
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.95, y: 4, boxShadow: "0 0 0 #000" }}
                                 type="submit" 
-                                className="w-full h-16 rounded-2xl bg-yellow-400 text-black border-4 border-black font-comic text-2xl tracking-widest uppercase shadow-[8px_8px_0_#000] transition-all flex items-center justify-center gap-2"
+                                disabled={isSubmitting}
+                                className="w-full h-16 rounded-2xl bg-yellow-400 text-black border-4 border-black font-custom text-2xl tracking-widest uppercase shadow-[8px_8px_0_#000] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                               >
-                                   {isCreating ? "CREATE" : "JOIN"} <Zap className="w-6 h-6 fill-black stroke-[2]" />
+                                   {isSubmitting ? (
+                                       <Loader2 className="w-8 h-8 animate-spin" />
+                                   ) : (
+                                       <>
+                                           {isCreating ? "CREATE" : "JOIN"} <Zap className="w-6 h-6 fill-black stroke-[2]" />
+                                       </>
+                                   )}
                               </motion.button>
                          </form>
                     </motion.div>
@@ -500,6 +603,15 @@ export default function ProfilePage() {
             )}
         </AnimatePresence>
 
+        <AnimatePresence>
+            {toast && (
+                <Toast 
+                    message={toast.message} 
+                    type={toast.type} 
+                    onClose={() => setToast(null)} 
+                />
+            )}
+        </AnimatePresence>
       </div>
     </ProtectedRoute>
   );
