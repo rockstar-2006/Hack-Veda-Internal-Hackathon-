@@ -73,16 +73,15 @@ body {
 button, 
 a,
 [role="button"] {
-  touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
   cursor: pointer;
-  -webkit-user-select: none;
-  user-select: none;
 }
 
 /* Prevent decorative fixed background from stealing touch events */
-.bg-decoration-layer {
+.bg-decoration-layer,
+#live-background-container {
   pointer-events: none !important;
+  user-select: none !important;
 }
 
 .font-comic {

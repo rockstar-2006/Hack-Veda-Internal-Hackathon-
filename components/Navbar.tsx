@@ -18,7 +18,7 @@ export const Navbar = () => {
                 <Zap className="w-4 h-4 md:w-5 md:h-5 text-black fill-black" />
               </div>
               <span className="text-2xl md:text-3xl font-comic text-black tracking-widest drop-shadow-[2px_2px_0_#00f0ff] uppercase">
-                HackVeda
+                Hack-o-Veda
               </span>
             </Link>
 

@@ -15,9 +15,9 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "HackVeda 2026 | SMVITM",
-  description: "Official Hackathon Portal for SODE. Design. Build. Lead.",
-  keywords: ["hackveda", "hackathon", "SODE", "college", "competition", "coding"],
+  title: "Hack-o-Veda 2026 | SMVITM",
+  description: "Official Hack-o-Veda Portal. Design. Build. Lead.",
+  keywords: ["hack-o-veda", "hackathon", "SMVITM", "college", "competition", "coding"],
 };
 
 export default function RootLayout({
@@ -39,16 +39,26 @@ export default function RootLayout({
             dangerouslySetInnerHTML={{
               __html: `
                 if ('serviceWorker' in navigator) {
+                  // EMERGENCY CLEANUP: Unregister Service Worker if it exists to fix full-page reloads on localhost
+                  if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                      for(let registration of registrations) {
+                        registration.unregister();
+                      }
+                    });
+                  }
+                  /* 
                   window.addEventListener('load', function() {
                     navigator.serviceWorker.register('/sw.js').then(
                       function(registration) {
-                        console.log('Service Worker registration successful with scope: ', registration.scope);
+                        if (registration.update) registration.update();
                       },
                       function(err) {
-                        console.log('Service Worker registration failed: ', err);
+                        // console.log('Service Worker registration failed: ', err);
                       }
                     );
                   });
+                  */
                 }
               `,
             }}

@@ -39,27 +39,16 @@ export const Sidebar = ({ onClose, announcementCount = 1 }: { onClose?: () => vo
   const { user } = useAuth();
   const router = useRouter();
   const [isAdmin, setIsAdmin] = useState(false);
-
-  const [installPrompt, setInstallPrompt] = useState<any>(null);
+  const [imgError, setImgError] = useState(false);
 
   useEffect(() => {
-    setIsAdmin(typeof window !== 'undefined' && localStorage.getItem('adminSession') === 'active');
-    
-    const handler = (e: any) => {
-      e.preventDefault();
-      setInstallPrompt(e);
+    const checkAdmin = () => {
+      setIsAdmin(typeof window !== 'undefined' && localStorage.getItem('adminSession') === 'active');
     };
-    
-    window.addEventListener('beforeinstallprompt', handler);
-    return () => window.removeEventListener('beforeinstallprompt', handler);
+    checkAdmin();
+    window.addEventListener('storage', checkAdmin);
+    return () => window.removeEventListener('storage', checkAdmin);
   }, []);
-
-  const handleInstall = async () => {
-    if (!installPrompt) return;
-    installPrompt.prompt();
-    const { outcome } = await installPrompt.userChoice;
-    if (outcome === 'accepted') setInstallPrompt(null);
-  };
 
   const isViewingAdmin = pathname.startsWith('/admin');
 
@@ -144,18 +133,6 @@ export const Sidebar = ({ onClose, announcementCount = 1 }: { onClose?: () => vo
                         );
                 })}
                 
-                {/* PWA Install Button */}
-                {installPrompt && (
-                   <motion.button 
-                     initial={{ scale: 0.8, opacity: 0 }}
-                     animate={{ scale: 1, opacity: 1 }}
-                     onClick={handleInstall}
-                     className="w-full flex items-center gap-4 px-4 py-4 rounded-2xl bg-black text-white border-4 border-black shadow-[4px_4px_0_#00f0ff] -translate-y-1 font-comic text-xl uppercase tracking-widest mt-8 sticky bottom-0"
-                   >
-                       <Zap className="w-6 h-6 fill-yellow-400 text-yellow-400" />
-                       INSTALL APP
-                   </motion.button>
-                )}
                </>
            ) : (
                  <>
@@ -195,14 +172,22 @@ export const Sidebar = ({ onClose, announcementCount = 1 }: { onClose?: () => vo
            <div className="bg-white p-4 rounded-2xl flex items-center justify-between border-4 border-black shadow-[4px_4px_0_#000] transition-all">
                 <div className="flex items-center gap-3 truncate">
                     <div className="w-12 h-12 rounded-xl bg-purple-400 border-4 border-black flex items-center justify-center text-black shrink-0 overflow-hidden">
-                        {user?.photoURL ? (
-                            <img src={user.photoURL} alt="Profile" className="w-full h-full object-cover" />
+                        {user?.photoURL && !imgError && typeof window !== 'undefined' && !sessionStorage.getItem('hackveda_img_fail') ? (
+                            <img 
+                                src={user.photoURL} 
+                                alt="Profile" 
+                                className="w-full h-full object-cover"
+                                onError={() => {
+                                    setImgError(true);
+                                    sessionStorage.setItem('hackveda_img_fail', 'true');
+                                }}
+                            />
                         ) : (
                             <User className="w-6 h-6 stroke-[3]" />
                         )}
                     </div>
                     <div className="flex flex-col truncate">
-                        <span className="text-sm font-comic text-black truncate uppercase tracking-widest leading-none mb-1">{isAdmin ? "HACKVEDA ADMIN" : (user?.displayName?.split(" ")[0] || "HERO")}</span>
+                        <span className="text-sm font-comic text-black truncate uppercase tracking-widest leading-none mb-1">{isAdmin ? "HACK-O-VEDA ADMIN" : (user?.displayName?.split(" ")[0] || "HERO")}</span>
                         <div className="flex items-center gap-2">
                              <div className="w-3 h-3 rounded-full bg-green-500 border-2 border-black animate-pulse" />
                              <span className="text-[10px] font-bold text-gray-600 truncate uppercase tracking-widest leading-none">ONLINE</span>

@@ -141,14 +141,30 @@ export default function SubmissionPage() {
     }
   };
 
-  if (loading) {
+  const [showLoader, setShowLoader] = useState(false);
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (loading) {
+      timer = setTimeout(() => setShowLoader(true), 400); 
+    } else {
+      setShowLoader(false);
+    }
+    return () => clearTimeout(timer);
+  }, [loading]);
+
+  if (loading && showLoader) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6">
-          <div className="relative">
+      <div className="flex flex-col items-center justify-center min-h-[75vh] gap-6 px-4">
+          <motion.div 
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="relative"
+          >
               <div className="w-24 h-24 border-8 border-black border-t-pink-500 rounded-full animate-spin shadow-[8px_8px_0_#000]" />
               <Zap className="absolute inset-0 m-auto w-10 h-10 text-black fill-yellow-400 animate-pulse" />
-          </div>
-          <p className="font-comic text-2xl tracking-[0.2em] text-black uppercase animate-bounce">Accessing Documentation Terminal...</p>
+          </motion.div>
+          <p className="font-comic text-2xl tracking-[0.2em] text-black uppercase animate-pulse text-center">Accessing Documentation Terminal...</p>
       </div>
     );
   }
