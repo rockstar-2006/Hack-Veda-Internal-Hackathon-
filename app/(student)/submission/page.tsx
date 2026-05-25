@@ -86,8 +86,8 @@ export default function SubmissionPage() {
     }
     
     // Team Size Validation
-    if (team.memberIds.length < 2 || team.memberIds.length > 4) {
-        setError(`Team Composition Invalid: Your team must have between 2 and 4 members to submit.`);
+    if (team.memberIds.length < 2 || team.memberIds.length > 5) {
+        setError(`Team Composition Invalid: Your team must have between 2 and 5 members to submit.`);
         return;
     }
 

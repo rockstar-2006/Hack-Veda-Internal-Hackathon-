@@ -13,7 +13,8 @@ import {
   deleteDoc,
   getDoc,
   orderBy,
-  limit
+  limit,
+  setDoc
 } from "firebase/firestore";
 import { db } from "./firebase";
 import { generateCode } from "@/utils/generateCode";
@@ -193,6 +194,18 @@ export const leaveTeam = async (teamId: string, userId: string) => {
 
 // Submission Operations
 export const submitIdea = async (teamId: string, fileUrl: string) => {
+  // Idempotency check: Only update if submission doesn't already exist OR if URL changed
+  const docRef = doc(db, "submissions", teamId);
+  const existingSnap = await withTimeout(getDoc(docRef), 8000);
+  
+  if (existingSnap.exists()) {
+    const existing = existingSnap.data() as Submission;
+    // If same URL already submitted, don't resubmit
+    if (existing.fileUrl === fileUrl) {
+      return { id: teamId, ...existing };
+    }
+  }
+
   const submissionData: Omit<Submission, "id"> = {
     teamId,
     fileUrl,
@@ -200,7 +213,6 @@ export const submitIdea = async (teamId: string, fileUrl: string) => {
   };
 
   // We use teamId as document ID to ensure only one submission per team
-  const docRef = doc(db, "submissions", teamId);
   await setDoc(docRef, submissionData);
   return { id: teamId, ...submissionData };
 };
@@ -297,7 +309,6 @@ export const updateTeamName = async (teamId: string, teamName: string) => {
 };
 
 // User Profile Operations
-import { setDoc } from "firebase/firestore";
 import { UserProfile } from "@/types";
 
 export const updateUserProfile = async (userId: string, data: Partial<UserProfile>) => {

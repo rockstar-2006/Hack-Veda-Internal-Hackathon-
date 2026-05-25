@@ -26,7 +26,8 @@ export const Navbar = () => {
                  {[
                      { label: 'Timeline', href: '/schedule' },
                      { label: 'Protocols', href: '/rules' },
-                     { label: 'Rewards', href: '/prizes' }
+                     { label: 'Rewards', href: '/prizes' },
+                     { label: 'About', href: '/about' }
                  ].map((link, i) => (
                     <Link 
                         key={i} 

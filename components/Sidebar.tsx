@@ -17,7 +17,8 @@ import {
   Search,
   X,
   Zap,
-  ShieldCheck
+  ShieldCheck,
+  Info
 } from "lucide-react";
 import { signOut as firebaseSignOut } from "@/lib/auth";
 import { useAuth } from "@/hooks/useAuth";
@@ -32,6 +33,7 @@ const NAV_ITEMS = [
   { label: "Schedule", icon: Calendar, href: "/schedule" },
   { label: "Rules", icon: ShieldQuestion, href: "/rules" },
   { label: "Prizes", icon: Award, href: "/prizes" },
+  { label: "About", icon: Info, href: "/about" },
 ];
 
 export const Sidebar = ({ onClose, announcementCount = 1 }: { onClose?: () => void, announcementCount?: number }) => {

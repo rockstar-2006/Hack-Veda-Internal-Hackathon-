@@ -1,10 +1,14 @@
 import { NextResponse } from 'next/server';
 import { getAdminDb } from '@/lib/firebase-admin';
+import { validateAdminSession } from '@/lib/adminAuthValidator';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
     try {
+        // Validate admin session from headers
+        validateAdminSession(request as any);
+        
         // Get pagination limit from URL params
         const { searchParams } = new URL(request.url);
         const limitParam = searchParams.get('limit');
@@ -36,6 +40,12 @@ export async function GET(request: Request) {
         return NextResponse.json(teams);
     } catch (error: any) {
         console.error("Admin Teams + Submission API Error:", error);
+        
+        // Return 401 for auth errors
+        if (error.message?.includes('session') || error.message?.includes('authentication')) {
+            return NextResponse.json({ error: error.message }, { status: 401 });
+        }
+        
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }

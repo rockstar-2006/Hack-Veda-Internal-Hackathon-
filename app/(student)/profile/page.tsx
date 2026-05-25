@@ -236,7 +236,7 @@ export default function ProfilePage() {
   if (showSetup) {
       return (
           <ProtectedRoute>
-              <div className="max-w-2xl mx-auto px-4 sm:px-6 py-10 lg:py-20 min-h-screen font-sans">
+              <div className="max-w-2xl mx-auto px-4 sm:px-6 py-6 lg:py-10 min-h-screen font-sans">
                   <motion.div 
                     initial={{ scale: 0.8, opacity: 0, rotate: -5 }}
                     animate={{ scale: 1, opacity: 1, rotate: 0 }}
@@ -275,7 +275,7 @@ export default function ProfilePage() {
                             </div>
                         )}
                         
-                        <form onSubmit={handleProfileUpdate} className="space-y-6 relative z-10 bg-white p-6 md:p-8 rounded-2xl border-4 border-black shadow-[6px_6px_0px_#000]">
+                        <form onSubmit={handleProfileUpdate} className="space-y-4 relative z-10 bg-white p-4 md:p-6 rounded-2xl border-4 border-black shadow-[6px_6px_0px_#000]">
                              {team && team.leaderId === user?.uid && (
                                 <div className="space-y-2">
                                     <label className="text-xs font-bold text-black uppercase tracking-widest pl-2 block">Team Name</label>
@@ -372,7 +372,7 @@ export default function ProfilePage() {
                                whileTap={{ scale: 0.95, y: 4, boxShadow: "0_0_0_#000" }}
                                type="submit" 
                                disabled={profileSaving}
-                               className="w-full h-14 rounded-xl bg-yellow-400 text-black border-4 border-black flex items-center justify-center gap-2 text-lg font-comic tracking-widest uppercase mt-6 shadow-[6px_6px_0px_#000] transition-all disabled:opacity-50"
+                               className="w-full h-14 rounded-xl bg-yellow-400 text-black border-4 border-black flex items-center justify-center gap-2 text-lg font-comic tracking-widest uppercase mt-4 shadow-[6px_6px_0px_#000] transition-all disabled:opacity-50"
                              >
                                  {profileSaving ? <Loader2 className="w-6 h-6 animate-spin" /> : "Save Profile & Finish!"}
                              </motion.button>
@@ -401,7 +401,7 @@ export default function ProfilePage() {
 
   return (
     <ProtectedRoute>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-20 min-h-screen font-sans">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 min-h-screen font-sans">
         
         {/* Floating Profile Settings Button */}
         <div className="fixed bottom-4 right-4 sm:bottom-8 sm:right-8 z-[1000] pointer-events-auto">
@@ -422,8 +422,8 @@ export default function ProfilePage() {
         </div>
 
         {/* Header Section */}
-        <section className="mb-12 md:mb-16 flex flex-col items-center justify-center gap-8 lg:gap-12 text-center w-full">
-            <div className="flex-1 space-y-4 md:space-y-6 flex flex-col items-center">
+        <section className="mb-8 md:mb-10 flex flex-col items-center justify-center gap-6 lg:gap-8 text-center w-full">
+            <div className="flex-1 space-y-3 md:space-y-4 flex flex-col items-center">
                  <motion.div 
                    initial={{ x: -50, opacity: 0 }}
                    animate={{ x: 0, opacity: 1 }}
@@ -485,7 +485,7 @@ export default function ProfilePage() {
                   </div>
 
                  {/* Team Code & Action Buttons */}
-                 <div className="flex flex-col items-center lg:items-start gap-6 mt-8">
+                 <div className="flex flex-col items-center lg:items-start gap-4 mt-4">
                      {team ? (
                          <motion.div 
                            initial={{ opacity: 0, y: 20 }}
@@ -537,7 +537,7 @@ export default function ProfilePage() {
                className="p-1 rounded-3xl bg-black shadow-[8px_8px_0_#ff007f] w-full lg:w-fit transform hover:-rotate-1 transition-transform"
             >
                 <div className="bg-white p-6 md:p-8 rounded-[22px]">
-                   <Countdown targetDate="2026-04-10T10:00:00" label="HACKATHON STARTING IN" />
+                   <Countdown targetDate="2026-07-31T10:00:00" label="HACKATHON STARTING IN" />
                 </div>
             </motion.div>
         </section>
@@ -545,7 +545,7 @@ export default function ProfilePage() {
 
 
         {/* Global Action Grid */}
-        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 mb-16">
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 mb-10 md:mb-12">
             {[
                 { label: 'TEAM', desc: 'Member Info', href: '/team', icon: Users, color: 'bg-yellow-400' },
                 { label: 'SUBMIT', desc: 'Upload PDF', href: '/submission', icon: FileCheck, color: 'bg-cyan-400' },
@@ -590,11 +590,11 @@ export default function ProfilePage() {
         </section>
 
         {/* Notifications Bar */}
-        <section className="p-6 md:p-8 rounded-3xl bg-white border-4 border-black shadow-[10px_10px_0_#00f0ff] relative overflow-hidden">
+        <section className="p-4 md:p-6 rounded-3xl bg-white border-4 border-black shadow-[10px_10px_0_#00f0ff] relative overflow-hidden">
              {/* Action Lines Background */}
              <div className="absolute inset-0 opacity-10 [background:repeating-linear-gradient(45deg,#000,#000_2px,transparent_2px,transparent_20px)] pointer-events-none" />
 
-             <div className="flex flex-col md:flex-row items-center gap-6 relative z-10 w-full text-center md:text-left">
+             <div className="flex flex-col md:flex-row items-center gap-4 relative z-10 w-full text-center md:text-left">
                  <motion.div 
                     animate={{ rotate: [0, -10, 10, -10, 10, 0] }}
                     transition={{ duration: 0.5, delay: 2, repeat: Infinity, repeatDelay: 3 }}

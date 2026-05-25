@@ -3,6 +3,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { getAdminAuthHeaders } from "@/lib/adminAuthValidator";
 import { Team } from "@/types";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { 
@@ -43,11 +44,12 @@ export default function AdminDashboard() {
     
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+    const authHeaders = getAdminAuthHeaders();
     
     try {
       const [statsRes, teamsRes] = await Promise.all([
-          fetch('/api/admin/stats', { signal: controller.signal }),
-          fetch('/api/admin/teams?limit=100', { signal: controller.signal })
+          fetch('/api/admin/stats', { signal: controller.signal, headers: authHeaders }),
+          fetch('/api/admin/teams?limit=100', { signal: controller.signal, headers: authHeaders })
       ]);
       
       clearTimeout(timeout);
@@ -93,10 +95,11 @@ export default function AdminDashboard() {
     try {
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 10000);
+        const authHeaders = getAdminAuthHeaders();
         
         const response = await fetch('/api/admin/teams/shortlist', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', ...authHeaders },
             body: JSON.stringify({ teamId, status: !currentStatus }),
             signal: controller.signal
         });

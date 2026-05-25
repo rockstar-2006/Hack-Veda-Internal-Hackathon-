@@ -1,8 +1,30 @@
 import { NextResponse } from "next/server";
+import { checkRateLimit, getClientIP, getRemainingAttempts } from "@/lib/rateLimiter";
 
 export async function POST(request: Request) {
   try {
+    // Rate limiting check
+    const ip = getClientIP(request);
+    if (!checkRateLimit(ip)) {
+      const remaining = getRemainingAttempts(ip);
+      return NextResponse.json(
+        { 
+          success: false, 
+          message: `Too many login attempts. Please try again in 15 minutes.` 
+        }, 
+        { status: 429 }
+      );
+    }
+
     const { email, password } = await request.json();
+
+    // Validate inputs
+    if (!email || !password) {
+      return NextResponse.json(
+        { success: false, message: "Email and password required." }, 
+        { status: 400 }
+      );
+    }
 
     const adminEmail = process.env.ADMIN_EMAIL;
     const adminPassword = process.env.ADMIN_PASSWORD;

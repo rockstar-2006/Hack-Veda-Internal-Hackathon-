@@ -26,94 +26,130 @@ import { useRef } from "react";
 const timelineEvents = [
   { 
     id: 1,
-    date: "2026-04-01", 
-    time: "09:00 AM",
-    title: "Registration Opens", 
-    description: "Start creating your teams and preparing your idea proposals.",
-    icon: Users,
+    date: "2026-07-31", 
+    time: "10:00 AM",
+    title: "Inauguration & Opening", 
+    description: "Grand Inauguration and opening ceremony at MBA Block, SMVITM.",
+    icon: Mic2,
     color: "from-blue-500 to-indigo-600"
   },
   { 
     id: 2,
-    date: "2026-04-06", 
-    time: "11:59 PM",
-    title: "Registration Closes", 
-    description: "Final deadline for team formation and PDF submissions.",
-    icon: Flag,
-    color: "from-rose-500 to-red-600"
-  },
-  { 
-    id: 3,
-    date: "2026-04-08", 
-    time: "10:00 AM",
-    title: "Shortlist Announcement", 
-    description: "The top teams selected for the final hackathon are revealed.",
-    icon: Sparkles,
-    color: "from-amber-400 to-orange-600"
-  },
-  { 
-    id: 4,
-    date: "2026-04-10", 
-    time: "10:00 AM",
-    title: "Grand Inauguration", 
-    description: "Official opening ceremony of Hackveda 2026 at the Auditorium.",
-    icon: Mic2,
-    color: "from-indigo-500 to-purple-600"
-  },
-  { 
-    id: 5,
-    date: "2026-04-10", 
-    time: "12:00 PM",
-    title: "Hackathon Start", 
-    description: "The 24-hour non-stop building phase begins. Good luck!",
+    date: "2026-07-31", 
+    time: "11:00 AM",
+    title: "Hacking Begins!", 
+    description: "Release of the problem statements. The 24-hour hacking timer starts now!",
     icon: Zap,
     color: "from-yellow-400 to-amber-600"
   },
   { 
-    id: 6,
-    date: "2026-04-10", 
-    time: "06:00 PM",
-    title: "Checkpoint 1", 
-    description: "Mentors will visit your table to review progress and guide you.",
+    id: 3,
+    date: "2026-07-31", 
+    time: "01:00 PM - 02:00 PM",
+    title: "Lunch Break", 
+    description: "Fuel up for the marathon coding session ahead.",
     icon: Coffee,
+    color: "from-rose-500 to-red-600"
+  },
+  { 
+    id: 4,
+    date: "2026-07-31", 
+    time: "02:00 PM - 05:00 PM",
+    title: "Coding Session I", 
+    description: "Bring your ideas to life. Design, architect, and begin coding your prototype.",
+    icon: Rocket,
     color: "from-sky-500 to-blue-600"
   },
   { 
-    id: 7,
-    date: "2026-04-11", 
-    time: "10:00 AM",
-    title: "Checkpoint 2", 
-    description: "Final review of your projects before the ultimate submission.",
+    id: 5,
+    date: "2026-07-31", 
+    time: "05:00 PM - 05:45 PM",
+    title: "Tea Break", 
+    description: "Enjoy some refreshments and discuss progress with mentors.",
+    icon: Coffee,
+    color: "from-amber-400 to-orange-600"
+  },
+  { 
+    id: 6,
+    date: "2026-07-31", 
+    time: "06:00 PM",
+    title: "Round 1 Evaluation", 
+    description: "Rigorous evaluation round by expert judges to check concept, design, and plan.",
     icon: Target,
+    color: "from-indigo-500 to-purple-600"
+  },
+  { 
+    id: 7,
+    date: "2026-07-31", 
+    time: "08:00 PM - 09:00 PM",
+    title: "Dinner Break", 
+    description: "Recharge your energy with a delicious dinner.",
+    icon: Coffee,
     color: "from-emerald-400 to-teal-600"
   },
   { 
     id: 8,
-    date: "2026-04-11", 
-    time: "12:00 PM",
-    title: "Final Submission", 
-    description: "All coding stops. Submit your final projects for evaluation.",
+    date: "2026-07-31", 
+    time: "09:00 PM - 12:00 AM",
+    title: "Coding Session II", 
+    description: "Deep hacking into the night. Connect databases and build APIs.",
     icon: Rocket,
-    color: "from-red-500 to-rose-600"
+    color: "from-purple-500 to-indigo-600"
   },
   { 
     id: 9,
-    date: "2026-04-11", 
-    time: "12 PM - 2 PM",
-    title: "Judge Presentation", 
-    description: "Present your hard work to our panel of expert judges.",
-    icon: Award,
-    color: "from-indigo-600 to-violet-700"
+    date: "2026-07-31", 
+    time: "12:00 AM",
+    title: "Midnight Snacks", 
+    description: "A quick boost of energy with snacks for the night owls.",
+    icon: Sparkles,
+    color: "from-pink-500 to-rose-600"
   },
   { 
     id: 10,
-    date: "2026-04-11", 
-    time: "03:00 PM",
-    title: "Awards Ceremony", 
-    description: "The moment of truth. Prizes and certificates are distributed.",
+    date: "2026-08-01", 
+    time: "01:00 AM - 08:00 AM",
+    title: "Coding Session III", 
+    description: "The home stretch. Clean up code, fix bugs, and prepare presentation slide decks.",
+    icon: Rocket,
+    color: "from-cyan-500 to-blue-600"
+  },
+  { 
+    id: 11,
+    date: "2026-08-01", 
+    time: "08:00 AM - 09:00 AM",
+    title: "Tea Break", 
+    description: "Morning hot tea to refresh before the final review rounds.",
+    icon: Coffee,
+    color: "from-yellow-400 to-orange-500"
+  },
+  { 
+    id: 12,
+    date: "2026-08-01", 
+    time: "09:00 AM",
+    title: "Round 2 Evaluation", 
+    description: "Demonstrate your working prototype and address judges' questions.",
+    icon: Target,
+    color: "from-orange-500 to-red-600"
+  },
+  { 
+    id: 13,
+    date: "2026-08-01", 
+    time: "11:00 AM",
+    title: "Round 3 Evaluation", 
+    description: "Final evaluation of shortlisted teams pitching live to the jury.",
+    icon: Award,
+    color: "from-teal-400 to-emerald-600"
+  },
+  { 
+    id: 14,
+    date: "2026-08-01", 
+    time: "12:00 PM",
+    title: "Valedictory Ceremony", 
+    description: "Awards presentation, certificate distribution, and closing remarks.",
     icon: Trophy,
     color: "from-yellow-500 to-orange-500"
-  },
+  }
 ];
 
 function TiltCard({ children, isEven, isToday }: { children: React.ReactNode, isEven: boolean, isToday: boolean }) {
@@ -169,10 +205,10 @@ export default function SchedulePage() {
 
   return (
     <ProtectedRoute>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 md:py-24 min-h-screen pb-32 md:pb-40 relative overflow-hidden font-sans">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 md:py-4 min-h-screen pb-16 relative overflow-hidden font-sans">
         
         {/* Header Section */}
-        <div className="text-center mb-20 md:mb-32 relative z-10">
+        <div className="text-center mb-6 md:mb-8 relative z-10">
              <motion.div 
                initial={{ y: -20, opacity: 0 }}
                animate={{ y: 0, opacity: 1 }}
@@ -198,7 +234,7 @@ export default function SchedulePage() {
                 <div className="absolute inset-0 bg-cyan-400" />
              </div>
 
-             <div className="space-y-16 md:space-y-24">
+             <div className="space-y-8 md:space-y-10">
                   {timelineEvents.map((event, index) => {
                       const isEven = index % 2 === 0;
                       const eventDate = parseISO(event.date);
