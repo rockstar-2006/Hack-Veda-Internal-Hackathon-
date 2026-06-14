@@ -1,0 +1,300 @@
+
+PROPOSAL DOCUMENT
+HACKATHON PREMIER LEAGUE – Season 1
+( H P L )
+Build For Udupi — A 3-Week League of Innovation
+Submitted to:
+Shri Madhwa Vadiraja Institute of Technology and Management (SMVITM), Udupi
+Proposed by:
+CodeTroopers Club, in collaboration with IGNITE, AIKYA, IEEE Student Chapter & ISTE Student Chapter
+Proposed Date:
+15/07/26 to 22/08/26
+1. Introduction
+Hackathons have become a cornerstone of student innovation, but most follow a familiar single-day or 24-hour format that, while exciting, often leads to burnout, rushed solutions, and limited time for genuine problem-solving. The Hackathon Premier League (HPL) reimagines this experience by combining the structure, drama, and sustained excitement of a sports league — modelled on the Indian Premier League (IPL) — with the technical depth of a hackathon.
+Instead of a single intense session, HPL unfolds over three weeks as a ‘season’. Teams (referred to as Squads) compete in weekly head-to-head ‘match days’, progressively building a solution to a problem statement in structured phases, while climbing a live points table. The season culminates in an offline Grand Finale, where the top-performing squads face off for the HPL Championship title.
+This format keeps participants engaged over a longer period, encourages iterative and well-thought-out development (similar to agile sprints), and creates the kind of anticipation, rivalry, and celebration typically associated with a sporting league — making the event memorable for participants, judges, and the institution alike.
+2. Organizing Committee
+2.1 Organizing Clubs & Associations
+HPL will be organised through the existing collaborative network used for the club’s technical events:
+CodeTroopers Club (Lead Organizer)
+IGNITE
+AIKYA
+IEEE Student Chapter
+ISTE Student Chapter
+2.2 Faculty Coordinators
+The following faculty members are proposed to coordinate and oversee HPL, ensuring smooth execution across all three weeks of the season:
+S.No
+Name
+Designation / Department
+1
+Dr. Sadanand L
+Associate Professor & HOD, Computer Science
+2
+Dr. Rajesh Nayak
+Associate Professor & HOD, Machine Learning
+3
+Mr. Chandrashekhar Kuthyar
+Assistant Professor (Selection Grade), Computer Science
+4
+Mr. Sarvesh S Rao
+Assistant Professor, Data Science
+5
+Dr. Rashmi Samanth
+Assistant Professor (Selection Grade), Machine Learning
+2.3 Student Organizers
+The core student organising team driving HPL’s planning, promotion, and on-ground execution:
+S.No
+Name
+Role
+1
+Abhishek Kini
+Club Head, CodeTroopers
+2
+Tejas Nayak
+Workbench Head, CodeTroopers
+3
+Pradyumna U
+President, IGNITE
+4
+Yashwanth V
+President, AIKYA
+5
+Bhushan Poojary
+Organizing Committee Member
+2.4 Proposed Judging Panel & Mentors
+Drawing on the same network of faculty, alumni, and industry professionals engaged for the club’s other technical events, the following mentors and judges are proposed as a starting pool for HPL’s weekly head-to-head evaluations and the Grand Finale. The final panel for each match day and the finale will be drawn from this pool based on availability and track relevance.
+Mentors
+Mentor
+Designation
+Mr. Sumedh Navuda
+Independent Researcher & Dev Intern at Unloadin, India
+Mr. Gautam N Shet
+Pre-sales Data Architect at Niveus Solutions, India
+Mr. Satvik S Bhat
+Software Engineer, Unicourt, India
+Mr. Vikram Poojary
+Junior AI-ML Engineer at EGDK Private Limited, India
+Mr. Akshaykumar Hegde
+Independent Researcher and AI Engineer at 360Labs.ai, India
+Mr. Prathviraj
+Backend Developer at Kamabala Solutions Pvt. Ltd. & Founder of VquinT.in, India
+Mr. Ramachandra
+System Designer at TCS, India
+Mr. Dhanush Shastri
+Physical Design Engineer at Aritrak Technologies Pvt. Ltd., India
+Mr. Yagnesh
+Director at Vrisharya Technologies Private Limited, India
+Ms. K Nivedita Kamath
+Application Developer at Niveus Solutions, India
+Judges
+Judge
+Designation
+Mr. Chandrashekhar Kuthyar
+Assistant Professor (Selection Grade), Computer Science
+Dr. Rajesh Nayak
+Associate Professor & HOD, Machine Learning
+Mr. Raghvendra G.S
+Assistant Professor (Senior), Computer Science
+Mr. Deepak Rao M
+Assistant Professor (Senior), Computer Science
+Mr. Sarvesh S Rao
+Assistant Professor, Data Science
+Mr. Bhushan Poojary
+Organizing Committee Member
+Mr. Tejas Nayak
+Workbench Head, CodeTroopers
+Mr. Abhishek Kini
+Club Head, CodeTroopers
+3. Concept Overview — The HPL Analogy
+The core idea behind HPL is to translate the season-long, competitive, and entertainment-driven structure of the IPL into a technical event. The table below maps familiar IPL elements to their corresponding HPL components, giving stakeholders an immediate sense of how the format works.
+IPL Element
+HPL Equivalent
+Franchise / Team
+A registered Squad of participants competing under a team name of their choice
+Season
+The 3-week duration of the entire event
+Match Day
+Weekly online evaluation round (Saturdays, Weeks 1 & 2)
+Innings / Overs
+Each ‘Phase’ of the problem statement (PS split into 3 parts)
+Head-to-Head Fixture
+Two squads judged relative to each other in the same phase
+Points Table
+Live leaderboard updated after every match day
+Playoffs
+Top 10 squads advancing to the Grand Finale
+Final
+Offline Grand Finale in Week 3
+Player of the Match / MVP
+Standout individual contributor recognition each match day
+Champions Trophy
+HPL Championship title, cash prize, and trophy for the winning squad
+4. Objectives
+The Hackathon Premier League aims to:
+Create a sustained, multi-week engagement model that keeps students invested in problem-solving over time, rather than a single high-pressure day.
+Encourage iterative, sprint-based development by splitting each problem statement into three progressive phases.
+Introduce a fair, transparent, and exciting evaluation system through head-to-head matches and a live points table.
+Foster healthy competition, team spirit, and strategic thinking similar to a sports league environment.
+Provide participants with continuous feedback from judges across multiple rounds, improving learning outcomes.
+Build anticipation and a sense of community through weekly ‘match day’ updates, leaderboards, and a high-energy offline finale.
+Position the institution as an innovator in event formats, offering a unique showcase for sponsors, faculty, and media.
+5. Event Structure
+5.1 Tracks & Problem Statements
+HPL will feature three tracks, each anchored by a single overarching problem statement. Every problem statement is divided into three progressive phases — one per week — so that squads build their solution incrementally, much like a season unfolds match by match. Participants register for one track and commit to all three phases of that track’s problem statement.
+Track
+Theme / Problem Statement
+Phase 1 (Week 1)
+Phase 2 (Week 2)
+Phase 3 (Week 3 – Finale)
+Track A
+[e.g., AI / Machine Learning]
+[Phase 1 scope]
+[Phase 2 scope]
+[Phase 3 scope – final build & demo]
+Track B
+[e.g., Web / App Development]
+[Phase 1 scope]
+[Phase 2 scope]
+[Phase 3 scope – final build & demo]
+Track C
+[e.g., Sustainability / Social Impact]
+[Phase 1 scope]
+[Phase 2 scope]
+[Phase 3 scope – final build & demo]
+Note: Track names, themes, and phase-wise scope are placeholders to be finalised by the organising committee based on relevance and sponsor interests.
+5.2 Team Composition — Squads
+Participants will register in self-formed teams called Squads, with the following composition:
+Squad Size: 5 members per squad — 4 Core Members + 1 Squad Member (an additional member who can be rotated in/out for different phases, similar to IPL’s ‘Impact Player’ concept, allowing flexibility in contribution).
+Self-Formed Teams: Only the Team leader have to register with his team. Team members need not register separatly
+Franchise Identity: Each squad selects a team/franchise name and (optionally) a logo adding a fun, competitive branding element throughout the season.
+5.3 League Format & Duration
+The HPL season runs across 3 weeks, structured as follows:
+Week
+Phase
+Mode
+Key Activity
+Week 1 (Saturday)
+Phase 1
+Online
+Match Day 1 — squads submit Phase 1 deliverables; judges conduct head-to-head evaluations and award points
+Week 2 (Saturday)
+Phase 2
+Online
+Match Day 2 — squads build on Phase 1 work, submit Phase 2 deliverables; head-to-head evaluations continue; points table updates
+Week 3
+Phase 3 — Grand Finale
+Offline (on-campus)
+Top 10 squads (by cumulative points) present their final, complete solution live before a judging panel and audience
+6. Match Format & Scoring System
+Each week, squads within the same track are paired into head-to-head fixtures — similar to league match-ups. Both squads in a fixture submit their work for that week’s phase, and a judging panel evaluates the two submissions relative to each other against a common rubric (see Section 8).
+6.1 Points System
+Points are awarded after each head-to-head match as follows:
+Outcome of Head-to-Head Match
+Points Awarded
+Win (judged superior performance)
+3 points
+Tie (evaluated as equal by judges)
+1 point each
+Loss
+0 points
+Bonus point (exceptional execution / innovation, judge’s discretion)
++1 point
+Note:The judgement criteria will be announced later.
+6.2 The Points Table
+A live, cumulative Points Table is maintained for each track and updated after every match day, showing each squad’s total points, matches played, and net evaluation score (an aggregated judge score used as a tiebreaker, similar to Net Run Rate in the IPL).
+At the end of Week 2, the points tables across all tracks are consolidated. The top 10 squads overall (or a defined number per track, to be finalised by the organising committee) qualify for the Grand Finale — mirroring the IPL Playoffs.
+7. Grand Finale — Week 3 (Offline)
+The Grand Finale brings the top 10 qualifying squads together on campus for a high-energy, in-person culmination of the season.
+Squads present and demo the complete, final version of their solution (Phase 3), incorporating feedback and improvements from Phases 1 and 2.
+A panel of judges — ideally including faculty, industry experts, and special guests — evaluates each presentation live.
+Finale scores are combined with cumulative league points to determine the Final League Table and crown the HPL Champions.
+The event will include an awards ceremony recognising the Champion Squad, Runner-Up, and special individual awards (see Section 9).
+8. Judging Criteria for Final Phase
+A consistent rubric will be used across final head-to-head matche to ensure fairness and transparency:
+Criterion
+Weightage
+Description
+Innovation & Creativity
+25%
+Originality of the idea and approach to the problem statement
+Technical Implementation
+25%
+Quality of execution, code/architecture, and functionality of the solution
+Problem-Solving Approach
+20%
+Clarity of methodology, logic, and how effectively the phase objective is met
+Presentation & Communication
+15%
+Clarity, structure, and confidence in presenting the work and demo
+Progress & Improvement
+15%
+Visible growth and refinement of the solution across phases
+9. Prizes & Recognition
+In keeping with the league spirit, HPL will recognise both team and individual excellence through a mix of cash prizes, trophies, and IPL-style accolades:
+Award
+Recognition
+HPL Champions (Winning Squad)
+Cash prize of 10,000/- + HPL Championship Trophy + Certificates
+Runner-Up Squad
+Cash prize of 6000/- + Certificates+runner up trophy
+2nd Runner-Up
+Cash prize of 4000/-+ Certificates+ trophy
+Player of the Match (per match day)
+Individual recognition certificate + Cash prize of 2000/- 
+Best Debutant (for 2nd year students)
+Cash Prize of 2000/- + certificate for the standout individual contributor across the season
+Best Comeback Squad
+Cash Prize of 2000/- + certificate for best comeback in the season
+All Participants
+Certificates of Participation
+Note: Prize amounts will be finalised based on the approved budget and sponsorship support.
+10. Tentative Timeline
+Activity
+Tentative Timeline
+Proposal approval & planning
+June 3rd week
+Promotion & registrations open
+July 15th ,2026
+Track allocation & squad confirmation
+July 15th to July 30th, 2026
+Match Day 1 (Phase 1, Online)
+August 8th, 2026
+Match Day 2 (Phase 2, Online)
+August 15th ,2026
+Grand Finale (Phase 3, Offline)
+August 21st and 22nd, 2026 
+Awards ceremony & closing
+August 22nd, 2026
+11. Resources & Requirements
+11.1 Venue & Infrastructure
+Venue for the offline Grand Finale: MBA Block, SMVITM Campus (or another suitable campus space with adequate seating for participants, judges, and audience)
+Stable Wi-Fi/internet
+11.2 Platforms & Tools
+Online registration platform - HPL website.
+Submission portal for weekly phase deliverables - GitHub
+Video conferencing tool for online head-to-head judging sessions - Google Meet / HPL website.
+A live, shareable points table / leaderboard updated after each match day- HPL website.
+11.3 Human Resources
+Organising committee for coordination, logistics, and communication across the 3-week season.
+Judging panel — a mix of faculty members and industry professionals or alumni, for both weekly matches and the finale.
+Volunteers for on-ground support during the Grand Finale.
+11.4 Budget Heads (Indicative)
+Items
+Amount(Rs.)
+Cash Prizes and Tropies
+30,000/-
+Dinner + midnight snack + breakfast
+6000/-
+Miscellaneous (prints + deco + logistics)
+4000/-
+12. Expected Outcomes & Benefits
+Higher sustained engagement: A 3-week season generates ongoing buzz and conversation, compared to a one-day event that is quickly forgotten.
+Better quality solutions: Phased development encourages iteration, feedback incorporation, and more polished final products.
+Skill development: Participants experience structured, sprint-style project execution — a valuable, industry-relevant skill.
+Stronger community building: Weekly matches, leaderboards, and rivalries foster a sense of community and excitement similar to following a sports league.
+Enhanced institutional branding: A first-of-its-kind format positions SMVITM as an innovator in student engagement and technical events, with strong potential for media coverage and sponsorships.
+13. Conclusion
+The Hackathon Premier League offers a fresh, engaging, and structured alternative to the traditional one-day hackathon. By borrowing the season-long excitement, fixtures, points table, and finale drama of the IPL, HPL transforms technical competition into an experience that participants will follow, discuss, and remember — much like a sporting season.
+We believe this format will not only deliver stronger technical outcomes through its phased approach, but also significantly boost student engagement, campus energy, and the institution’s reputation as a hub for innovative events. We look forward to your feedback and support in bringing the first season of HPL to life.
+Prepared by: Abhishek kini – Club Head , CodeTroopers Club
+Contact: codetroopers@sode-edu.in

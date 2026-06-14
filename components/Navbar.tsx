@@ -14,11 +14,11 @@ export const Navbar = () => {
           
           <div className="flex items-center gap-6 md:gap-12">
             <Link href="/" className="flex items-center gap-2 md:gap-4 group transition-all transform hover:scale-105 active:scale-95">
-              <div className="bg-yellow-400 p-2 md:p-2.5 rounded-xl border-2 border-black shadow-[2px_2px_0_#000] group-hover:rotate-12 transition-transform duration-500">
-                <Zap className="w-4 h-4 md:w-5 md:h-5 text-black fill-black" />
+              <div className="bg-yellow-400 p-2 md:p-2.5 rounded-xl border-2 border-black shadow-[2px_2px_0_#000] group-hover:rotate-12 transition-transform duration-500 flex items-center justify-center font-bold">
+                🏏
               </div>
               <span className="text-2xl md:text-3xl font-comic text-black tracking-widest drop-shadow-[2px_2px_0_#00f0ff] uppercase">
-                Hack-o-Veda
+                HPL Season 1
               </span>
             </Link>
 

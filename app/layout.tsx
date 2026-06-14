@@ -15,9 +15,9 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Hack-o-Veda 2026 | SMVITM",
-  description: "Official Hack-o-Veda Portal. Design. Build. Lead.",
-  keywords: ["hack-o-veda", "hackathon", "SMVITM", "college", "competition", "coding"],
+  title: "Hackathon Premier League (HPL) - Season 1 | SMVITM",
+  description: "Official Hackathon Premier League Portal - Build For Udupi. A 3-Week League of Innovation.",
+  keywords: ["hpl", "hackathon premier league", "SMVITM", "college", "competition", "coding", "cricket league", "squads"],
 };
 
 export default function RootLayout({

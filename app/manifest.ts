@@ -2,8 +2,8 @@ import { MetadataRoute } from 'next'
  
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'Hack-o-Veda 2026 | SMVITM',
-    short_name: 'Hack-o-Veda',
+    name: 'Hackathon Premier League (HPL) - Season 1 | SMVITM',
+    short_name: 'HPL',
     description: 'Official Innovation & Hackathon Portal of Shri Madhwa Vadiraja Institute of Technology & Management.',
     start_url: '/',
     display: 'standalone',

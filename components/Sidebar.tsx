@@ -28,12 +28,13 @@ import { useRouter } from "next/navigation";
 
 const NAV_ITEMS = [
   { label: "Dashboard", icon: LayoutDashboard, href: "/profile" },
-  { label: "My Team", icon: Users, href: "/team" },
+  { label: "My Squad", icon: Users, href: "/team" },
+  { label: "Points Table", icon: Trophy, href: "/leaderboard" },
   { label: "Submission", icon: FileCheck, href: "/submission" },
   { label: "Schedule", icon: Calendar, href: "/schedule" },
-  { label: "Rules", icon: ShieldQuestion, href: "/rules" },
-  { label: "Prizes", icon: Award, href: "/prizes" },
-  { label: "About", icon: Info, href: "/about" },
+  { label: "Playbook / Rules", icon: ShieldQuestion, href: "/rules" },
+  { label: "Rewards", icon: Award, href: "/prizes" },
+  { label: "About HPL", icon: Info, href: "/about" },
 ];
 
 export const Sidebar = ({ onClose, announcementCount = 1 }: { onClose?: () => void, announcementCount?: number }) => {
@@ -74,14 +75,14 @@ export const Sidebar = ({ onClose, announcementCount = 1 }: { onClose?: () => vo
       {/* Brand & Mobile Close */}
       <div className="mb-10 flex items-center justify-between relative z-10">
            <Link href={isViewingAdmin ? "/admin/dashboard" : "/profile"} className="flex gap-4 group items-center" onClick={onClose}>
-                <div className="bg-yellow-400 p-3 rounded-xl border-4 border-black shadow-[4px_4px_0_#000] group-hover:-translate-y-1 transition-transform">
-                    <Zap className="w-6 h-6 text-black fill-black" />
+                <div className="bg-yellow-400 p-3 rounded-xl border-4 border-black shadow-[4px_4px_0_#000] group-hover:-translate-y-1 transition-transform flex items-center justify-center font-bold text-2xl">
+                    🏏
                 </div>
                 <div className="flex flex-col">
                     <span className="text-4xl font-comic text-black uppercase tracking-widest leading-none drop-shadow-[2px_2px_0_#00f0ff]">
-                        HACKVEDA
+                        HPL 2026
                     </span>
-                    <span className="text-xs font-bold text-gray-600 uppercase tracking-widest leading-none mt-1">Innovation 2026</span>
+                    <span className="text-xs font-bold text-gray-600 uppercase tracking-widest leading-none mt-1">Premier League</span>
                 </div>
            </Link>
            
@@ -189,7 +190,7 @@ export const Sidebar = ({ onClose, announcementCount = 1 }: { onClose?: () => vo
                         )}
                     </div>
                     <div className="flex flex-col truncate">
-                        <span className="text-sm font-comic text-black truncate uppercase tracking-widest leading-none mb-1">{isAdmin ? "HACK-O-VEDA ADMIN" : (user?.displayName?.split(" ")[0] || "HERO")}</span>
+                        <span className="text-sm font-comic text-black truncate uppercase tracking-widest leading-none mb-1">{isAdmin ? "HPL ADMIN" : (user?.displayName?.split(" ")[0] || "HERO")}</span>
                         <div className="flex items-center gap-2">
                              <div className="w-3 h-3 rounded-full bg-green-500 border-2 border-black animate-pulse" />
                              <span className="text-[10px] font-bold text-gray-600 truncate uppercase tracking-widest leading-none">ONLINE</span>

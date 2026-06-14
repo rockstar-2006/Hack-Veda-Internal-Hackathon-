@@ -12,6 +12,8 @@ import { Toast, ToastType } from "./Toast";
 import { db } from "@/lib/firebase";
 import { collection, query, orderBy, limit, onSnapshot } from "firebase/firestore";
 import LiveBackground from "./LiveBackground";
+import { LoadingScreen } from "./LoadingScreen";
+
 
 export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname();
@@ -149,6 +151,9 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className={`min-h-screen bg-[#fffcf0] font-sans ${!isAuthPage ? 'lg:pl-72' : ''} selection:bg-pink-500 selection:text-white relative isolate`}>
 
+      {/* 🏏 LOADING SCREEN — overlays everything on first visit */}
+      <LoadingScreen />
+
       {/* 🚀 THE VIBRANT LIVE BACKGROUND (Z-INDEX: -2) */}
       <div id="live-background-container" className="fixed inset-0 z-[-2] pointer-events-none">
          <LiveBackground />
@@ -160,10 +165,10 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
       {showSidebar && (
         <header className="lg:hidden fixed top-0 left-0 right-0 h-20 border-b-4 border-black px-6 flex items-center justify-between shadow-[0px_4px_0_#000] z-[150] bg-white text-black">
           <div className="flex items-center gap-3">
-            <div className="bg-yellow-400 p-2 rounded-xl border-2 border-black">
-              <Zap className="w-5 h-5 text-black fill-black font-black" />
+            <div className="bg-yellow-400 p-2 rounded-xl border-2 border-black flex items-center justify-center font-bold">
+              🏏
             </div>
-            <span className="text-xl font-comic tracking-tighter uppercase font-black">HACK-O-VEDA</span>
+            <span className="text-xl font-comic tracking-tighter uppercase font-black">HPL SEASON 1</span>
           </div>
           <button
             onClick={(e: React.MouseEvent) => { e.preventDefault(); setIsSidebarOpen(prev => !prev); }}

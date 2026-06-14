@@ -190,7 +190,7 @@ export default function SubmissionPage() {
     </ProtectedRoute>
   );
 
-  const isTeamSizeInvalid = !!(team && (team.memberIds.length < 2 || team.memberIds.length > 4));
+  const isTeamSizeInvalid = !!(team && (team.memberIds.length < 2 || team.memberIds.length > 5));
 
   if (success) {
       return (
@@ -206,7 +206,7 @@ export default function SubmissionPage() {
                            <ShieldCheck className="w-10 h-10 text-white" />
                        </div>
                        <h2 className="text-2xl md:text-4xl font-black text-gray-900 mb-4 tracking-tight uppercase">Submission Received.</h2>
-                       <p className="text-green-700 text-sm md:text-base font-bold mb-10">Your idea has been successfully submitted to Hackveda.</p>
+                       <p className="text-green-700 text-sm md:text-base font-bold mb-10">Your project deliverables have been successfully uploaded for this phase.</p>
                        
                        <div className="flex flex-col sm:flex-row gap-4 justify-center">
                            <Link href="/profile" className="flex-1 max-w-[200px] h-12 bg-gray-900 text-white rounded-xl flex items-center justify-center font-bold uppercase text-xs tracking-widest hover:bg-black transition-all active:scale-95 shadow-md">
@@ -246,39 +246,29 @@ export default function SubmissionPage() {
 
   return (
     <ProtectedRoute>
-      <div className="max-w-4xl mx-auto px-6 py-12 md:py-20 min-h-screen pb-32 font-sans relative">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-5 min-h-screen font-sans relative">
         
-        {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16 text-center md:text-left">
-            <div>
-                 <motion.div 
-                   initial={{ x: -20, opacity: 0 }}
-                   animate={{ x: 0, opacity: 1 }}
-                   className="inline-flex items-center gap-2 bg-yellow-400 text-black px-4 py-2 rounded-xl text-sm font-bold uppercase tracking-widest mb-4 border-4 border-black shadow-[4px_4px_0_#000]"
-                 >
-                      <Zap className="w-5 h-5 fill-black" />
-                      HACKVEDA SUBMISSION
-                 </motion.div>
-                 <h1 className="text-4xl lg:text-6xl font-comic text-black leading-none tracking-widest uppercase mb-2 drop-shadow-[4px_4px_0_#00f0ff]">
-                    UPLOAD OUR <br/><span className="text-white drop-shadow-[4px_4px_0_#000]">PROJECT!</span>
-                 </h1>
-                 <p className="bg-white p-3 inline-block border-4 border-black rounded-xl text-sm font-bold text-gray-800 shadow-[4px_4px_0_#ff007f] transform -rotate-1 mt-4">
-                     Upload your documentation. Only the best survive.
-                 </p>
+        {/* ─── Page Header Bar ─── */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-5">
+          <div className="flex items-center gap-3 flex-wrap">
+            <Link href="/profile" className="flex items-center gap-2 bg-pink-400 text-black px-4 py-2.5 rounded-xl font-comic text-sm uppercase tracking-widest border-4 border-black shadow-[4px_4px_0_#000] hover:-translate-y-0.5 transition-all">
+              <ArrowLeft className="w-4 h-4 stroke-[3]" /> BACK
+            </Link>
+            <div className="flex items-center gap-2 bg-yellow-400 text-black px-3 py-2.5 rounded-xl border-4 border-black shadow-[3px_3px_0_#000]">
+              <Zap className="w-4 h-4 fill-black" />
+              <span className="font-comic text-sm tracking-wider uppercase">HPL SUBMISSION</span>
             </div>
-            {team && (
-                <div className="bg-cyan-400 border-4 border-black p-6 rounded-2xl text-right shadow-[8px_8px_0_#000] relative overflow-hidden group w-full md:w-auto mt-6 md:mt-0 transform rotate-1 hover:rotate-0 transition-transform">
-                    <div className="absolute top-0 right-0 p-4 opacity-20 group-hover:scale-110 transition-transform pointer-events-none">
-                        <Users className="w-16 h-16 text-black" />
-                    </div>
-                    <p className="text-xs font-bold text-black bg-white inline-block px-2 py-1 border-2 border-black rounded-lg uppercase tracking-widest mb-1 relative z-10">Your Team</p>
-                    <p className="text-3xl font-comic text-white drop-shadow-[2px_2px_0_#000] leading-none uppercase tracking-widest mt-2 relative z-10">{team.teamName}</p>
-                    <div className="flex items-center justify-end gap-2 mt-4 relative z-10">
-                         <div className={`w-3 h-3 rounded-full border-2 border-black ${isTeamSizeInvalid ? 'bg-red-500 animate-pulse' : 'bg-green-500'} shadow-[2px_2px_0_#000]`} />
-                         <span className={`text-xs font-bold uppercase tracking-widest ${isTeamSizeInvalid ? 'text-red-900 bg-red-200 px-2 rounded border-2 border-black' : 'text-black'}`}>{team.memberIds.length} Members Active</span>
-                    </div>
-                </div>
-            )}
+            <h1 className="text-3xl md:text-4xl font-comic text-black uppercase drop-shadow-[3px_3px_0_#00f0ff] leading-none">
+              UPLOAD <span className="text-white drop-shadow-[3px_3px_0_#000]">PROJECT!</span>
+            </h1>
+          </div>
+          {team && (
+            <div className="flex items-center gap-3 bg-cyan-400 border-4 border-black px-4 py-2.5 rounded-xl shadow-[4px_4px_0_#000]">
+              <div className={`w-2.5 h-2.5 rounded-full border-2 border-black ${isTeamSizeInvalid ? 'bg-red-500 animate-pulse' : 'bg-green-500'}`} />
+              <span className="font-comic text-base text-black uppercase tracking-wider">{team.teamName}</span>
+              <span className={`text-xs font-black uppercase tracking-widest ${isTeamSizeInvalid ? 'text-red-700' : 'text-black/60'}`}>{team.memberIds.length}/5</span>
+            </div>
+          )}
         </div>
 
         {/* Tab Switcher */}
@@ -316,7 +306,7 @@ export default function SubmissionPage() {
                     </div>
                     <div className="text-center md:text-left bg-white p-4 border-4 border-black rounded-xl w-full">
                         <h4 className="font-comic text-2xl mb-1 tracking-widest uppercase">TEAM SIZE NOT ALLOWED!</h4>
-                        <p className="font-bold text-sm text-gray-800">HackVeda requires teams to have 2 to 4 members. You currently have {team?.memberIds.length}.</p>
+                        <p className="font-bold text-sm text-gray-800">HPL requires squads to have 2 to 5 members. You currently have {team?.memberIds.length}.</p>
                     </div>
                     <Link href="/team" className="h-14 px-8 bg-yellow-400 text-black border-4 border-black rounded-xl flex items-center justify-center font-comic text-lg uppercase tracking-widest shadow-[4px_4px_0_#000] hover:-translate-y-1 hover:shadow-[6px_6px_0_#000] active:translate-y-1 active:shadow-none transition-all md:ml-auto shrink-0 w-full md:w-auto mt-2 md:mt-0">
                         UPDATE TEAM
@@ -472,7 +462,7 @@ export default function SubmissionPage() {
                     <div className="bg-white p-6 border-4 border-black rounded-2xl shadow-[6px_6px_0_#000] transform hover:-translate-y-2 transition-transform mt-4 md:mt-0">
                         <div className="text-yellow-400 font-comic text-5xl tracking-widest drop-shadow-[2px_2px_0_#000]">02.</div>
                         <p className="text-[10px] font-bold text-black uppercase tracking-widest leading-relaxed mt-2 bg-cyan-300 p-2 border-2 border-black rounded">DEADLINE COMPLIANCE</p>
-                        <p className="text-gray-800 font-medium text-xs mt-3">Submissions close securely at 12:00 PM on April 11.</p>
+                        <p className="text-gray-800 font-medium text-xs mt-3">Match Day deliverables must be uploaded before the 05:00 PM deadline.</p>
                     </div>
                     <div className="bg-white p-6 border-4 border-black rounded-2xl shadow-[6px_6px_0_#000] transform hover:-translate-y-2 transition-transform mt-8 md:mt-0">
                         <div className="text-cyan-400 font-comic text-5xl tracking-widest drop-shadow-[2px_2px_0_#000]">03.</div>

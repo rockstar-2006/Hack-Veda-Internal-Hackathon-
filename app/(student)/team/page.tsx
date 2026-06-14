@@ -158,8 +158,8 @@ export default function TeamPage() {
           setToast({ message: "ONLY LEADERS CAN ADD MEMBERS!", type: "error" });
           return;
       }
-      if (members.length >= 4) {
-          setToast({ message: "TEAM IS FULL!", type: "error" });
+      if (members.length >= 5) {
+          setToast({ message: "SQUAD IS FULL (MAX 5 MEMBERS)!", type: "error" });
           return;
       }
 
@@ -237,41 +237,34 @@ export default function TeamPage() {
 
   return (
     <ProtectedRoute>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 lg:py-20 min-h-screen pb-40 relative font-sans">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-5 min-h-screen font-sans">
         
-        {/* Header Section */}
-        <section className="mb-12 flex flex-col lg:flex-row items-center justify-between gap-8">
-            <div className="flex-1 text-center lg:text-left">
-                 <motion.div 
-                   initial={{ x: -20, opacity: 0 }}
-                   animate={{ x: 0, opacity: 1 }}
-                   className="inline-flex items-center gap-2 bg-black text-white px-4 py-2 rounded-xl border-4 border-black mb-4 shadow-[4px_4px_0_#ff007f]"
-                 >
-                      <Zap className="w-5 h-5 text-yellow-400" />
-                      <span className="font-comic text-xl tracking-wider uppercase">Team Hub</span>
-                 </motion.div>
-                 <h1 className="text-6xl md:text-8xl font-comic text-black leading-none drop-shadow-[4px_4px_0_#ff007f] uppercase mb-4">
-                    MY TEAM
-                 </h1>
-                 <p className="text-gray-600 font-bold max-w-xl uppercase text-xs tracking-[0.2em] leading-relaxed">
-                    Collaboration is the key to innovation. Manage your roster and prepare for the hackathon deployment.
-                 </p>
+        {/* ─── Page Header Bar ─── */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-5">
+          <div className="flex items-center gap-3">
+            <Link href="/profile" className="flex items-center gap-2 bg-pink-400 text-black px-4 py-2.5 rounded-xl font-comic text-sm uppercase tracking-widest border-4 border-black shadow-[4px_4px_0_#000] hover:-translate-y-0.5 transition-all">
+              <ArrowLeft className="w-4 h-4 stroke-[3]" /> BACK
+            </Link>
+            <div className="flex items-center gap-2 bg-black text-white px-3 py-2.5 rounded-xl border-4 border-black shadow-[3px_3px_0_#ff007f]">
+              <Zap className="w-4 h-4 text-yellow-400" />
+              <span className="font-comic text-sm tracking-wider uppercase">Team Hub</span>
             </div>
-            
+          </div>
+          <div className="flex items-center gap-3">
+            <h1 className="text-3xl md:text-4xl font-comic text-black leading-none drop-shadow-[3px_3px_0_#ff007f] uppercase">
+              MY <span className="text-white drop-shadow-[3px_3px_0_#000]">TEAM</span>
+            </h1>
             {team && (
-                <div className="bg-white border-4 border-black p-6 rounded-[32px] shadow-[8px_8px_0_#000] min-w-[300px]">
-                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Assigned Unit</p>
-                    <p className="text-4xl font-comic text-black leading-none uppercase">{team.teamName}</p>
-                    <div className="flex items-center gap-2 mt-4">
-                         <div className="w-3 h-3 rounded-full bg-green-500 border-2 border-black animate-pulse" />
-                         <span className="text-[10px] font-black uppercase tracking-widest text-black/60">Deployment Active</span>
-                    </div>
-                </div>
+              <div className="bg-white border-4 border-black px-4 py-2 rounded-xl shadow-[4px_4px_0_#000] flex items-center gap-2">
+                <div className="w-2.5 h-2.5 rounded-full bg-green-500 border-2 border-black animate-pulse" />
+                <span className="font-comic text-base text-black uppercase tracking-wider">{team.teamName}</span>
+              </div>
             )}
-        </section>
+          </div>
+        </div>
 
         {team ? (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
                 
                 {/* Team Members List (Terminal Style) */}
                 <div className="lg:col-span-2 space-y-8">
@@ -302,6 +295,10 @@ export default function TeamPage() {
                                     const classification = (member?.year || teamSnippet?.year) 
                                         ? `${member?.year || teamSnippet?.year} ${member?.branch || teamSnippet?.branch || ""}`.trim()
                                         : "ENGINEERING";
+                                    
+                                    const roleLabel = isLeader 
+                                        ? "Lead" 
+                                        : (index === 4 ? "Impact Player" : "Core");
                                 
                                     return (
                                         <motion.div 
@@ -312,7 +309,7 @@ export default function TeamPage() {
                                             className={`p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 group transition-colors ${isYou ? 'bg-cyan-50' : 'hover:bg-white'}`}
                                         >
                                             <div className="flex items-center gap-4">
-                                                <div className={`w-14 h-14 rounded-2xl border-4 border-black flex items-center justify-center shadow-[4px_4px_0_#000] ${isLeader ? 'bg-yellow-400' : 'bg-white'}`}>
+                                                <div className={`w-14 h-14 rounded-2xl border-4 border-black flex items-center justify-center shadow-[4px_4px_0_#000] ${isLeader ? 'bg-yellow-400' : (index === 4 ? 'bg-emerald-400' : 'bg-white')}`}>
                                                     {isLeader ? <ShieldCheck className="w-8 h-8" /> : <UserCheck className="w-8 h-8" />}
                                                 </div>
                                                 <div>
@@ -329,8 +326,8 @@ export default function TeamPage() {
                                                       <span className="text-[10px] font-black text-gray-300 uppercase mb-1">Classification</span>
                                                       <span className="text-xs font-black text-black uppercase tracking-wider">{classification}</span>
                                                  </div>
-                                                 <div className={`px-6 py-3 rounded-2xl border-4 border-black font-black text-sm uppercase shadow-[4px_4px_0_#000] ${isLeader ? 'bg-black text-yellow-400' : 'bg-white text-black'}`}>
-                                                     {isLeader ? "Lead" : "Member"}
+                                                 <div className={`px-6 py-3 rounded-2xl border-4 border-black font-black text-sm uppercase shadow-[4px_4px_0_#000] ${isLeader ? 'bg-black text-yellow-400' : (index === 4 ? 'bg-emerald-400 text-black animate-pulse' : 'bg-white text-black')}`}>
+                                                     {roleLabel}
                                                  </div>
                                             </div>
                                         </motion.div>
@@ -347,7 +344,7 @@ export default function TeamPage() {
                             </div>
                             <div className="flex-1">
                                 <h4 className="font-comic text-3xl mb-2 tracking-wider uppercase">INCOMPLETE TEAM</h4>
-                                <p className="font-bold text-sm uppercase tracking-widest leading-relaxed opacity-90">HackVeda requires teams to have 2 to 4 members to participate. Your team is currently below the threshold.</p>
+                                <p className="font-bold text-sm uppercase tracking-widest leading-relaxed opacity-90">HPL requires squads to have 2 to 5 members to participate. Your squad is currently below the threshold.</p>
                             </div>
                          </div>
                     )}
@@ -365,7 +362,7 @@ export default function TeamPage() {
                               <h3 className="text-2xl font-comic uppercase tracking-widest">Add Teammate</h3>
                          </div>
 
-                         {team?.memberIds?.length < 4 ? (
+                         {team?.memberIds?.length < 5 ? (
                              <form onSubmit={handleAddTeammate} className="space-y-4">
                                   <input 
                                       type="text"
@@ -418,7 +415,7 @@ export default function TeamPage() {
                              </div>
                              <div className="bg-[#f8f9fa] border-4 border-black p-4 rounded-2xl text-center">
                                  <p className="text-[10px] font-black text-black/30 uppercase mb-1">Members</p>
-                                 <p className="text-xs font-black text-black uppercase">{team?.memberIds?.length || 0}/4</p>
+                                 <p className="text-xs font-black text-black uppercase">{team?.memberIds?.length || 0}/5</p>
                              </div>
                         </div>
 
